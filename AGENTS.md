@@ -39,3 +39,10 @@
 - `Assets/_PrivateAssets/` 内の変更は、サブモジュール側でコミット & push してから、本体側でサブモジュールの更新をコミットする
 - パッケージの追加（`Packages/manifest.json` の変更）は事前に確認すること
 - 変更後はコンパイルエラーが出ないか確認し、変更点を簡潔に説明すること
+
+## コミット規約
+- AIが関わったコミットには、メッセージ末尾に次の行を入れる（GitHubのコントリビューターにClaudeが表示される）
+
+```
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
