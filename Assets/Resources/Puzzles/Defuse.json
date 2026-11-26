@@ -1,0 +1,5 @@
+{
+    "puzzles": [
+        { "gimmick": "Defuse", "type": "Defuse", "text": "パンはパンでも食べられないパンは？", "items": [], "choices": ["フライパン", "メロンパン", "食パン", "あんパン"], "answer": "フライパン" }
+    ]
+}

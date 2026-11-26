@@ -1,0 +1,27 @@
+{
+    "puzzles": [
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["いぬ", "うし", "とり", "ねこ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["あめ", "くも", "そら", "ゆき"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["いちご", "かき", "なし", "もも"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["えんぴつ", "けしごむ", "のり", "はさみ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["あさがお", "さくら", "ひまわり", "ゆり"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["うどん", "おにぎり", "すし", "らーめん"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["いす", "つくえ", "ほんだな", "まど"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["かめ", "さる", "たぬき", "わに"], "choices": [], "answer": "" },
+
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["朝", "昼", "夕方", "夜"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["春", "夏", "秋", "冬"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["月曜", "水曜", "金曜", "日曜"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["1月", "4月", "7月", "12月"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["赤ちゃん", "子ども", "大人", "お年寄り"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["日の出", "正午", "日の入り", "真夜中"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C3", "text": "時間の早い順に押せ", "items": ["たまご", "幼虫", "さなぎ", "チョウ"], "choices": [], "answer": "" },
+
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["アリ", "ネズミ", "イヌ", "ゾウ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["米つぶ", "ビー玉", "りんご", "スイカ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ミリ", "センチ", "メートル", "キロ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["メダカ", "金魚", "マグロ", "クジラ"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["月", "地球", "木星", "太陽"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["自転車", "自動車", "バス", "飛行機"], "choices": [], "answer": "" }
+    ]
+}
