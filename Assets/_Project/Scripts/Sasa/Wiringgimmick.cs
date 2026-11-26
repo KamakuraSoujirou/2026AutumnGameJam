@@ -412,7 +412,7 @@ public class Wiringgimmick : Gimmick
     /// </summary>
     /// <param name="colorName">色名</param>
     /// <param name="color">配線の色</param>
-    /// <returns>読めたら true</returns>
+        switch (colorName == null ? string.Empty : colorName.Trim())
     private static bool TryGetColorFromName(string colorName, out WireColor color)
     {
         switch (colorName == null ? string.Empty : colorName.Trim())
