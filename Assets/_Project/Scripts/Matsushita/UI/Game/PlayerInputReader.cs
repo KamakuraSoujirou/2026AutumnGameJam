@@ -11,7 +11,6 @@ using UnityEngine.InputSystem;
 /// </remarks>
 public class PlayerInputReader : MonoBehaviour
 {
-
     [SerializeField, Tooltip("CPU対戦のとき、どちらのキーセットでもP1を操作できるようにする")] private bool _isCpuMode;
 
     /// <summary>
@@ -39,7 +38,7 @@ public class PlayerInputReader : MonoBehaviour
     }
 
     /// <summary>
-    /// キーボードの入力を調べる
+    /// 毎フレーム、入力を確認する
     /// </summary>
     private void Update()
     {
