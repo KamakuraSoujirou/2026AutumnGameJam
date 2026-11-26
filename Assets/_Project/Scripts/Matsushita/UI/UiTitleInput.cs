@@ -38,6 +38,15 @@ public class UiTitleInput : MonoBehaviour
     }
 
     /// <summary>
+    /// 勝利条件と時間短縮の行を、今の設定に合わせる（タイトルに戻ってきても、前に選んだ値が残るように）
+    /// </summary>
+    private void Start()
+    {
+        GameConfig config = GameConfig.Load();
+        _view.SelectMatchRules(config.WinsToMatch, config.IsShortenEnabled);
+    }
+
+    /// <summary>
     /// キーの入力を調べる
     /// </summary>
     private void Update()
@@ -80,10 +89,11 @@ public class UiTitleInput : MonoBehaviour
     }
 
     /// <summary>
-    /// ゲームスタートを知らせる
+    /// 選んだ勝利条件と時間短縮を設定に入れてから、ゲームスタートを知らせる
     /// </summary>
     private void RequestStart()
     {
+        GameConfig.Load().SetMatchRules(_view.WinsToMatch, _view.IsShortenEnabled);
         Debug.Log($"ゲームスタート（CPU対戦：{_view.IsCpuMode}、CPUの強さ：{_view.CpuLevel}、{_view.WinsToMatch}本先取、時間短縮：{_view.IsShortenEnabled}、読み上げ：{_view.IsVoiceEnabled}）");
         _onStartRequested.Invoke();
     }
