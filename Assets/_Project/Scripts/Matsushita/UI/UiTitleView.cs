@@ -100,6 +100,17 @@ public class UiTitleView : MonoBehaviour
     }
 
     /// <summary>
+    /// 勝利条件と時間短縮の行を、渡されたルールに合わせて選び直す（タイトルに戻ってきたときに、前に選んだ値を出す用）
+    /// </summary>
+    /// <param name="winsToMatch">何本先取か（3以上なら「3本先取」、それ以外は「2本先取」を選ぶ）</param>
+    /// <param name="isShortenEnabled">時間短縮を使うか</param>
+    public void SelectMatchRules(int winsToMatch, bool isShortenEnabled)
+    {
+        _rows[WinRow].Select(winsToMatch >= 3 ? 1 : 0);
+        _rows[ShortenRow].Select(isShortenEnabled ? 0 : 1);
+    }
+
+    /// <summary>
     /// 選んでいる行の選択肢を左右に動かす
     /// </summary>
     /// <param name="delta">左なら -1、右なら 1</param>

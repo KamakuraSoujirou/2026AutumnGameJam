@@ -101,6 +101,18 @@ public class GameConfig
     }
 
     /// <summary>
+    /// タイトルで選んだ対戦ルール（勝利条件と時間短縮）に変える
+    /// Load が返す設定そのものを書き換えるので、シーンが変わっても残る（アプリを閉じるか Play Mode を止めると JSON の値に戻る）
+    /// </summary>
+    /// <param name="winsToMatch">何ラウンド取れば試合に勝つか（1未満なら1にする）</param>
+    /// <param name="isShortenEnabled">時間短縮を使うか</param>
+    public void SetMatchRules(int winsToMatch, bool isShortenEnabled)
+    {
+        roundsToWin = Mathf.Max(1, winsToMatch);
+        isShrinkEnabled = isShortenEnabled;
+    }
+
+    /// <summary>
     /// Play Mode を始めるたびに読み直す（ドメインのリロードを切っていても、JSON の変更が反映されるように）
     /// </summary>
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
