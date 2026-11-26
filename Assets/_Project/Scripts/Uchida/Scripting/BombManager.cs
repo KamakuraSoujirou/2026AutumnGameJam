@@ -1,10 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 /// <summary>
 /// 爆弾本体の進行役。2人の入力をギミックに渡し、パス・時間切れ・勝敗（2本先取）を管理する
-/// 操作：P1 は WASD、P2 は矢印キー。試合が終わったら Space でもう一度
+/// キーやマウスは直接読まない。入力は TryPress と TryRematch で受け取り、受け付けるかどうかはここで決める
 /// </summary>
 public class BombManager : MonoBehaviour
 {
@@ -36,6 +35,25 @@ public class BombManager : MonoBehaviour
     /// 表示を変えるべきこと（持ち手・問題文・勝ち数・状態など）が起きたときに呼ばれる
     /// </summary>
     public event Action OnChanged;
+
+    /// <summary>
+    /// 入力を受け付けたときに、ギミックに渡す前に呼ばれる（ボタンを押した動き用）
+    /// </summary>
+    public event Action<InputDirection> OnPressed;
+
+    /// <summary>
+    /// 不正解のときに呼ばれる（間違えたプレイヤーの番号と、減る秒数）
+    /// </summary>
+    public event Action<int, float> OnMissed;
+
+    /// <summary>受け取るたびに戻す持ち時間（秒）</summary>
+    public float HoldTime => _bombTimer.TimeLimit;
+
+    /// <summary>爆弾が相手に飛んでいく長さ（秒）</summary>
+    public float FlightDuration => _config.FlightDuration;
+
+    /// <summary>何ラウンド取れば試合に勝つか</summary>
+    public int WinsToMatch => _config.WinsToMatch;
 
     /// <summary>今の進行の状態</summary>
     public BombState State => _state;
@@ -78,6 +96,39 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 方向の入力を受け取る。持っている人の入力だけを受け付け、受け取った直後とスタン中は受け付けない
+    /// </summary>
+    /// <param name="player">押したプレイヤーの番号（0 か 1）</param>
+    /// <param name="direction">押された方向</param>
+    /// <returns>受け付けたら true</returns>
+    public bool TryPress(int player, InputDirection direction)
+    {
+        if (_state != BombState.Answering || player != _holder || _lockTimer > 0f || _stunTimer > 0f)
+        {
+            return false;
+        }
+
+        OnPressed?.Invoke(direction);
+        Press(direction);
+        return true;
+    }
+
+    /// <summary>
+    /// 試合が終わっていれば、もう一度始める
+    /// </summary>
+    /// <returns>始めたら true</returns>
+    public bool TryRematch()
+    {
+        if (_state != BombState.MatchOver)
+        {
+            return false;
+        }
+
+        StartMatch();
+        return true;
+    }
+
+    /// <summary>
     /// 設定を読む
     /// </summary>
     private void Awake()
@@ -110,12 +161,10 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 状態ごとに、待ち時間を進めるか入力を受け取る
+    /// 状態ごとに、待ち時間を進める
     /// </summary>
     private void Update()
     {
-        Keyboard keyboard = Keyboard.current;
-
         switch (_state)
         {
             case BombState.RoundStart:
@@ -125,7 +174,7 @@ public class BombManager : MonoBehaviour
                 }
                 break;
             case BombState.Answering:
-                UpdateAnswering(keyboard);
+                TickInputLock();
                 break;
             case BombState.Flying:
                 if (TickPhase())
@@ -137,12 +186,6 @@ public class BombManager : MonoBehaviour
                 if (TickPhase())
                 {
                     FinishRound();
-                }
-                break;
-            case BombState.MatchOver:
-                if (keyboard != null && keyboard.spaceKey.wasPressedThisFrame)
-                {
-                    StartMatch();
                 }
                 break;
         }
@@ -200,10 +243,9 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 持っている人の入力だけをギミックに渡す。受け取った直後とスタン中は受け付けない
+    /// 受け取った直後とスタン中の、入力できない時間を進める
     /// </summary>
-    /// <param name="keyboard">キーボード</param>
-    private void UpdateAnswering(Keyboard keyboard)
+    private void TickInputLock()
     {
         if (_lockTimer > 0f)
         {
@@ -218,16 +260,6 @@ public class BombManager : MonoBehaviour
             {
                 OnChanged?.Invoke();
             }
-        }
-
-        if (keyboard == null || _lockTimer > 0f || _stunTimer > 0f)
-        {
-            return;
-        }
-
-        if (TryGetDirection(keyboard, _holder, out InputDirection direction))
-        {
-            Press(direction);
         }
     }
 
@@ -247,6 +279,7 @@ public class BombManager : MonoBehaviour
             case AnswerResult.Wrong:
                 Debug.Log($"[BombManager] P{_holder + 1} 不正解（{direction}）");
                 _stunTimer = _config.StunDuration;
+                OnMissed?.Invoke(_holder, _config.WrongPenalty);
                 OnChanged?.Invoke();
                 _bombTimer.Subtract(_config.WrongPenalty);
                 break;
@@ -331,44 +364,5 @@ public class BombManager : MonoBehaviour
     private int GetOpponent(int player)
     {
         return (player + 1) % PlayerCount;
-    }
-
-    /// <summary>
-    /// そのプレイヤーのキーで、この瞬間に押された方向を調べる（P1 は WASD、P2 は矢印キー）
-    /// </summary>
-    /// <param name="keyboard">キーボード</param>
-    /// <param name="player">プレイヤーの番号</param>
-    /// <param name="direction">押された方向</param>
-    /// <returns>方向キーが押されていれば true</returns>
-    private bool TryGetDirection(Keyboard keyboard, int player, out InputDirection direction)
-    {
-        bool isP1 = player == 0;
-        direction = InputDirection.Up;
-
-        if ((isP1 ? keyboard.wKey : keyboard.upArrowKey).wasPressedThisFrame)
-        {
-            direction = InputDirection.Up;
-            return true;
-        }
-
-        if ((isP1 ? keyboard.sKey : keyboard.downArrowKey).wasPressedThisFrame)
-        {
-            direction = InputDirection.Down;
-            return true;
-        }
-
-        if ((isP1 ? keyboard.aKey : keyboard.leftArrowKey).wasPressedThisFrame)
-        {
-            direction = InputDirection.Left;
-            return true;
-        }
-
-        if ((isP1 ? keyboard.dKey : keyboard.rightArrowKey).wasPressedThisFrame)
-        {
-            direction = InputDirection.Right;
-            return true;
-        }
-
-        return false;
     }
 }
