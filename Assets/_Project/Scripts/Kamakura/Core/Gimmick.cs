@@ -5,6 +5,19 @@ using UnityEngine;
 /// </summary>
 public abstract class Gimmick : MonoBehaviour
 {
+    [SerializeField, Tooltip("ラウンド開始のバナーと画面下に出すギミックの名前（例：暗号ロック式）")] private string _displayName;
+    [SerializeField, Tooltip("ラウンド開始のバナーに出す一行説明")] private string _description;
+
+    /// <summary>
+    /// ギミックの名前（空なら、画面側の仮の名前を出す）
+    /// </summary>
+    public virtual string DisplayName => _displayName;
+
+    /// <summary>
+    /// ギミックの一行説明
+    /// </summary>
+    public virtual string Description => _description;
+
     /// <summary>
     /// 液晶に出す問題文
     /// </summary>
