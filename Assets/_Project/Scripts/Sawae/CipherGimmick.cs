@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ギミック2：暗号。3文字の暗号（B1〜B5）を解いて、上下左右のボタン（○△□☆）で入力する。
+/// ギミック2：暗号。4文字の暗号（B1〜B5）を解いて、上下左右のボタン（○△□☆）で入力する。
 /// 入力は爆弾本体から Answer() で受け取る。謎の作り方は CipherPuzzle に書く
 /// </summary>
 public class CipherGimmick : Gimmick
@@ -81,7 +81,7 @@ public class CipherGimmick : Gimmick
     }
 
     /// <summary>
-    /// ボタンが押されたときに呼ばれる。途中まで合っていればContinue、3文字そろえばCorrect、間違えたらWrong
+    /// ボタンが押されたときに呼ばれる。途中まで合っていればContinue、4文字そろえばCorrect、間違えたらWrong
     /// </summary>
     /// <param name="direction">押された方向</param>
     /// <returns>入力の結果</returns>

@@ -8,9 +8,9 @@ using System.Collections.Generic;
 public class CipherPuzzle
 {
     /// <summary>
-    /// 答えの長さ（3文字）
+    /// 答えの長さ（4文字。Notion「謎B：暗号」のとおり、4つの記号を1回ずつ全部入力する）
     /// </summary>
-    public const int AnswerLength = 3;
+    public const int AnswerLength = 4;
 
     // B3 計算で使う数字の範囲（ボタンは1〜4）
     private const int MinNumber = 1;
@@ -28,8 +28,8 @@ public class CipherPuzzle
     // B2 対応表に使うひらがなの候補（ここに足すと種類が増える）
     private static readonly string[] KanaPool = { "あ", "か", "さ", "た", "な", "は", "ま", "や" };
 
-    // B5 数える：多い順に並べたときの個数（1位が3個、2位が2個、3位が1個）
-    private static readonly int[] CountOrder = { 3, 2, 1 };
+    // B5 数える：多い順に並べたときの個数（1位が4個、2位が3個、3位が2個、4位が1個）
+    private static readonly int[] CountOrder = { 4, 3, 2, 1 };
 
     /// <summary>
     /// 謎を作る（外からは Create() を使う）
@@ -98,18 +98,18 @@ public class CipherPuzzle
     // ============================================================
 
     /// <summary>
-    /// B1 そのまま：「△○☆」をそのまま入力する
+    /// B1 そのまま：「△○☆□」をそのまま入力する
     /// </summary>
     /// <returns>作った謎</returns>
     private static CipherPuzzle CreateSame()
     {
-        InputDirection[] answers = CreateRandomDirections();
+        InputDirection[] answers = CreateShuffledDirections();
         string question = $"「{ToSymbolText(answers)}」をそのまま入力";
         return new CipherPuzzle(question, CreateSymbolLabels(), answers);
     }
 
     /// <summary>
-    /// B2 対応表：「あ＝○ か＝△ さ＝□ た＝☆」と「さかた」→ □△☆
+    /// B2 対応表：「あ＝○ か＝△ さ＝□ た＝☆」と「さかたあ」→ □△☆○
     /// </summary>
     /// <returns>作った謎</returns>
     private static CipherPuzzle CreateTable()
@@ -126,7 +126,7 @@ public class CipherPuzzle
             tableEntries[i] = $"{kanaList[i]}＝{SymbolLabels[(int)tableDirections[i]]}";
         }
 
-        // 出題する言葉：表の4つのうち3つを、ランダムな順で使う
+        // 出題する言葉：表の4つを全部、ランダムな順で使う
         int[] pickOrder = { 0, 1, 2, 3 };
         Shuffle(pickOrder);
 
@@ -143,21 +143,19 @@ public class CipherPuzzle
     }
 
     /// <summary>
-    /// B3 計算：「1+1、4−1、2×2」→ 2・3・4（ボタンは1〜4）
+    /// B3 計算：「1+1、4−1、2×2、3−2」→ 2・3・4・1（ボタンは1〜4。答えは1〜4を1回ずつ）
     /// </summary>
     /// <returns>作った謎</returns>
     private static CipherPuzzle CreateCalc()
     {
-        InputDirection[] answers = new InputDirection[AnswerLength];
+        InputDirection[] answers = CreateShuffledDirections();
         string[] expressions = new string[AnswerLength];
 
         for (int i = 0; i < AnswerLength; i++)
         {
-            int result = UnityEngine.Random.Range(MinNumber, MaxNumber + 1);
+            // InputDirection の並び（0〜3番目）を 1〜4 に当てはめる
+            int result = Array.IndexOf(AllDirections, answers[i]) + MinNumber;
             expressions[i] = CreateExpression(result);
-
-            // 1〜4 を InputDirection の並び（0〜3番目）に当てはめる
-            answers[i] = AllDirections[result - MinNumber];
         }
 
         string question = string.Join("、", expressions);
@@ -165,12 +163,12 @@ public class CipherPuzzle
     }
 
     /// <summary>
-    /// B4 逆順：「☆□○ を逆から」→ ○□☆
+    /// B4 逆順：「☆□○△ を逆から」→ △○□☆
     /// </summary>
     /// <returns>作った謎</returns>
     private static CipherPuzzle CreateReverse()
     {
-        InputDirection[] shown = CreateRandomDirections();
+        InputDirection[] shown = CreateShuffledDirections();
         InputDirection[] answers = (InputDirection[])shown.Clone();
         Array.Reverse(answers);
 
@@ -179,12 +177,12 @@ public class CipherPuzzle
     }
 
     /// <summary>
-    /// B5 数える：記号を3個・2個・1個ずつ混ぜて出し、多い順に入力する
+    /// B5 数える：記号を4個・3個・2個・1個ずつ混ぜて出し、多い順に入力する
     /// </summary>
     /// <returns>作った謎</returns>
     private static CipherPuzzle CreateCount()
     {
-        // 先頭の3つを使う（先頭ほど個数が多い）
+        // 4つ全部を使う（先頭ほど個数が多い）
         InputDirection[] picked = CreateShuffledDirections();
 
         InputDirection[] answers = new InputDirection[AnswerLength];
@@ -268,22 +266,6 @@ public class CipherPuzzle
         }
 
         return text;
-    }
-
-    /// <summary>
-    /// 方向をランダムに選んで、答えの長さぶん並べる（同じ方向が重なってもよい）
-    /// </summary>
-    /// <returns>方向の並び</returns>
-    private static InputDirection[] CreateRandomDirections()
-    {
-        InputDirection[] directions = new InputDirection[AnswerLength];
-
-        for (int i = 0; i < directions.Length; i++)
-        {
-            directions[i] = AllDirections[UnityEngine.Random.Range(0, AllDirections.Length)];
-        }
-
-        return directions;
     }
 
     /// <summary>
