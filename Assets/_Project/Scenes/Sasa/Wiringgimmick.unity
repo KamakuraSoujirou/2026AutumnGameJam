@@ -1867,7 +1867,6 @@ MonoBehaviour:
   _downText: {fileID: 1009618377}
   _leftText: {fileID: 1097463523}
   _rightText: {fileID: 656505946}
-  _logic: {fileID: 1595359629}
 --- !u!114 &1595359629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1880,9 +1879,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7af0ca69635be741a40c0540649f94d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wiringgimmick
-  _Question: {fileID: 1153417313}
+  _view: {fileID: 1595359628}
+  _questionLabel: {fileID: 1153417313}
   _serialNumberText: {fileID: 666282331}
   _lampText: {fileID: 1366174990}
+  _stage1Types: 00000000
+  _stage2Types: 0000000001000000
+  _stage3Types: 0100000002000000
+  _stage4Types: 0200000003000000
 --- !u!1 &1668908587
 GameObject:
   m_ObjectHideFlags: 0
