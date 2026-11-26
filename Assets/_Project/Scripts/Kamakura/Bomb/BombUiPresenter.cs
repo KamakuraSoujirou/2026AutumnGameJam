@@ -14,8 +14,8 @@ public class BombUiPresenter : MonoBehaviour
     [SerializeField] private BombManager _bombManager;
     [SerializeField] private BombTimer _bombTimer;
     [SerializeField] private UiGameView _view;
-    [SerializeField] private string _gimmickName = "テスト";
-    [SerializeField] private string _gimmickDescription = "出ている順に方向を押せ！";
+    [SerializeField, Tooltip("ギミックに名前が付いていないときに出す名前")] private string _gimmickName = "テスト";
+    [SerializeField, Tooltip("ギミックに説明が付いていないときに出す説明")] private string _gimmickDescription = "出ている順に方向を押せ！";
 
     private BombState? _shownState;
     private int _shownHolder = BombManager.NoPlayer;
@@ -104,17 +104,32 @@ public class BombUiPresenter : MonoBehaviour
     {
         int round = _bombManager.GetWins(0) + _bombManager.GetWins(1) + 1;
 
+        // そのラウンドのギミックの名前と説明。ギミックに付いていなければ、仮の名前と説明を出す
+        string gimmickName = OrDefault(_bombManager.GimmickName, _gimmickName);
+        string gimmickDescription = OrDefault(_bombManager.GimmickDescription, _gimmickDescription);
+
         _view.ResetEffects();
         ResetBomb();
         _view.SetRound(round);
         _view.SetPlayerNames("P1", "P2");
-        _view.SetGimmickName(_gimmickName);
+        _view.SetGimmickName(gimmickName);
         ShowWins();
         _view.SetPass(1, 1);
         _view.SetHoldTime(_bombManager.HoldTime);
         ShowHolder(_bombManager.Holder);
         ShowTime(_bombManager.HoldTime);
-        _view.ShowBanner($"ROUND {round}", _gimmickName, _gimmickDescription);
+        _view.ShowBanner($"ROUND {round}", gimmickName, gimmickDescription);
+    }
+
+    /// <summary>
+    /// 文字が空なら、代わりの文字を返す
+    /// </summary>
+    /// <param name="text">使いたい文字</param>
+    /// <param name="fallback">空のときに使う文字</param>
+    /// <returns>text か fallback</returns>
+    private static string OrDefault(string text, string fallback)
+    {
+        return string.IsNullOrEmpty(text) ? fallback : text;
     }
 
     /// <summary>

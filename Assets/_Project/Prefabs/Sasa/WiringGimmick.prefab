@@ -583,7 +583,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7af0ca69635be741a40c0540649f94d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Wiringgimmick
+  _displayName: "\u914D\u7DDA\u5207\u65AD\u5F0F"
+  _description: "\u6B63\u3057\u3044\u7DDA\u30921\u672C\u5207\u308C\uFF01"
   _view: {fileID: 8751206977099324813}
+  _bombView: {fileID: 0}
   _questionLabel: {fileID: 0}
   _serialNumberText: {fileID: 60494800109329422}
   _lampText: {fileID: 1004825120078938363}

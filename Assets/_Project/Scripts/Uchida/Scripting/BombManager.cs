@@ -83,6 +83,12 @@ public class BombManager : MonoBehaviour
     /// <summary>今の問題文</summary>
     public string QuestionText => _gimmick.QuestionText;
 
+    /// <summary>今のギミックの名前（空なら決まっていない）</summary>
+    public string GimmickName => _gimmick.DisplayName;
+
+    /// <summary>今のギミックの一行説明</summary>
+    public string GimmickDescription => _gimmick.Description;
+
     /// <summary>今の待ち時間（開始・飛行・爆発）がどこまで進んだか（0〜1）</summary>
     public float PhaseProgress => _phaseDuration > 0f ? 1f - Mathf.Clamp01(_phaseTimer / _phaseDuration) : 1f;
 

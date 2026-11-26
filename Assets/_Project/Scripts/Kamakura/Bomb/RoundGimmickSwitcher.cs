@@ -21,6 +21,16 @@ public class RoundGimmickSwitcher : Gimmick
     public Gimmick Current => _current;
 
     /// <summary>
+    /// 今のラウンドのギミックの名前
+    /// </summary>
+    public override string DisplayName => _current != null ? _current.DisplayName : base.DisplayName;
+
+    /// <summary>
+    /// 今のラウンドのギミックの一行説明
+    /// </summary>
+    public override string Description => _current != null ? _current.Description : base.Description;
+
+    /// <summary>
     /// 液晶に出す問題文
     /// </summary>
     public override string QuestionText => _current != null ? _current.QuestionText : string.Empty;
