@@ -812,7 +812,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BombManager
   _bombTimer: {fileID: 484021773}
-  _gimmick: {fileID: 484021772}
+  _gimmick: {fileID: 953167110}
 --- !u!114 &484021772
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1394,6 +1394,118 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 878634810}
   m_CullTransparentMesh: 1
+--- !u!1001 &953167109
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 94693178185811625, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: _bombManager
+      value: 
+      objectReference: {fileID: 484021771}
+    - target: {fileID: 909241418677910049, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_Name
+      value: GimmickSet
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+--- !u!114 &953167110 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 94693178185811625, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+  m_PrefabInstance: {fileID: 953167109}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b2ec2e040a7b14408687077044692f2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoundGimmickSwitcher
 --- !u!1 &1068926843
 GameObject:
   m_ObjectHideFlags: 0
@@ -1989,3 +2101,4 @@ SceneRoots:
   - {fileID: 484021774}
   - {fileID: 796534364}
   - {fileID: 1147111097}
+  - {fileID: 953167109}
