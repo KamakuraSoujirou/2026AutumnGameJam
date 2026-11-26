@@ -243,6 +243,31 @@ MonoBehaviour:
     _size: {x: 270, y: 270}
     _fileName: button_green
     _sprite: {fileID: 0}
+  - _id: ART-21
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u80CC\u666F"
+    _size: {x: 1920, y: 1080}
+    _fileName: result_bg
+    _sprite: {fileID: 0}
+  - _id: ART-11_p1_win
+    _label: "\u30AD\u30E3\u30E9 P1\uFF08\u52DD\u3061\u9854\uFF09"
+    _size: {x: 600, y: 900}
+    _fileName: chr_p1_win
+    _sprite: {fileID: 0}
+  - _id: ART-11_p2_win
+    _label: "\u30AD\u30E3\u30E9 P2\uFF08\u52DD\u3061\u9854\uFF09"
+    _size: {x: 600, y: 900}
+    _fileName: chr_p2_win
+    _sprite: {fileID: 0}
+  - _id: UI-19
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u8868\u306E\u67A0"
+    _size: {x: 700, y: 730}
+    _fileName: ui_result_table
+    _sprite: {fileID: 0}
+  - _id: UI-20
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u30DC\u30BF\u30F3\uFF08\u6B21\u3078\u30FB\u30EA\u30B9\u30BF\u30FC\u30C8\u30FB\u30BF\u30A4\u30C8\u30EB\u3078\uFF09"
+    _size: {x: 480, y: 110}
+    _fileName: ui_result_button
+    _sprite: {fileID: 0}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}
   _bodyFont: {fileID: 0}

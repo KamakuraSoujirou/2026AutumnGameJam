@@ -66,6 +66,24 @@ public class UiSkin : ScriptableObject
     }
 
     /// <summary>
+    /// 画像がまだ入っていない登録だけを消す（使わなくなった素材IDの片付け用。エディタの組み立て用）
+    /// </summary>
+    /// <param name="id">消す素材ID</param>
+    /// <returns>消したら true</returns>
+    public bool RemoveEntryIfEmpty(string id)
+    {
+        UiSkinEntry entry = FindEntry(id);
+
+        if (entry == null || entry.Sprite != null)
+        {
+            return false;
+        }
+
+        _entries.Remove(entry);
+        return true;
+    }
+
+    /// <summary>
     /// 同じIDがまだなければ登録を足す（エディタの組み立て用）
     /// </summary>
     /// <param name="entry">足す登録</param>

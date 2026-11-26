@@ -9,7 +9,7 @@ using UnityEngine.UI;
 /// <summary>
 /// UIの仮組みをメニューから作る。素材がなくても仮の四角で画面が成立し、UiSkin に画像を入れれば差し替わる
 /// </summary>
-public static class UiMockBuilder
+public static partial class UiMockBuilder
 {
     private const string PrefabFolder = "Assets/_Project/Prefabs/Matsushita/UI";
     private const string SceneFolder = "Assets/_Project/Scenes/Matsushita";
@@ -564,6 +564,21 @@ public static class UiMockBuilder
             isChanged |= skin.AddEntryIfMissing(entry);
         }
 
+        foreach (UiSkinEntry entry in CreateGameEntries())
+        {
+            isChanged |= skin.AddEntryIfMissing(entry);
+        }
+
+        foreach (UiSkinEntry entry in CreateResultEntries())
+        {
+            isChanged |= skin.AddEntryIfMissing(entry);
+        }
+
+        foreach (string staleId in StaleArtIds)
+        {
+            isChanged |= skin.RemoveEntryIfEmpty(staleId);
+        }
+
         if (isChanged)
         {
             EditorUtility.SetDirty(skin);
@@ -645,7 +660,8 @@ public static class UiMockBuilder
     /// </summary>
     /// <param name="prefab">置くプレハブ</param>
     /// <param name="scenePath">保存先</param>
-    private static void CreatePreviewScene(GameObject prefab, string scenePath)
+    /// <param name="onInstantiated">プレハブをシーンに置いた直後に呼ぶ処理（確認用の部品を足すなど）。不要なら null</param>
+    private static void CreatePreviewScene(GameObject prefab, string scenePath, System.Action<GameObject> onInstantiated = null)
     {
         Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
 
@@ -657,7 +673,8 @@ public static class UiMockBuilder
         camera.backgroundColor = Color.black;
         SceneManager.MoveGameObjectToScene(cameraObject, scene);
 
-        PrefabUtility.InstantiatePrefab(prefab, scene);
+        GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, scene);
+        onInstantiated?.Invoke(instance);
         EditorSceneManager.SaveScene(scene, scenePath);
         EditorSceneManager.CloseScene(scene, true);
     }

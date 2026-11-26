@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
 using UnityEngine.UI;
 
 /// <summary>
@@ -63,7 +61,7 @@ public class UiTitleView : MonoBehaviour
     /// </summary>
     private void Awake()
     {
-        EnsureEventSystem();
+        UiEventSystem.Ensure();
 
         for (int i = 0; i < _rows.Length; i++)
         {
@@ -125,7 +123,7 @@ public class UiTitleView : MonoBehaviour
         _focusIndex = rowIndex;
         RefreshFocus();
         RefreshCpuLevelRow();
-        ClearUiSelection();
+        UiEventSystem.ClearSelection();
     }
 
     /// <summary>
@@ -135,34 +133,8 @@ public class UiTitleView : MonoBehaviour
     {
         _focusIndex = _rows.Length;
         RefreshFocus();
-        ClearUiSelection();
+        UiEventSystem.ClearSelection();
         StartClicked?.Invoke();
-    }
-
-    /// <summary>
-    /// クリックしたボタンが選択されたままだと、Space や Enter でもう一度押されてしまうので解除する
-    /// </summary>
-    private void ClearUiSelection()
-    {
-        if (EventSystem.current != null)
-        {
-            EventSystem.current.SetSelectedGameObject(null);
-        }
-    }
-
-    /// <summary>
-    /// シーンに EventSystem がなければ作る（これがないとクリックが届かない）
-    /// </summary>
-    private static void EnsureEventSystem()
-    {
-        if (FindAnyObjectByType<EventSystem>() != null)
-        {
-            return;
-        }
-
-        GameObject eventSystemObject = new GameObject("EventSystem", typeof(EventSystem));
-        InputSystemUIInputModule inputModule = eventSystemObject.AddComponent<InputSystemUIInputModule>();
-        inputModule.AssignDefaultActions();
     }
 
     /// <summary>
