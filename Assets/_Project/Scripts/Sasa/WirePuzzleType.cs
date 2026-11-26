@@ -1,5 +1,5 @@
 /// <summary>
-/// 配線の謎の種類（できているものだけ。T3 はまだ）。
+/// 配線の謎の種類（T1〜T8）。
 /// プレハブには番号で保存されるので、足すときは必ず最後に足す
 /// </summary>
 public enum WirePuzzleType
@@ -23,5 +23,8 @@ public enum WirePuzzleType
     Memory,
 
     /// <summary>T6 逆さ読み（「れきをりどみ」→ みどりをきれ → 緑の線）</summary>
-    Reverse
+    Reverse,
+
+    /// <summary>T3 連想（「空と海に共通する色」→ 青の線。問題は Resources/Puzzles/WireAssociation.json）</summary>
+    Association
 }

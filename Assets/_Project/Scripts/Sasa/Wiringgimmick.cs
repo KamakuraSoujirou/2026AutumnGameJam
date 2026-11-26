@@ -14,6 +14,9 @@ public class Wiringgimmick : Gimmick
     // 線の本数（上下左右）
     private const int WireCount = 4;
 
+    // T3 連想の、JSON での種類名
+    private const string AssociationType = "T3";
+
     // T7 仲間外れの記号版で使う記号
     private static readonly string[] OddOneOutSymbols = { "○", "△", "□", "☆" };
 
@@ -30,12 +33,11 @@ public class Wiringgimmick : Gimmick
     [SerializeField] private Text _serialNumberText;
     [SerializeField] private Text _lampText;
 
-    // 難易度ごとに出す謎の種類（Notion の表から、できているものだけ）
-    // 段3・段4の T3 はまだないので入れていない
+    // 難易度ごとに出す謎の種類（Notion「難易度の段階」の表のとおり）
     [SerializeField] private WirePuzzleType[] _stage1Types = { WirePuzzleType.ColorMark };
     [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord, WirePuzzleType.OddOneOut };
-    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Serial, WirePuzzleType.Memory };
-    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.Reverse, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Association, WirePuzzleType.Serial, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Association, WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.Reverse, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
 
     private int _serialNumber;
     // ランプの点灯状態
@@ -63,6 +65,9 @@ public class Wiringgimmick : Gimmick
     private InputDirection _lastCutDirection;
     private WireColor _lastCutColor;
 
+    // T3 連想の問題（初めて使うときに読む）
+    private PuzzleDatabase _associationDatabase;
+
     /// <summary>
     /// 現在の配線色
     /// </summary>
@@ -77,6 +82,22 @@ public class Wiringgimmick : Gimmick
     /// 次に押すと正解の方向
     /// </summary>
     public override InputDirection NextAnswer => _nextAnswer;
+
+    /// <summary>
+    /// T3 連想の問題（Resources/Puzzles/WireAssociation.json）。初めて使うときに読む
+    /// </summary>
+    private PuzzleDatabase AssociationDatabase
+    {
+        get
+        {
+            if (_associationDatabase == null)
+            {
+                _associationDatabase = new PuzzleDatabase(PuzzleDatabase.WireAssociationPath);
+            }
+
+            return _associationDatabase;
+        }
+    }
 
     /// <summary>
     /// ラウンドの最初に呼ばれる。同じ種類の連続回数を数え直し、切った線の記憶（T8）も消す
@@ -149,6 +170,9 @@ public class Wiringgimmick : Gimmick
             case WirePuzzleType.Lamp:
                 CreateT5Puzzle();
                 break;
+            case WirePuzzleType.Association:
+                CreateT3Puzzle();
+                break;
             case WirePuzzleType.Reverse:
                 CreateT6Puzzle();
                 break;
@@ -179,7 +203,13 @@ public class Wiringgimmick : Gimmick
             candidates.Remove(WirePuzzleType.Memory);
         }
 
-        // T8 しかない段階で T8 が出せないときは、T1 を出す
+        // T3 連想は、JSON に問題が1問もなければ出さない
+        if (candidates.Contains(WirePuzzleType.Association) && AssociationDatabase.GetPuzzles(AssociationType).Count == 0)
+        {
+            candidates.Remove(WirePuzzleType.Association);
+        }
+
+        // 出せる種類がなくなったときは、T1 を出す
         if (candidates.Count == 0)
         {
             candidates.Add(WirePuzzleType.ColorMark);
@@ -355,6 +385,58 @@ public class Wiringgimmick : Gimmick
         {
             // 消灯：★と同じ方向
             _nextAnswer = starDirection;
+        }
+    }
+
+    /// <summary>
+    /// T3 連想問題を生成する。JSON の問題文をそのまま出し、answer の色の線を正解にする
+    /// </summary>
+    private void CreateT3Puzzle()
+    {
+        PuzzleData puzzle = AssociationDatabase.Draw(AssociationType);
+
+        if (puzzle == null || !TryGetColorFromName(puzzle.Answer, out WireColor color))
+        {
+            Debug.LogWarning($"[配線] T3 連想の答え「{puzzle?.Answer}」が色名（赤・青・黄・緑）ではないので、T1 を出します");
+            CreateT1Puzzle();
+            return;
+        }
+
+        _targetColor = color;
+        _questionText = puzzle.Text;
+        _nextAnswer = GetDirectionFromColor(color);
+    }
+
+    /// <summary>
+    /// JSON に書いた色名を配線の色に変える（赤・青・黄・緑。ひらがなと「黄色」も読める）
+    /// </summary>
+    /// <param name="colorName">色名</param>
+    /// <param name="color">配線の色</param>
+    /// <returns>読めたら true</returns>
+    private static bool TryGetColorFromName(string colorName, out WireColor color)
+    {
+        switch (colorName.Trim())
+        {
+            case "赤":
+            case "あか":
+                color = WireColor.Red;
+                return true;
+            case "青":
+            case "あお":
+                color = WireColor.Blue;
+                return true;
+            case "黄":
+            case "黄色":
+            case "きいろ":
+                color = WireColor.Yellow;
+                return true;
+            case "緑":
+            case "みどり":
+                color = WireColor.Green;
+                return true;
+            default:
+                color = WireColor.Red;
+                return false;
         }
     }
 
