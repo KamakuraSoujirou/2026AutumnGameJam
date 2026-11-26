@@ -14,12 +14,12 @@ public class BombManager : MonoBehaviour
     /// <summary>まだ決まっていないことを表す番号</summary>
     public const int NoPlayer = -1;
 
-    [SerializeField] private GameConfig _config;
     [SerializeField] private BombTimer _bombTimer;
     [SerializeField] private Gimmick _gimmick;
 
     private readonly int[] _wins = new int[PlayerCount];
 
+    private GameConfig _config;
     private BombState _state;
     private int _holder;
     private int _flightTarget;
@@ -75,6 +75,14 @@ public class BombManager : MonoBehaviour
     public int GetWins(int player)
     {
         return _wins[player];
+    }
+
+    /// <summary>
+    /// 設定を読む
+    /// </summary>
+    private void Awake()
+    {
+        _config = GameConfig.Load();
     }
 
     /// <summary>
@@ -181,7 +189,7 @@ public class BombManager : MonoBehaviour
     {
         _holder = player;
         _receiveCount++;
-        _stage = DifficultyCalculator.GetStage(_receiveCount);
+        _stage = DifficultyCalculator.GetStage(_receiveCount, _config.StagePasses);
         _gimmick.CreatePuzzle(_stage);
         _lockTimer = _config.ReceiveLockDuration;
         _stunTimer = 0f;

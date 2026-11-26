@@ -6,8 +6,7 @@ using UnityEngine;
 /// </summary>
 public class BombTimer : MonoBehaviour
 {
-    [SerializeField] private GameConfig _config;
-
+    private GameConfig _config;
     private float _remaining;
     private bool _isRunning;
     private bool _hasWarned;
@@ -49,10 +48,11 @@ public class BombTimer : MonoBehaviour
     public float WarningTime => _config.WarningTime;
 
     /// <summary>
-    /// 残り時間を持ち時間にしておく
+    /// 設定を読み、残り時間を持ち時間にしておく
     /// </summary>
     private void Awake()
     {
+        _config = GameConfig.Load();
         _remaining = TimeLimit;
     }
 
