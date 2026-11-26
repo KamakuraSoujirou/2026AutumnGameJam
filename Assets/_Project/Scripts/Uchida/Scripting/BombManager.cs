@@ -2,7 +2,7 @@
 using UnityEngine;
 
 /// <summary>
-/// 爆弾本体の進行役。2人の入力をギミックに渡し、パス・時間切れ・勝敗（2本先取）を管理する
+/// 爆弾本体の進行役。2人の入力をギミックに渡し、パス・時間切れ・勝敗（何本先取かは GameConfig）を管理する
 /// キーやマウスは直接読まない。入力は TryPress と TryRematch で受け取り、受け付けるかどうかはここで決める
 /// </summary>
 public class BombManager : MonoBehaviour
@@ -26,6 +26,7 @@ public class BombManager : MonoBehaviour
     private int _stage;
     private int _roundWinner = NoPlayer;
     private int _matchWinner = NoPlayer;
+    private float _holdTime;
     private float _phaseTimer;
     private float _phaseDuration;
     private float _lockTimer;
@@ -46,8 +47,8 @@ public class BombManager : MonoBehaviour
     /// </summary>
     public event Action<int, float> OnMissed;
 
-    /// <summary>受け取るたびに戻す持ち時間（秒）</summary>
-    public float HoldTime => _bombTimer.TimeLimit;
+    /// <summary>今の持ち時間（秒）。受け取るたびにこの秒数に戻す。時間短縮が ON なら、パスが進むと短くなる</summary>
+    public float HoldTime => _holdTime;
 
     /// <summary>爆弾が相手に飛んでいく長さ（秒）</summary>
     public float FlightDuration => _config.FlightDuration;
@@ -219,13 +220,14 @@ public class BombManager : MonoBehaviour
         _stunTimer = 0f;
         _lockTimer = 0f;
         _gimmick.ResetRound();
-        _bombTimer.ResetTime();
+        _holdTime = _bombTimer.TimeLimit;
+        _bombTimer.ResetTime(_holdTime);
         BeginPhase(BombState.RoundStart, _config.RoundStartDuration);
         Debug.Log($"[BombManager] ラウンド開始 先攻：P{firstPlayer + 1}（P1 {_wins[0]} - {_wins[1]} P2）");
     }
 
     /// <summary>
-    /// 爆弾を受け取る。持ち時間を戻し、パス回数に合った難易度の問題を作る
+    /// 爆弾を受け取る。パス回数に合った持ち時間に戻し（時間短縮）、難易度に合った問題を作る
     /// </summary>
     /// <param name="player">受け取るプレイヤー</param>
     private void Receive(int player)
@@ -236,10 +238,11 @@ public class BombManager : MonoBehaviour
         _gimmick.CreatePuzzle(_stage);
         _lockTimer = _config.ReceiveLockDuration;
         _stunTimer = 0f;
-        _bombTimer.ResetTime();
+        _holdTime = _bombTimer.GetHoldTime(_receiveCount);
+        _bombTimer.ResetTime(_holdTime);
         _bombTimer.StartTimer();
         BeginPhase(BombState.Answering, 0f);
-        Debug.Log($"[BombManager] P{player + 1} が受け取った（{_receiveCount}回目、難易度{_stage}）");
+        Debug.Log($"[BombManager] P{player + 1} が受け取った（{_receiveCount}回目、難易度{_stage}、持ち時間{_holdTime}秒）");
     }
 
     /// <summary>

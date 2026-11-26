@@ -1102,10 +1102,6 @@ PrefabInstance:
       propertyPath: _onBackRequested.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: BombInputConnector, Assembly-CSharp
       objectReference: {fileID: 0}
-    - target: {fileID: 7777041256864850487, guid: cad68415dea7c9a45ab41e095181c841, type: 3}
-      propertyPath: m_text
-      value: "Space \u304B Enter \u3067 \u3082\u3046\u4E00\u5EA6"
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

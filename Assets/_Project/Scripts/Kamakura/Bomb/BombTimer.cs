@@ -6,6 +6,8 @@ using UnityEngine;
 /// </summary>
 public class BombTimer : MonoBehaviour
 {
+    private const float ShortenStep = 1f;
+
     private GameConfig _config;
     private float _remaining;
     private bool _isRunning;
@@ -68,6 +70,25 @@ public class BombTimer : MonoBehaviour
 
         _remaining -= Time.deltaTime;
         CheckRemaining();
+    }
+
+    /// <summary>
+    /// 何回目の受け取りかに合わせた持ち時間を返す（Notion の本体-12）
+    /// 時間短縮が ON なら、ShortenStartPass 回目から1秒ずつ短くなり、MinTimeLimit より短くはならない
+    /// （初期値なら、9回目まで10秒、10回目で9秒、11回目で8秒 … 14回目からは5秒）
+    /// </summary>
+    /// <param name="receiveCount">そのラウンドで何回目の受け取りか（ラウンド最初の問題を1回目とする）</param>
+    /// <returns>持ち時間（秒）</returns>
+    public float GetHoldTime(int receiveCount)
+    {
+        if (!_config.IsShortenEnabled || receiveCount < _config.ShortenStartPass)
+        {
+            return TimeLimit;
+        }
+
+        int shortenCount = receiveCount - _config.ShortenStartPass + 1;
+        float shortened = TimeLimit - shortenCount * ShortenStep;
+        return Mathf.Min(TimeLimit, Mathf.Max(_config.MinTimeLimit, shortened));
     }
 
     /// <summary>
