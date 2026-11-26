@@ -1,0 +1,63 @@
+name: Claude PR レビュー
+
+# PR が作られた・更新されたときに、Claude が自動でコードレビューしてコメントを付ける
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+# 同じ PR に続けて push したら、古いレビューは止めて最新だけレビューする
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    # 下書き PR と、フォーク元からの PR（シークレットが渡らない）はスキップ
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      # 非公開アセットのサブモジュールは取得しない（レビューには不要）
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Claude でレビュー
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            あなたは Unity（6000.3.28f1）で作るゲームジャム作品のレビュアーです。
+            この PR をレビューし、コメントはすべて日本語で書いてください。
+            まずリポジトリ直下の AGENTS.md を読み、そこに書かれたコーディング規約とチームのルールを基準にしてください。
+            短期間のゲームジャムなので、完璧さより「みんなが読める・壊さない」を優先し、細かすぎる指摘は控えてください。
+
+            重点的に見ること:
+            1. バグ・動かなくなる変更（null 参照、コンパイルエラーになりそうな記述、Update での重い処理、物理処理を FixedUpdate 以外に書いている など）
+            2. AGENTS.md の規約違反（命名、[SerializeField] private、波括弧の省略、1ファイル1クラス、ファイル名とクラス名の一致、日本語の /// <summary> など）
+            3. チームのルール違反
+               - 自分のスクリプト・シーン・プレハブが Assets/_Project/<種類>/<名前>/ 以下にあるか
+               - 画像・音声・モデル・購入アセットが公開リポジトリに入っていないか（Assets/_PrivateAssets/ 以下に置くべき）
+               - 追加・移動したアセットに対応する .meta ファイルがそろっているか
+               - Packages/manifest.json の変更（パッケージ追加）があれば、事前に相談済みか確認を促す
+               - 本番シーン（Assets/Scenes/ 以下）を変更している場合は、他の人と同時編集していないか注意を促す
+
+            .unity / .prefab / .asset の YAML の中身は細かく読まなくてよいです（どのファイルが変わったかだけ確認）。
+
+            具体的な行への指摘は mcp__github_inline_comment__create_inline_comment でインラインコメントにしてください。
+            最後に `gh pr comment` で、全体のまとめ（良い点・直したほうがいい点・マージしてよさそうか）を短く 1 件投稿してください。
+            問題がなければ、無理に指摘を作らず「問題なし」と書いてください。
+          claude_args: |
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Glob,Grep"
