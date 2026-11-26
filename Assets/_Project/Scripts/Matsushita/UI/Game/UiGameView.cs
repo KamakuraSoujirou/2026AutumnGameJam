@@ -26,6 +26,8 @@ public class UiGameView : MonoBehaviour
     private const float BannerPopSeconds = 0.25f;
     private const float ExplosionSeconds = 0.5f;
     private const float ExplosionFlashAlpha = 0.7f;
+    private const int RematchIndex = 0;
+    private const int TitleIndex = 1;
 
     [Header("上の表示")]
     [SerializeField, Tooltip("ラウンド（R1）")] private TMP_Text _roundText;
@@ -60,9 +62,12 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("リザルト全体")] private GameObject _resultRoot;
     [SerializeField, Tooltip("勝者の表示")] private TMP_Text _resultTitle;
     [SerializeField, Tooltip("勝ち星の数の表示")] private TMP_Text _resultScore;
+    [SerializeField, Tooltip("リザルトのボタン（再戦、タイトルへの順）")] private Button[] _resultButtons;
+    [SerializeField, Tooltip("リザルトで選んでいるボタンに出す枠（ボタンと同じ順）")] private GameObject[] _resultFocusFrames;
 
     private readonly Vector2[] _penaltyStartPositions = new Vector2[PlayerCount];
     private readonly Coroutine[] _penaltyRoutines = new Coroutine[PlayerCount];
+    private int _resultFocusIndex;
     private int _holderIndex = -1;
     private float _remainingTime = 10f;
     private float _holdSeconds = 10f;
@@ -81,9 +86,19 @@ public class UiGameView : MonoBehaviour
     public event Action<InputDirection> DirectionClicked;
 
     /// <summary>
+    /// リザルトで「再戦」が選ばれたときに呼ばれる（「タイトルへ」は「戻る」と同じく On Back Requested を呼ぶ）
+    /// </summary>
+    public event Action RematchRequested;
+
+    /// <summary>
     /// 爆弾の表示
     /// </summary>
     public UiBombView Bomb => _bomb;
+
+    /// <summary>
+    /// リザルトを出しているか
+    /// </summary>
+    public bool IsResultShown => _resultRoot.activeSelf;
 
     /// <summary>
     /// マウスのクリックを受けられるようにして、ボタンの押下を結びつける
@@ -100,6 +115,8 @@ public class UiGameView : MonoBehaviour
         _backButton.onClick.AddListener(RequestBack);
         _defuseButton.onClick.AddListener(OnDefuseClicked);
         _bomb.ButtonClicked += OnButtonClicked;
+        _resultButtons[RematchIndex].onClick.AddListener(OnRematchClicked);
+        _resultButtons[TitleIndex].onClick.AddListener(OnResultTitleClicked);
     }
 
     /// <summary>
@@ -341,7 +358,7 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// リザルトを出す
+    /// リザルトを出す（最初は「再戦」を選んだ状態）
     /// </summary>
     /// <param name="winnerIndex">勝った側（0：P1、1：P2）</param>
     /// <param name="player1Wins">P1が取ったラウンド数</param>
@@ -350,7 +367,34 @@ public class UiGameView : MonoBehaviour
     {
         _resultTitle.text = winnerIndex == 0 ? "P1の勝ち！" : "P2の勝ち！";
         _resultScore.text = $"{player1Wins} − {player2Wins}";
+        _resultFocusIndex = RematchIndex;
+        RefreshResultFocus();
         _resultRoot.SetActive(true);
+    }
+
+    /// <summary>
+    /// リザルトで選んでいるボタンを左右に動かす（端で止まる）
+    /// </summary>
+    /// <param name="delta">左なら -1、右なら 1</param>
+    public void MoveResultFocus(int delta)
+    {
+        _resultFocusIndex = Mathf.Clamp(_resultFocusIndex + delta, 0, _resultButtons.Length - 1);
+        RefreshResultFocus();
+    }
+
+    /// <summary>
+    /// リザルトで選んでいるボタンを決定する
+    /// </summary>
+    public void DecideResult()
+    {
+        if (_resultFocusIndex == RematchIndex)
+        {
+            RematchRequested?.Invoke();
+        }
+        else
+        {
+            RequestBack();
+        }
     }
 
     /// <summary>
@@ -380,6 +424,39 @@ public class UiGameView : MonoBehaviour
             _panels[i].SetDefuseCaption(false);
             _panels[i].SetThinking(false);
             StopPenalty(i);
+        }
+    }
+
+    /// <summary>
+    /// リザルトの「再戦」がクリックされた
+    /// </summary>
+    private void OnRematchClicked()
+    {
+        _resultFocusIndex = RematchIndex;
+        RefreshResultFocus();
+        UiEventSystem.ClearSelection();
+        DecideResult();
+    }
+
+    /// <summary>
+    /// リザルトの「タイトルへ」がクリックされた
+    /// </summary>
+    private void OnResultTitleClicked()
+    {
+        _resultFocusIndex = TitleIndex;
+        RefreshResultFocus();
+        UiEventSystem.ClearSelection();
+        DecideResult();
+    }
+
+    /// <summary>
+    /// リザルトで選んでいるボタンにだけ枠を出す
+    /// </summary>
+    private void RefreshResultFocus()
+    {
+        for (int i = 0; i < _resultFocusFrames.Length; i++)
+        {
+            _resultFocusFrames[i].SetActive(i == _resultFocusIndex);
         }
     }
 
