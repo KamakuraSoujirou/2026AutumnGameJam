@@ -18,6 +18,9 @@ public class CipherGimmick : Gimmick
     // 入力済みの文字を出すテキスト
     [SerializeField] private Text _enteredText;
 
+    // 試合画面の爆弾（試合では、ボタンの文字と入力済みの文字をここに出す。テストシーンでは空でよい）
+    [SerializeField] private UiBombView _bombView;
+
     // 難易度ごとに出す謎の種類（仕様書「難易度の段階」の表のとおり）
     [SerializeField] private CipherPuzzleType[] _stage1Types = { CipherPuzzleType.Same };
     [SerializeField] private CipherPuzzleType[] _stage2Types = { CipherPuzzleType.Same, CipherPuzzleType.Reverse };
@@ -188,11 +191,16 @@ public class CipherGimmick : Gimmick
     /// </summary>
     private void ShowButtonLabels()
     {
-        for (int i = 0; i < _buttonLabelTexts.Length; i++)
+        for (int i = 0; i < _puzzle.ButtonLabels.Length; i++)
         {
-            if (_buttonLabelTexts[i] != null)
+            if (i < _buttonLabelTexts.Length && _buttonLabelTexts[i] != null)
             {
                 _buttonLabelTexts[i].text = _puzzle.ButtonLabels[i];
+            }
+
+            if (_bombView != null)
+            {
+                _bombView.SetButtonLabel((InputDirection)i, _puzzle.ButtonLabels[i]);
             }
         }
     }
@@ -202,11 +210,6 @@ public class CipherGimmick : Gimmick
     /// </summary>
     private void ShowEntered()
     {
-        if (_enteredText == null)
-        {
-            return;
-        }
-
         string[] slots = new string[CipherPuzzle.AnswerLength];
 
         for (int i = 0; i < slots.Length; i++)
@@ -214,6 +217,16 @@ public class CipherGimmick : Gimmick
             slots[i] = i < _enteredCount ? _puzzle.GetLabel(_puzzle.Answers[i]) : EmptySlotText;
         }
 
-        _enteredText.text = string.Join(" ", slots);
+        string entered = string.Join(" ", slots);
+
+        if (_enteredText != null)
+        {
+            _enteredText.text = entered;
+        }
+
+        if (_bombView != null)
+        {
+            _bombView.SetInput(entered);
+        }
     }
 }

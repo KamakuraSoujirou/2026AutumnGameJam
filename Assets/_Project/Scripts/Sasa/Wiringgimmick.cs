@@ -12,6 +12,10 @@ public class Wiringgimmick : Gimmick
     private const int MaxSameTypeInRow = 2;
 
     [SerializeField] private WirePuzzleView _view;
+
+    // 試合画面の爆弾（試合では、線の色・シリアル番号・ランプをここに出す。テストシーンでは空でよい）
+    [SerializeField] private UiBombView _bombView;
+
     [SerializeField, FormerlySerializedAs("_Question")] private Text _questionLabel;
     [SerializeField] private Text _serialNumberText;
     [SerializeField] private Text _lampText;
@@ -371,6 +375,18 @@ public class Wiringgimmick : Gimmick
             _view.ShowWires(_currentColors);
         }
 
+        if (_bombView != null)
+        {
+            for (int i = 0; i < _currentColors.Length; i++)
+            {
+                InputDirection direction = (InputDirection)i;
+                _bombView.SetWire(direction, ToUiWireColor(_currentColors[i]), UiWireState.Normal);
+            }
+
+            _bombView.SetSerial(_serialNumber);
+            _bombView.SetLamp(_isLampOn);
+        }
+
         if (_serialNumberText != null)
         {
             _serialNumberText.text = _serialNumber.ToString();
@@ -476,11 +492,48 @@ public class Wiringgimmick : Gimmick
                 _view.CutWire(direction);
             }
 
+            ShowWireState(direction, UiWireState.Cut);
             return AnswerResult.Correct;
         }
 
-        // 正解方向と一致しなかった場合は、線を切らずに戻す（時間減少とスタンは爆弾本体が行う）
+        // 正解方向と一致しなかった場合は、切った線を消す（時間減少とスタンは爆弾本体が行う）
+        ShowWireState(direction, UiWireState.Gone);
         return AnswerResult.Wrong;
+    }
+
+    /// <summary>
+    /// 試合画面の爆弾の線1本を、切れた・消えた見た目にする
+    /// </summary>
+    /// <param name="direction">切った線の方向</param>
+    /// <param name="state">線の状態</param>
+    private void ShowWireState(InputDirection direction, UiWireState state)
+    {
+        if (_bombView == null || _currentColors == null)
+        {
+            return;
+        }
+
+        _bombView.SetWire(direction, ToUiWireColor(_currentColors[(int)direction]), state);
+    }
+
+    /// <summary>
+    /// 配線の色を、試合画面の爆弾の色に変える
+    /// </summary>
+    /// <param name="color">配線の色</param>
+    /// <returns>試合画面の爆弾の色</returns>
+    private UiWireColor ToUiWireColor(WireColor color)
+    {
+        switch (color)
+        {
+            case WireColor.Red:
+                return UiWireColor.Red;
+            case WireColor.Blue:
+                return UiWireColor.Blue;
+            case WireColor.Yellow:
+                return UiWireColor.Yellow;
+            default:
+                return UiWireColor.Green;
+        }
     }
 
     /// <summary>

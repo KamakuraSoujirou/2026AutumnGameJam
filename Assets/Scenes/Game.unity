@@ -1410,6 +1410,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: GimmickSet
       objectReference: {fileID: 0}
+    - target: {fileID: 3595004637039669876, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: _bombView
+      value: 
+      objectReference: {fileID: 1145632628}
+    - target: {fileID: 4317047939616392724, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4326211877392659301, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
+      propertyPath: _bombView
+      value: 
+      objectReference: {fileID: 1145632628}
     - target: {fileID: 4356221046995279515, guid: 5c57521d2fa4c4249989238b24325283, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1643,6 +1655,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1068926843}
   m_CullTransparentMesh: 1
+--- !u!114 &1145632628 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 369831335716884394, guid: cad68415dea7c9a45ab41e095181c841, type: 3}
+  m_PrefabInstance: {fileID: 796534364}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d585edd02d815f42903a1ee0dcdc887, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UiBombView
 --- !u!1 &1147111093
 GameObject:
   m_ObjectHideFlags: 0
