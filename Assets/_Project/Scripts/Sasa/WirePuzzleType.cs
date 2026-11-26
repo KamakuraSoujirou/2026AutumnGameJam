@@ -1,5 +1,6 @@
 /// <summary>
-/// 配線の謎の種類（できているものだけ。T3・T6・T7・T8 はまだ）
+/// 配線の謎の種類（できているものだけ。T3・T6・T8 はまだ）。
+/// プレハブには番号で保存されるので、足すときは必ず最後に足す
 /// </summary>
 public enum WirePuzzleType
 {
@@ -13,5 +14,8 @@ public enum WirePuzzleType
     Serial,
 
     /// <summary>T5 ランプ（点灯なら★の反対側、消灯なら★の線）</summary>
-    Lamp
+    Lamp,
+
+    /// <summary>T7 仲間外れ（○○△○ → △の線。数字版は偶数3つと奇数1つ、またはその逆）</summary>
+    OddOneOut
 }

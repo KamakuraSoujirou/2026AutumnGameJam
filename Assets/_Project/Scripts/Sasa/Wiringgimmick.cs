@@ -11,6 +11,16 @@ public class Wiringgimmick : Gimmick
     // 同じ種類を続けて出してよい回数（3回続けない → 2回まで）
     private const int MaxSameTypeInRow = 2;
 
+    // 線の本数（上下左右）
+    private const int WireCount = 4;
+
+    // T7 仲間外れの記号版で使う記号
+    private static readonly string[] OddOneOutSymbols = { "○", "△", "□", "☆" };
+
+    // T7 仲間外れの数字版で使う数字（1桁にして、すぐ読めるようにする）
+    private static readonly int[] EvenNumbers = { 2, 4, 6, 8 };
+    private static readonly int[] OddNumbers = { 1, 3, 5, 7, 9 };
+
     [SerializeField] private WirePuzzleView _view;
 
     // 試合画面の爆弾（試合では、線の色・シリアル番号・ランプをここに出す。テストシーンでは空でよい）
@@ -21,17 +31,20 @@ public class Wiringgimmick : Gimmick
     [SerializeField] private Text _lampText;
 
     // 難易度ごとに出す謎の種類（Notion の表から、できているものだけ）
-    // 段2の T7、段3の T3・T8、段4の T3・T6・T7・T8 はまだないので入れていない
+    // 段3の T3・T8、段4の T3・T6・T8 はまだないので入れていない
     [SerializeField] private WirePuzzleType[] _stage1Types = { WirePuzzleType.ColorMark };
-    [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord };
+    [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord, WirePuzzleType.OddOneOut };
     [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Serial };
-    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp };
+    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.OddOneOut };
 
     private int _serialNumber;
     // ランプの点灯状態
     private bool _isLampOn;
 
     private WireColor[] _currentColors;
+
+    // 線ごとの記号や数字（InputDirection の並び。T7 以外は空）
+    private readonly string[] _symbols = new string[WireCount];
 
     // 今回の問題で指定された色
     private WireColor _targetColor;
@@ -107,6 +120,12 @@ public class Wiringgimmick : Gimmick
         // 現在の配線色として保存
         _currentColors = colors;
 
+        // 記号は T7 のときだけ出すので、いったん全部消しておく
+        for (int i = 0; i < WireCount; i++)
+        {
+            _symbols[i] = string.Empty;
+        }
+
         // 難易度に合った種類の問題を生成
         WirePuzzleType type = PickPuzzleType(stage);
 
@@ -124,10 +143,13 @@ public class Wiringgimmick : Gimmick
             case WirePuzzleType.Lamp:
                 CreateT5Puzzle();
                 break;
+            case WirePuzzleType.OddOneOut:
+                CreateT7Puzzle();
+                break;
         }
 
         ShowPuzzle();
-        Debug.Log($"[配線] 段階{stage}（{type}）：{_questionText}（正解：{_nextAnswer}）");
+        Debug.Log($"[配線] 段階{stage}（{type}）：{_questionText}（記号：{string.Join(" ", _symbols)}）（正解：{_nextAnswer}）");
     }
 
     /// <summary>
@@ -313,6 +335,91 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
+    /// T7 仲間外れ問題を生成する。4本の線に記号か数字を出し、1本だけ違う線を正解にする
+    /// </summary>
+    private void CreateT7Puzzle()
+    {
+        // 仲間外れにする線
+        int oddIndex = Random.Range(0, WireCount);
+
+        // 記号版と数字版を半分ずつ
+        if (Random.Range(0, 2) == 0)
+        {
+            SetOddOneOutSymbols(oddIndex);
+        }
+        else
+        {
+            SetOddOneOutNumbers(oddIndex);
+        }
+
+        _questionText = "仲間外れの線を切れ";
+        _nextAnswer = (InputDirection)oddIndex;
+    }
+
+    /// <summary>
+    /// T7 記号版：3本に同じ記号、1本だけ別の記号を付ける（○○△○）
+    /// </summary>
+    /// <param name="oddIndex">仲間外れにする線の番号</param>
+    private void SetOddOneOutSymbols(int oddIndex)
+    {
+        int sameIndex = Random.Range(0, OddOneOutSymbols.Length);
+
+        // 同じ記号以外から1つ選ぶ
+        int differentIndex = (sameIndex + Random.Range(1, OddOneOutSymbols.Length)) % OddOneOutSymbols.Length;
+
+        for (int i = 0; i < WireCount; i++)
+        {
+            _symbols[i] = i == oddIndex ? OddOneOutSymbols[differentIndex] : OddOneOutSymbols[sameIndex];
+        }
+    }
+
+    /// <summary>
+    /// T7 数字版：3本に偶数、1本だけ奇数を付ける（半分は逆に、奇数3つと偶数1つ）。数字はすべて違うものにする
+    /// </summary>
+    /// <param name="oddIndex">仲間外れにする線の番号</param>
+    private void SetOddOneOutNumbers(int oddIndex)
+    {
+        bool isMajorityEven = Random.Range(0, 2) == 0;
+        int[] majority = PickDistinctNumbers(isMajorityEven ? EvenNumbers : OddNumbers, WireCount - 1);
+        int[] minority = isMajorityEven ? OddNumbers : EvenNumbers;
+        int majorityIndex = 0;
+
+        for (int i = 0; i < WireCount; i++)
+        {
+            if (i == oddIndex)
+            {
+                _symbols[i] = minority[Random.Range(0, minority.Length)].ToString();
+            }
+            else
+            {
+                _symbols[i] = majority[majorityIndex].ToString();
+                majorityIndex++;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 数字の候補から、重ならないように指定の数だけ選ぶ
+    /// </summary>
+    /// <param name="source">数字の候補</param>
+    /// <param name="count">選ぶ数（候補の数以下）</param>
+    /// <returns>選んだ数字</returns>
+    private int[] PickDistinctNumbers(int[] source, int count)
+    {
+        int[] shuffled = (int[])source.Clone();
+
+        for (int i = shuffled.Length - 1; i > 0; i--)
+        {
+            int j = Random.Range(0, i + 1);
+            (shuffled[i], shuffled[j]) = (shuffled[j], shuffled[i]);
+        }
+
+        int[] picked = new int[count];
+        System.Array.Copy(shuffled, picked, count);
+        return picked;
+    }
+
+    /// <summary>
     /// 指定方向の反対方向を取得
     /// </summary>
     /// <param name="direction">元の方向</param>
@@ -366,13 +473,13 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
-    /// 配線・シリアル番号・ランプ・問題文を画面に出す（置いていないものは飛ばす）
+    /// 配線・記号・シリアル番号・ランプ・問題文を画面に出す（置いていないものは飛ばす）
     /// </summary>
     private void ShowPuzzle()
     {
         if (_view != null)
         {
-            _view.ShowWires(_currentColors);
+            _view.ShowWires(_currentColors, _symbols);
         }
 
         if (_bombView != null)
@@ -381,6 +488,9 @@ public class Wiringgimmick : Gimmick
             {
                 InputDirection direction = (InputDirection)i;
                 _bombView.SetWire(direction, ToUiWireColor(_currentColors[i]), UiWireState.Normal);
+
+                // 記号は隅だと小さくて○と□を見分けにくいので、ボタンの真ん中に大きく出す（空なら色名の頭文字に戻る）
+                _bombView.SetButtonLabel(direction, _symbols[i]);
             }
 
             _bombView.SetSerial(_serialNumber);

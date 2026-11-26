@@ -22,15 +22,16 @@ public class WirePuzzleView : MonoBehaviour
     [SerializeField] private Text _rightText;
 
     /// <summary>
-    /// 上下左右に配線の色を出す。切った線も元に戻す
+    /// 上下左右に配線の色と記号を出す。切った線も元に戻す
     /// </summary>
     /// <param name="colors">配線の色（InputDirection の並び：Up, Down, Left, Right の順）</param>
-    public void ShowWires(WireColor[] colors)
+    /// <param name="symbols">線ごとの記号や数字（並びは colors と同じ。出さない線は空）</param>
+    public void ShowWires(WireColor[] colors, string[] symbols)
     {
-        SetWire(_upWire, _upText, colors[0]);
-        SetWire(_downWire, _downText, colors[1]);
-        SetWire(_leftWire, _leftText, colors[2]);
-        SetWire(_rightWire, _rightText, colors[3]);
+        SetWire(_upWire, _upText, colors[0], symbols[0]);
+        SetWire(_downWire, _downText, colors[1], symbols[1]);
+        SetWire(_leftWire, _leftText, colors[2], symbols[2]);
+        SetWire(_rightWire, _rightText, colors[3], symbols[3]);
     }
 
     /// <summary>
@@ -77,12 +78,14 @@ public class WirePuzzleView : MonoBehaviour
     /// 配線の色と文字を設定する
     /// </summary>
     /// <param name="wire">配線の画像</param>
-    /// <param name="text">頭文字を出すテキスト</param>
+    /// <param name="text">頭文字と記号を出すテキスト</param>
     /// <param name="color">配線の色</param>
+    /// <param name="symbol">記号や数字（出さないときは空）</param>
     private void SetWire(
         Image wire,
         Text text,
-        WireColor color)
+        WireColor color,
+        string symbol)
     {
         if (wire != null)
         {
@@ -91,7 +94,7 @@ public class WirePuzzleView : MonoBehaviour
 
         if (text != null)
         {
-            text.text = GetInitial(color);
+            text.text = string.IsNullOrEmpty(symbol) ? GetInitial(color) : $"{GetInitial(color)} {symbol}";
         }
     }
 
