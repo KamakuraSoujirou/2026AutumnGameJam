@@ -1,7 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static BombManager;
 
 /// <summary>
 /// 爆弾モジュール全体の制御
@@ -38,48 +37,12 @@ public class BombManager : MonoBehaviour
         _currentExplosionTime = _explosionTime;   // 時間の初期化はここ
         _IsStun = false;
 
-        gimmick.ResetRound(this);               // 1. ギミックの状態を初期化
+        gimmick.ResetRound();                   // 1. ギミックの状態を初期化
         gimmick.CreatePuzzle(stage);            // 2. 問題を作る
         _questionTemPlate.text = _questionTextes[stage];
     }
 
-
-
-    /// <summary>
-    /// 方向の入力(CPU対戦時)    //完了済
-    /// </summary>
-    public enum InputDirection { Up, Down, Left, Right,P}
-
-    /// <summary>
-    /// 入力した結果             //ほぼ
-    /// </summary>
-    public enum AnswerResult { Continue, Correct, Wrong }
-
-    /// <summary>
-    /// すべてのギミックの元になるクラス
-    /// </summary>
-    public abstract class Gimmick : MonoBehaviour
-    {
-        /// <summary>液晶に出す問題文</summary>
-        public abstract string QuestionText { get; }
-        ///// <summary>(AI対戦専用) 正解したら情報を記憶、その後、NPCに送信</summary>   <-今回実装なし
-        //public abstract InputDirection NextAnswer { get; }
-        /// <summary>制限時間、ラウンドの初期化を呼ぶ</summary>
-        /// 
-        public virtual void ResetRound(BombManager bomb)
-        {
-            float explosionTime = bomb.Explotion;
-            float pernalty = bomb.PernaltyTime;
-            bool Stun = bomb.IsStun;
-        }
-
-        /// <summary>爆弾を受け取るたびに呼ばれる。stageは難易度の1〜4</summary>
-        public abstract void CreatePuzzle(int stage);
-        
-        /// <summary>選択肢のボタンが押されたときに呼ばれる</summary>
-        public abstract AnswerResult Answer(InputDirection direction);
-
-    }
+    // Gimmick・InputDirection・AnswerResult は Assets/_Project/Scripts/Kamakura/Core/ に移動
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Awake()
@@ -133,12 +96,6 @@ public class BombManager : MonoBehaviour
                     Question(n);
                     break;
                 }
-            case InputDirection Q:
-                {
-                    Debug.Log("Qキーを検出");
-                    Question(IsContinueCount);
-                }
-                break;
         }
     }
 
@@ -185,7 +142,6 @@ public class BombManager : MonoBehaviour
         if (Keyboard.current.downArrowKey.wasPressedThisFrame) return InputDirection.Down;
         if (Keyboard.current.leftArrowKey.wasPressedThisFrame) return InputDirection.Left;
         if (Keyboard.current.rightArrowKey.wasPressedThisFrame) return InputDirection.Right;
-        if (Keyboard.current.qKey.wasPressedThisFrame && IsContinueCount >= 5) return InputDirection.P;
         return null;
     }
     /// <summary>
