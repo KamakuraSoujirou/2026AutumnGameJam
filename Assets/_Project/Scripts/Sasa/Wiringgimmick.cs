@@ -31,11 +31,11 @@ public class Wiringgimmick : Gimmick
     [SerializeField] private Text _lampText;
 
     // 難易度ごとに出す謎の種類（Notion の表から、できているものだけ）
-    // 段3の T3・T8、段4の T3・T6・T8 はまだないので入れていない
+    // 段3の T3、段4の T3・T6 はまだないので入れていない
     [SerializeField] private WirePuzzleType[] _stage1Types = { WirePuzzleType.ColorMark };
     [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord, WirePuzzleType.OddOneOut };
-    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Serial };
-    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.OddOneOut };
+    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Serial, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
 
     private int _serialNumber;
     // ランプの点灯状態
@@ -58,6 +58,11 @@ public class Wiringgimmick : Gimmick
     private WirePuzzleType _lastType;
     private int _sameTypeCount;
 
+    // T8 記憶：このラウンドで直前に正解で切られた線（相手が切った線）
+    private bool _hasLastCut;
+    private InputDirection _lastCutDirection;
+    private WireColor _lastCutColor;
+
     /// <summary>
     /// 現在の配線色
     /// </summary>
@@ -74,11 +79,12 @@ public class Wiringgimmick : Gimmick
     public override InputDirection NextAnswer => _nextAnswer;
 
     /// <summary>
-    /// ラウンドの最初に呼ばれる。同じ種類の連続回数を数え直す
+    /// ラウンドの最初に呼ばれる。同じ種類の連続回数を数え直し、切った線の記憶（T8）も消す
     /// </summary>
     public override void ResetRound()
     {
         _sameTypeCount = 0;
+        _hasLastCut = false;
     }
 
     /// <summary>
@@ -146,6 +152,9 @@ public class Wiringgimmick : Gimmick
             case WirePuzzleType.OddOneOut:
                 CreateT7Puzzle();
                 break;
+            case WirePuzzleType.Memory:
+                CreateT8Puzzle();
+                break;
         }
 
         ShowPuzzle();
@@ -153,13 +162,25 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
-    /// 段階に合う謎の種類を均等に選ぶ。同じ種類が3回続かないようにする
+    /// 段階に合う謎の種類を均等に選ぶ。同じ種類が3回続かないようにする。
+    /// T8 記憶は、このラウンドでまだ線が切られていない（ラウンド最初のパス）ときは出さない
     /// </summary>
     /// <param name="stage">難易度の段階（1〜4）</param>
     /// <returns>選んだ謎の種類</returns>
     private WirePuzzleType PickPuzzleType(int stage)
     {
         List<WirePuzzleType> candidates = new List<WirePuzzleType>(GetStageTypes(stage));
+
+        if (!_hasLastCut)
+        {
+            candidates.Remove(WirePuzzleType.Memory);
+        }
+
+        // T8 しかない段階で T8 が出せないときは、T1 を出す
+        if (candidates.Count == 0)
+        {
+            candidates.Add(WirePuzzleType.ColorMark);
+        }
 
         // 2回続いていたら外す（候補が1つしかない段階は外せないのでそのまま）
         if (_sameTypeCount >= MaxSameTypeInRow && candidates.Count > 1)
@@ -399,6 +420,25 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
+    /// T8 記憶問題を生成する。相手がさっき切った線と同じ位置か、同じ色の線を正解にする
+    /// （線の並びはパスごとに変わるので、位置と色で答えが変わる）
+    /// </summary>
+    private void CreateT8Puzzle()
+    {
+        if (Random.Range(0, 2) == 0)
+        {
+            // 液晶の1行に収まる長さにする
+            _questionText = "さっき相手が切った位置を切れ";
+            _nextAnswer = _lastCutDirection;
+        }
+        else
+        {
+            _questionText = "さっき相手が切った色を切れ";
+            _nextAnswer = GetDirectionFromColor(_lastCutColor);
+        }
+    }
+
+    /// <summary>
     /// 数字の候補から、重ならないように指定の数だけ選ぶ
     /// </summary>
     /// <param name="source">数字の候補</param>
@@ -603,6 +643,15 @@ public class Wiringgimmick : Gimmick
             }
 
             ShowWireState(direction, UiWireState.Cut);
+
+            // 次の人の T8（記憶）のために、切った線の位置と色を覚えておく
+            if (_currentColors != null)
+            {
+                _hasLastCut = true;
+                _lastCutDirection = direction;
+                _lastCutColor = _currentColors[(int)direction];
+            }
+
             return AnswerResult.Correct;
         }
 
