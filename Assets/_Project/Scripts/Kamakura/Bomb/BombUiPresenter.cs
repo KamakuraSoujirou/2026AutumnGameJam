@@ -131,6 +131,7 @@ public class BombUiPresenter : MonoBehaviour
         }
 
         _view.SetPass(_bombManager.ReceiveCount, _bombManager.Stage);
+        _view.SetHoldTime(_bombManager.HoldTime);
         _shownHundredths = -1;
         ShowTime(_bombTimer.Remaining);
     }
