@@ -415,7 +415,7 @@ public class Wiringgimmick : Gimmick
     /// <returns>読めたら true</returns>
     private static bool TryGetColorFromName(string colorName, out WireColor color)
     {
-        switch (colorName.Trim())
+        switch (colorName == null ? string.Empty : colorName.Trim())
         {
             case "赤":
             case "あか":
