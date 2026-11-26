@@ -1,7 +1,11 @@
+using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.InputSystem.UI;
+using UnityEngine.UI;
 
 /// <summary>
-/// タイトル画面の表示。対戦設定の5行とゲームスタートのどれを選んでいるかを管理する
+/// タイトル画面の表示。対戦設定の5行とゲームスタートのどれを選んでいるかを管理する。マウスのクリックも受け付ける
 /// </summary>
 public class UiTitleView : MonoBehaviour
 {
@@ -15,8 +19,14 @@ public class UiTitleView : MonoBehaviour
     [SerializeField, Tooltip("対戦設定の行（上から：モード、CPUの強さ、勝利条件、時間短縮、読み上げ）")] private UiOptionRow[] _rows;
     [SerializeField, Tooltip("CPUの強さの行。2人対戦のときは薄くする")] private CanvasGroup _cpuLevelGroup;
     [SerializeField, Tooltip("ゲームスタートを選んでいるときに出す枠")] private GameObject _startFocusFrame;
+    [SerializeField, Tooltip("ゲームスタートのボタン（マウスで押す用）")] private Button _startButton;
 
     private int _focusIndex;
+
+    /// <summary>
+    /// ゲームスタートがマウスでクリックされたときに呼ばれる
+    /// </summary>
+    public event Action StartClicked;
 
     /// <summary>
     /// CPU対戦を選んでいるか
@@ -47,6 +57,22 @@ public class UiTitleView : MonoBehaviour
     /// ゲームスタートを選んでいるか
     /// </summary>
     public bool IsStartFocused => _focusIndex == _rows.Length;
+
+    /// <summary>
+    /// マウスでクリックできるように準備する
+    /// </summary>
+    private void Awake()
+    {
+        EnsureEventSystem();
+
+        for (int i = 0; i < _rows.Length; i++)
+        {
+            int rowIndex = i;
+            _rows[i].OptionClicked += _ => OnOptionClicked(rowIndex);
+        }
+
+        _startButton.onClick.AddListener(OnStartClicked);
+    }
 
     /// <summary>
     /// 最初はゲームスタートを選んだ状態にする
@@ -91,6 +117,55 @@ public class UiTitleView : MonoBehaviour
     }
 
     /// <summary>
+    /// クリックされた選択肢の行を、選んでいる行にする（選択肢を変える処理は行の側で済んでいる）
+    /// </summary>
+    /// <param name="rowIndex">クリックされた行の番号</param>
+    private void OnOptionClicked(int rowIndex)
+    {
+        _focusIndex = rowIndex;
+        RefreshFocus();
+        RefreshCpuLevelRow();
+        ClearUiSelection();
+    }
+
+    /// <summary>
+    /// ゲームスタートがクリックされたので、ゲームスタートを選んだ状態にして知らせる
+    /// </summary>
+    private void OnStartClicked()
+    {
+        _focusIndex = _rows.Length;
+        RefreshFocus();
+        ClearUiSelection();
+        StartClicked?.Invoke();
+    }
+
+    /// <summary>
+    /// クリックしたボタンが選択されたままだと、Space や Enter でもう一度押されてしまうので解除する
+    /// </summary>
+    private void ClearUiSelection()
+    {
+        if (EventSystem.current != null)
+        {
+            EventSystem.current.SetSelectedGameObject(null);
+        }
+    }
+
+    /// <summary>
+    /// シーンに EventSystem がなければ作る（これがないとクリックが届かない）
+    /// </summary>
+    private static void EnsureEventSystem()
+    {
+        if (FindAnyObjectByType<EventSystem>() != null)
+        {
+            return;
+        }
+
+        GameObject eventSystemObject = new GameObject("EventSystem", typeof(EventSystem));
+        InputSystemUIInputModule inputModule = eventSystemObject.AddComponent<InputSystemUIInputModule>();
+        inputModule.AssignDefaultActions();
+    }
+
+    /// <summary>
     /// 選んでいる行にだけ枠を出す
     /// </summary>
     private void RefreshFocus()
@@ -104,10 +179,11 @@ public class UiTitleView : MonoBehaviour
     }
 
     /// <summary>
-    /// 2人対戦のときは、CPUの強さの行を薄くする
+    /// 2人対戦のときは、CPUの強さの行を薄くして、クリックも効かなくする
     /// </summary>
     private void RefreshCpuLevelRow()
     {
         _cpuLevelGroup.alpha = IsCpuMode ? 1f : DisabledAlpha;
+        _cpuLevelGroup.interactable = IsCpuMode;
     }
 }

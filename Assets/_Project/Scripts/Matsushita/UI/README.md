@@ -10,7 +10,7 @@
    - `Assets/_Project/Prefabs/Matsushita/UI/UiSkin.asset`（素材の表）
    - `Assets/_Project/Scenes/Matsushita/UiMock_Title.unity`（確認用シーン。作ったあと開く）
 3. 再生して操作を確認する
-   - ↑↓（W S）：行を選ぶ ／ ←→（A D）：設定を変える ／ Space・Enter：ゲームスタート（今はコンソールに設定を出すだけ）
+   - ↑↓（W S）：行を選ぶ ／ ←→（A D）：設定を変える ／ Space・Enter：ゲームスタート（今はコンソールに設定を出すだけ）。マウスでも、選択肢のクリックで設定を変え、「ゲームスタート」のクリックで始められる（EventSystem がなければ `UiTitleView` が自動で作る）
    - 2人対戦のときは「CPUの強さ」の行を薄くして飛ばす
 4. 素材が届いたら `Assets/_PrivateAssets/Art/` に置き、**Tools → UI仮組 → 素材を割り当てて反映**
    - ファイル名（下の表）か、素材IDで始まる名前（例：`art_01_bomb.png`）で自動で割り当てる
@@ -41,7 +41,7 @@ UI-01〜04 は素材リストにない仮の番号です（発注書に足すか
 | `UiSkinApplier` | 画面の一番上に付け、子の差し込み口へ表の中身を配る |
 | `UiOsFont` | 日本語フォントが未準備の間、実行中だけPCの日本語フォント（ヒラギノ／游ゴシック／メイリオ）を使う |
 | `UiChip` / `UiOptionRow` | 選択肢ボタンと、対戦設定の1行 |
-| `UiTitleView` / `UiTitleInput` | タイトル画面の表示とキー操作 |
+| `UiTitleView` / `UiTitleInput` | タイトル画面の表示とキー・マウス操作 |
 | `Editor/UiMockBuilder` | 上のメニュー。プレハブとシーンを組み立てる |
 
 ## 残っていること

@@ -100,12 +100,13 @@ public static class UiMockBuilder
         BuildCharacters(screen, circleSprite);
         BuildControlsMenu(screen, roundSprite);
         BuildRules(screen);
-        GameObject startFocusFrame = BuildStartButton(screen, roundSprite);
+        GameObject startFocusFrame = BuildStartButton(screen, roundSprite, out Button startButton);
 
         UiTitleView view = root.AddComponent<UiTitleView>();
         SetObjectArray(view, "_rows", rows);
         SetObject(view, "_cpuLevelGroup", cpuLevelGroup);
         SetObject(view, "_startFocusFrame", startFocusFrame);
+        SetObject(view, "_startButton", startButton);
         root.AddComponent<UiTitleInput>();
     }
 
@@ -196,8 +197,9 @@ public static class UiMockBuilder
     /// </summary>
     /// <param name="screen">1920×1080 の土台</param>
     /// <param name="roundSprite">角丸の仮の形</param>
+    /// <param name="startButton">マウスで押すためのボタン</param>
     /// <returns>選んでいるときに出す枠</returns>
-    private static GameObject BuildStartButton(RectTransform screen, Sprite roundSprite)
+    private static GameObject BuildStartButton(RectTransform screen, Sprite roundSprite, out Button startButton)
     {
         RectTransform focusFrame = CreateRect("StartFocusFrame", screen, 596f, 843f, 674f, 224f);
         Image frameImage = focusFrame.gameObject.AddComponent<Image>();
@@ -209,6 +211,7 @@ public static class UiMockBuilder
         RectTransform button = CreateRect("StartButton", screen, 608f, 855f, 650f, 200f);
         AddArt(button, "UI-03", Orange, roundSprite, false, null);
         AddText("Label", button, 0f, 0f, 650f, 200f, "ゲームスタート", 84f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        startButton = AddClickArea(button);
 
         return focusFrame.gameObject;
     }
@@ -250,6 +253,7 @@ public static class UiMockBuilder
         {
             chips[i] = CreateChip(row, $"Chip{i}", options[i], 30f + i * (ChipWidth + ChipGap), 40f, ChipWidth, 44f, roundSprite);
             chips[i].SetSelected(i == selectedIndex);
+            SetObject(chips[i], "_button", AddClickArea((RectTransform)chips[i].transform));
         }
 
         UiOptionRow optionRow = row.gameObject.AddComponent<UiOptionRow>();
@@ -321,7 +325,7 @@ public static class UiMockBuilder
     /// <returns>画面の一番上</returns>
     private static GameObject CreateCanvasRoot(string name, UiSkin skin)
     {
-        GameObject root = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler));
+        GameObject root = new GameObject(name, typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         root.GetComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
 
         CanvasScaler scaler = root.GetComponent<CanvasScaler>();
@@ -405,6 +409,34 @@ public static class UiMockBuilder
         serialized.FindProperty("_isPreserveAspect").boolValue = isPreserveAspect;
         serialized.FindProperty("_placeholderObject").objectReferenceValue = placeholderObject;
         serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// マウスで押せるように Button を付ける。見た目は変えず、四角いクリック範囲だけを足す
+    /// </summary>
+    /// <param name="target">付ける四角</param>
+    /// <returns>付けた Button</returns>
+    private static Button AddClickArea(RectTransform target)
+    {
+        // 見た目用の Image があればそれを、なければ透明な Image を、クリックを受ける当たり判定にする
+        Image hitArea = target.GetComponent<Image>();
+
+        if (hitArea == null)
+        {
+            hitArea = target.gameObject.AddComponent<Image>();
+            hitArea.color = Color.clear;
+        }
+
+        hitArea.raycastTarget = true;
+        // 透明な Image は描画から外されてクリックも届かなくなるので、外されないようにする
+        hitArea.canvasRenderer.cullTransparentMesh = false;
+
+        Button button = target.gameObject.AddComponent<Button>();
+        button.targetGraphic = hitArea;
+        // 見た目の切り替えは自前で行う。矢印キーによる選択移動は UiTitleInput と取り合うので切る
+        button.transition = Selectable.Transition.None;
+        button.navigation = new Navigation { mode = Navigation.Mode.None };
+        return button;
     }
 
     /// <summary>

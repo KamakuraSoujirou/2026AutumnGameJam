@@ -3,7 +3,8 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// タイトル画面のキー操作。↑↓（W S）で行を選び、←→（A D）で設定を変え、Space か Enter で始める
+/// タイトル画面のキー操作。↑↓（W S）で行を選び、←→（A D）で設定を変え、Space か Enter で始める。
+/// マウスのクリックは UiTitleView が受け取り、ゲームスタートだけここへ知らせてくる
 /// </summary>
 [RequireComponent(typeof(UiTitleView))]
 public class UiTitleInput : MonoBehaviour
@@ -18,6 +19,22 @@ public class UiTitleInput : MonoBehaviour
     private void Awake()
     {
         _view = GetComponent<UiTitleView>();
+    }
+
+    /// <summary>
+    /// マウスでゲームスタートが押されたときも、キーと同じように始める
+    /// </summary>
+    private void OnEnable()
+    {
+        _view.StartClicked += RequestStart;
+    }
+
+    /// <summary>
+    /// マウスのクリックを受け取るのをやめる
+    /// </summary>
+    private void OnDisable()
+    {
+        _view.StartClicked -= RequestStart;
     }
 
     /// <summary>
