@@ -31,11 +31,11 @@ public class Wiringgimmick : Gimmick
     [SerializeField] private Text _lampText;
 
     // 難易度ごとに出す謎の種類（Notion の表から、できているものだけ）
-    // 段3の T3、段4の T3・T6 はまだないので入れていない
+    // 段3・段4の T3 はまだないので入れていない
     [SerializeField] private WirePuzzleType[] _stage1Types = { WirePuzzleType.ColorMark };
     [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord, WirePuzzleType.OddOneOut };
     [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Serial, WirePuzzleType.Memory };
-    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.Reverse, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
 
     private int _serialNumber;
     // ランプの点灯状態
@@ -148,6 +148,9 @@ public class Wiringgimmick : Gimmick
                 break;
             case WirePuzzleType.Lamp:
                 CreateT5Puzzle();
+                break;
+            case WirePuzzleType.Reverse:
+                CreateT6Puzzle();
                 break;
             case WirePuzzleType.OddOneOut:
                 CreateT7Puzzle();
@@ -353,6 +356,20 @@ public class Wiringgimmick : Gimmick
             // 消灯：★と同じ方向
             _nextAnswer = starDirection;
         }
+    }
+
+    /// <summary>
+    /// T6 逆さ読み問題を生成する。「みどりをきれ」を後ろから読んだ「れきをりどみ」を出す
+    /// </summary>
+    private void CreateT6Puzzle()
+    {
+        _targetColor = (WireColor)Random.Range(0, 4);
+
+        char[] letters = $"{GetColorName(_targetColor)}をきれ".ToCharArray();
+        System.Array.Reverse(letters);
+
+        _questionText = new string(letters);
+        _nextAnswer = GetDirectionFromColor(_targetColor);
     }
 
     /// <summary>

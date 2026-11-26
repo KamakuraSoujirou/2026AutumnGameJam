@@ -1,5 +1,5 @@
 /// <summary>
-/// 配線の謎の種類（できているものだけ。T3・T6 はまだ）。
+/// 配線の謎の種類（できているものだけ。T3 はまだ）。
 /// プレハブには番号で保存されるので、足すときは必ず最後に足す
 /// </summary>
 public enum WirePuzzleType
@@ -20,5 +20,8 @@ public enum WirePuzzleType
     OddOneOut,
 
     /// <summary>T8 記憶（相手がさっき切ったのと同じ位置／同じ色の線。ラウンドの最初には出さない）</summary>
-    Memory
+    Memory,
+
+    /// <summary>T6 逆さ読み（「れきをりどみ」→ みどりをきれ → 緑の線）</summary>
+    Reverse
 }
