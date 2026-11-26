@@ -14,9 +14,13 @@
 （`2026AutumnGameJam-assets`）を Git サブモジュールとして `Assets/_PrivateAssets/` に入れています。
 
 公開（このリポジトリ）
-- `Assets/Scripts/` … 自作の C# スクリプト
-- `Assets/Scenes/` … シーン
-- `Assets/Prefabs/` … プレハブ
+- `Assets/_Project/Scripts/<名前>/` … 自作の C# スクリプト
+- `Assets/_Project/Scenes/<名前>/` … シーン（自分用のテストシーンもここ）
+- `Assets/_Project/Prefabs/<名前>/` … プレハブ
+
+どのフォルダも、直下に担当者の名前のフォルダを作ってその中で作業する（例：`Assets/_Project/Scripts/Uchida/`）。
+
+ただし、みんなで使う本番のシーン（`Title.unity`, `Game.unity` など）は `Assets/Scenes/` に置く。
 
 非公開（サブモジュール `Assets/_PrivateAssets/`）
 - `Art/` … 画像・テクスチャ・マテリアル・UI素材
@@ -167,7 +171,7 @@ public class PlayerController : MonoBehaviour
 - `.meta` ファイルも必ず一緒にコミットする
 - 全員同じUnityバージョンを使う（上の「プロジェクト概要」参照）
 - コミット前にエラーが出ていないか（Consoleが赤くないか）確認する
-- 自分のスクリプトは `Assets/Scripts/` の下にまとめる
+- 自分のスクリプト・シーン・プレハブは、それぞれ `Assets/_Project/Scripts/<名前>/`・`Assets/_Project/Scenes/<名前>/`・`Assets/_Project/Prefabs/<名前>/` の下にまとめる
 
 ## AIへのルール
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/` の中身は読まない・編集しない
