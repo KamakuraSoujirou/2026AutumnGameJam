@@ -173,11 +173,26 @@ public class PlayerController : MonoBehaviour
 - コミット前にエラーが出ていないか（Consoleが赤くないか）確認する
 - 自分のスクリプト・シーン・プレハブは、それぞれ `Assets/_Project/Scripts/<名前>/`・`Assets/_Project/Scenes/<名前>/`・`Assets/_Project/Prefabs/<名前>/` の下にまとめる
 
+### アセット（サブモジュール）の更新手順
+`Assets/_PrivateAssets/`（assets リポジトリ）も本体と同じく、main / develop に直接 push しない。作業ブランチから develop に PR を出す。
+
+1. `Assets/_PrivateAssets/` の中で develop から作業ブランチ（`<名前>/<内容>`）を作り、コミット & push する
+2. assets リポジトリで develop に PR を出し、**「Create a merge commit」でマージする**
+   - Squash / Rebase だとコミットIDが変わり、本体が指しているコミットが develop から消えてしまう（assets 側の設定で Squash / Rebase はオフにしてある）
+3. 本体の作業ブランチで、サブモジュールを assets の develop の最新に合わせてコミットし、本体の develop に PR を出す
+
+```sh
+git submodule update --remote Assets/_PrivateAssets
+git add Assets/_PrivateAssets
+```
+
+4. 本体の develop を main に入れるときは、assets も develop → main の PR を出して揃える
+
 ## AIへのルール
 - `Library/`, `Temp/`, `Logs/`, `UserSettings/` の中身は読まない・編集しない
 - アセットを作成・移動・削除するときは、対応する `.meta` ファイルも必ず一緒に扱う（GUIDが壊れるため）
 - `.unity` / `.prefab` / `.asset` のYAMLは、頼まれない限り直接編集しない
 - 画像・音声・モデル・購入アセットは必ず `Assets/_PrivateAssets/` 以下に置く（公開リポジトリに入れない）
-- `Assets/_PrivateAssets/` 内の変更は、サブモジュール側でコミット & push してから、本体側でサブモジュールの更新をコミットする
+- `Assets/_PrivateAssets/` 内の変更は、上の「アセット（サブモジュール）の更新手順」に従う。サブモジュールの main / develop に直接 push しない
 - パッケージの追加（`Packages/manifest.json` の変更）は事前に確認すること
 - 変更後はコンパイルエラーが出ないか確認し、変更点を簡潔に説明すること

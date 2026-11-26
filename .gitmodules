@@ -1,3 +1,4 @@
 [submodule "Assets/_PrivateAssets"]
 	path = Assets/_PrivateAssets
 	url = https://github.com/KamakuraSoujirou/2026AutumnGameJam-assets.git
+	branch = develop
