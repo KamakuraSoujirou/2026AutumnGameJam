@@ -61,6 +61,8 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("勝者の表示")] private TMP_Text _resultTitle;
     [SerializeField, Tooltip("勝ち星の数の表示")] private TMP_Text _resultScore;
 
+    private readonly Vector2[] _penaltyStartPositions = new Vector2[PlayerCount];
+    private readonly Coroutine[] _penaltyRoutines = new Coroutine[PlayerCount];
     private int _holderIndex = -1;
     private float _remainingTime = 10f;
     private float _holdSeconds = 10f;
@@ -89,6 +91,12 @@ public class UiGameView : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+
+        for (int i = 0; i < PlayerCount; i++)
+        {
+            _penaltyStartPositions[i] = _penaltyTexts[i].rectTransform.anchoredPosition;
+        }
+
         _backButton.onClick.AddListener(RequestBack);
         _defuseButton.onClick.AddListener(OnDefuseClicked);
         _bomb.ButtonClicked += OnButtonClicked;
@@ -269,9 +277,9 @@ public class UiGameView : MonoBehaviour
     /// <param name="penaltySeconds">減る秒数</param>
     public void ShowPenalty(int playerIndex, float penaltySeconds)
     {
-        TMP_Text target = _penaltyTexts[playerIndex];
-        target.text = $"−{penaltySeconds:0.#}秒";
-        StartCoroutine(PlayPenalty(target));
+        StopPenalty(playerIndex);
+        _penaltyTexts[playerIndex].text = $"−{penaltySeconds:0.#}秒";
+        _penaltyRoutines[playerIndex] = StartCoroutine(PlayPenalty(playerIndex));
     }
 
     /// <summary>
@@ -371,7 +379,7 @@ public class UiGameView : MonoBehaviour
         {
             _panels[i].SetDefuseCaption(false);
             _panels[i].SetThinking(false);
-            _penaltyTexts[i].gameObject.SetActive(false);
+            StopPenalty(i);
         }
     }
 
@@ -439,14 +447,33 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
+    /// 「−2秒」の動きを止めて、位置と透明度を元に戻して隠す（連続で呼ばれたときや、演出の片付け用）
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    private void StopPenalty(int playerIndex)
+    {
+        if (_penaltyRoutines[playerIndex] != null)
+        {
+            StopCoroutine(_penaltyRoutines[playerIndex]);
+            _penaltyRoutines[playerIndex] = null;
+        }
+
+        TMP_Text target = _penaltyTexts[playerIndex];
+        target.rectTransform.anchoredPosition = _penaltyStartPositions[playerIndex];
+        target.alpha = 1f;
+        target.gameObject.SetActive(false);
+    }
+
+    /// <summary>
     /// 「−2秒」を少し上に動かしながら消す
     /// </summary>
-    /// <param name="target">動かす文字</param>
+    /// <param name="playerIndex">0：P1、1：P2</param>
     /// <returns>コルーチン</returns>
-    private IEnumerator PlayPenalty(TMP_Text target)
+    private IEnumerator PlayPenalty(int playerIndex)
     {
+        TMP_Text target = _penaltyTexts[playerIndex];
         RectTransform rect = target.rectTransform;
-        Vector2 start = rect.anchoredPosition;
+        Vector2 start = _penaltyStartPositions[playerIndex];
         target.gameObject.SetActive(true);
 
         for (float elapsed = 0f; elapsed < PenaltyShowSeconds; elapsed += Time.unscaledDeltaTime)
@@ -457,9 +484,7 @@ public class UiGameView : MonoBehaviour
             yield return null;
         }
 
-        target.gameObject.SetActive(false);
-        target.alpha = 1f;
-        rect.anchoredPosition = start;
+        StopPenalty(playerIndex);
     }
 
     /// <summary>
