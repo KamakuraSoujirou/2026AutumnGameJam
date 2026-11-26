@@ -1,0 +1,18 @@
+{
+    "holdTime": 10.0,
+    "warningTime": 3.0,
+    "missPenalty": 2.0,
+    "stunTime": 0.5,
+    "flightTime": 0.4,
+    "arriveLock": 0.15,
+    "introTime": 1.8,
+    "boomTime": 2.0,
+    "roundsToWin": 2,
+    "stagePasses": [1, 3, 5, 7],
+    "defuseMinPass": 5,
+    "isShrinkEnabled": true,
+    "shrinkFromPass": 10,
+    "shrinkMin": 5.0,
+    "lampInterval": 0.6,
+    "idleReturn": 30.0
+}
