@@ -20,6 +20,7 @@ public class BombUiPresenter : MonoBehaviour
     private BombState? _shownState;
     private int _shownHolder = BombManager.NoPlayer;
     private int _shownHundredths = -1;
+    private int _defuseChallenger = BombManager.NoPlayer;
 
     /// <summary>
     /// 爆弾本体の知らせを受け取れるようにする（BombManager の Start より先に登録される）
@@ -42,18 +43,18 @@ public class BombUiPresenter : MonoBehaviour
     }
 
     /// <summary>
-    /// 答えている間は、残り時間の表示を進める
+    /// 答えている間と解除中は、残り時間の表示を進める
     /// </summary>
     private void Update()
     {
-        if (_shownState == BombState.Answering)
+        if (_shownState == BombState.Answering || _shownState == BombState.Defusing)
         {
             ShowTime(_bombTimer.Remaining);
         }
     }
 
     /// <summary>
-    /// 状態が切り替わったときは画面を切り替え、答えている間は問題文を書き直す
+    /// 状態が切り替わったときは画面を切り替え、答えている間は問題文と解除の状態を書き直す
     /// </summary>
     private void Refresh()
     {
@@ -61,6 +62,12 @@ public class BombUiPresenter : MonoBehaviour
 
         if (_shownState != state)
         {
+            // 解除中から別の状態になったら、暗くした画面を戻す
+            if (_shownState == BombState.Defusing)
+            {
+                EndDefuse();
+            }
+
             _shownState = state;
             ShowState(state);
         }
@@ -68,6 +75,7 @@ public class BombUiPresenter : MonoBehaviour
         if (state == BombState.Answering)
         {
             _view.Bomb.SetQuestion(_bombManager.QuestionText);
+            _view.Bomb.SetDefuseState(_bombManager.DefuseStatus == DefuseStatus.Available ? UiDefuseState.Available : UiDefuseState.Locked);
         }
     }
 
@@ -88,8 +96,14 @@ public class BombUiPresenter : MonoBehaviour
             case BombState.Flying:
                 ShowFlying();
                 break;
+            case BombState.Defusing:
+                ShowDefusing();
+                break;
             case BombState.Exploding:
                 ShowExploding();
+                break;
+            case BombState.Defused:
+                ShowDefused();
                 break;
             case BombState.MatchOver:
                 // 試合が終わったあとのリザルトは、UiResultRecorder（Matsushita/UI/Result）が重ねて出す
@@ -170,6 +184,49 @@ public class BombUiPresenter : MonoBehaviour
     {
         ShowTime(0f);
         _view.ShowExplosion(_bombManager.Holder);
+        _shownHolder = BombManager.NoPlayer;
+        ShowWins();
+    }
+
+    /// <summary>
+    /// 解除の挑戦を始める。画面を暗くして相手側に「解除中！」を出し、液晶に問題文、4つのボタンに選択肢を出す
+    /// </summary>
+    private void ShowDefusing()
+    {
+        UiBombView bomb = _view.Bomb;
+        _defuseChallenger = _bombManager.Holder;
+        _view.SetDefuse(_defuseChallenger, true);
+        bomb.SetQuestion(_bombManager.DefuseQuestionText);
+        bomb.SetInput(string.Empty);
+
+        for (int i = 0; i < DirectionCount; i++)
+        {
+            InputDirection direction = (InputDirection)i;
+            bomb.SetButtonLabel(direction, _bombManager.GetDefuseChoice(direction));
+            bomb.SetWireSymbol(direction, string.Empty);
+        }
+    }
+
+    /// <summary>
+    /// 解除の挑戦が終わったので、暗くした画面と「解除中！」を戻す
+    /// </summary>
+    private void EndDefuse()
+    {
+        if (_defuseChallenger == BombManager.NoPlayer)
+        {
+            return;
+        }
+
+        _view.SetDefuse(_defuseChallenger, false);
+        _defuseChallenger = BombManager.NoPlayer;
+    }
+
+    /// <summary>
+    /// 解除に成功したので、「解除成功！」を出して、勝ち星を増やす
+    /// </summary>
+    private void ShowDefused()
+    {
+        _view.ShowDefuseSuccess(_bombManager.RoundWinner);
         _shownHolder = BombManager.NoPlayer;
         ShowWins();
     }
