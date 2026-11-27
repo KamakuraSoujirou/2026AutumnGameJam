@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// キーボードとマウスの入力を爆弾本体に渡す。受け付けるかどうか（持ち手・スタン中など）は BombManager が決める
-/// 操作：P1 は WASD、P2 は矢印キー。Esc でタイトルへ。
+/// 操作：P1 は WASD、P2 は矢印キー。解除は P1 が Q、P2 が右Shift か /（液晶の下の解除ボタンでも始まる）。Esc でタイトルへ。
 /// 試合が終わったら、←→（A D）で「再戦」「タイトルへ」を選び、Space か Enter で決める（マウスでも押せる）
 /// </summary>
 public class BombInputConnector : MonoBehaviour
@@ -29,8 +29,10 @@ public class BombInputConnector : MonoBehaviour
     private void OnEnable()
     {
         _inputReader.DirectionPressed += OnDirectionPressed;
+        _inputReader.DefusePressed += OnDefusePressed;
         _inputReader.BackPressed += _view.RequestBack;
         _view.DirectionClicked += OnDirectionClicked;
+        _view.DefuseRequested += OnDefuseClicked;
         _view.RematchRequested += OnRematchRequested;
     }
 
@@ -40,8 +42,10 @@ public class BombInputConnector : MonoBehaviour
     private void OnDisable()
     {
         _inputReader.DirectionPressed -= OnDirectionPressed;
+        _inputReader.DefusePressed -= OnDefusePressed;
         _inputReader.BackPressed -= _view.RequestBack;
         _view.DirectionClicked -= OnDirectionClicked;
+        _view.DefuseRequested -= OnDefuseClicked;
         _view.RematchRequested -= OnRematchRequested;
     }
 
@@ -77,6 +81,26 @@ public class BombInputConnector : MonoBehaviour
         }
 
         _bombManager.TryPress(player, direction);
+    }
+
+    /// <summary>
+    /// 解除キーが押されたことを爆弾本体に伝える（始められるかどうかは BombManager が決める）
+    /// </summary>
+    /// <param name="player">押したプレイヤーの番号</param>
+    private void OnDefusePressed(int player)
+    {
+        _bombManager.TryStartDefuse(player);
+    }
+
+    /// <summary>
+    /// 液晶の下の解除ボタンのクリックを爆弾本体に伝える。マウスは誰が押したか分からないので、持ち主が押したものとして扱う
+    /// </summary>
+    private void OnDefuseClicked()
+    {
+        _bombManager.TryStartDefuse(_bombManager.Holder);
+
+        // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
+        UiEventSystem.ClearSelection();
     }
 
     /// <summary>

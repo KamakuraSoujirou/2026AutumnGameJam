@@ -28,6 +28,7 @@ public class UiGameView : MonoBehaviour
     private const float ExplosionFlashAlpha = 0.7f;
     private const int RematchIndex = 0;
     private const int TitleIndex = 1;
+    private const string DefuseSuccessWord = "解除成功！";
 
     [Header("上の表示")]
     [SerializeField, Tooltip("ラウンド（R1）")] private TMP_Text _roundText;
@@ -67,6 +68,8 @@ public class UiGameView : MonoBehaviour
 
     private readonly Vector2[] _penaltyStartPositions = new Vector2[PlayerCount];
     private readonly Coroutine[] _penaltyRoutines = new Coroutine[PlayerCount];
+    private TMP_Text _explosionWord;
+    private string _explosionDefaultWord;
     private int _resultFocusIndex;
     private int _holderIndex = -1;
     private float _remainingTime = 10f;
@@ -331,6 +334,7 @@ public class UiGameView : MonoBehaviour
     /// <param name="loserIndex">負けた側（0：P1、1：P2）</param>
     public void ShowExplosion(int loserIndex)
     {
+        SetExplosionWord(false);
         _explosionFlash.gameObject.SetActive(true);
         _explosionText.gameObject.SetActive(true);
         SetHolder(-1);
@@ -340,6 +344,43 @@ public class UiGameView : MonoBehaviour
         {
             StartCoroutine(PlayExplosion());
         }
+    }
+
+    /// <summary>
+    /// 解除成功の演出を出す。爆発の文字を「解除成功！」に変えて出す（爆発していないので、アフロにはしない）
+    /// </summary>
+    public void ShowDefuseSuccess()
+    {
+        SetExplosionWord(true);
+        _explosionFlash.gameObject.SetActive(true);
+        _explosionText.gameObject.SetActive(true);
+        SetHolder(-1);
+
+        if (Application.isPlaying)
+        {
+            StartCoroutine(PlayExplosion());
+        }
+    }
+
+    /// <summary>
+    /// 爆発の文字を「ドカーン！」（元の文字）か「解除成功！」にする
+    /// </summary>
+    /// <param name="isDefused">解除成功なら true</param>
+    private void SetExplosionWord(bool isDefused)
+    {
+        if (_explosionWord == null)
+        {
+            _explosionWord = _explosionText.GetComponentInChildren<TMP_Text>(true);
+
+            if (_explosionWord == null)
+            {
+                return;
+            }
+
+            _explosionDefaultWord = _explosionWord.text;
+        }
+
+        _explosionWord.text = isDefused ? DefuseSuccessWord : _explosionDefaultWord;
     }
 
     /// <summary>
