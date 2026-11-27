@@ -121,43 +121,43 @@ MonoBehaviour:
   - _id: ART-03_red
     _label: "\u914D\u7DDA\uFF08red\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_red
-    _sprite: {fileID: 0}
+    _fileName: code_red_normal
+    _sprite: {fileID: 21300000, guid: 731dfe8bc30c1e683cc9059a74e97c1c, type: 3}
   - _id: ART-03_cut_red
     _label: "\u914D\u7DDA\uFF08red\u30FB\u5207\u65AD\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_cut_red
-    _sprite: {fileID: 0}
+    _fileName: code_red_disconnect
+    _sprite: {fileID: 21300000, guid: 81487bc1dcae0bf1f189c730868dfaf2, type: 3}
   - _id: ART-03_blue
     _label: "\u914D\u7DDA\uFF08blue\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_blue
-    _sprite: {fileID: 0}
+    _fileName: code_blue_normal
+    _sprite: {fileID: 21300000, guid: f216ce611d052d191c459b758bdf8a9a, type: 3}
   - _id: ART-03_cut_blue
     _label: "\u914D\u7DDA\uFF08blue\u30FB\u5207\u65AD\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_cut_blue
-    _sprite: {fileID: 0}
+    _fileName: code_blue_disconnect
+    _sprite: {fileID: 21300000, guid: b72a0f48fadd901f5a589cec486be901, type: 3}
   - _id: ART-03_yellow
     _label: "\u914D\u7DDA\uFF08yellow\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_yellow
-    _sprite: {fileID: 0}
+    _fileName: code_yellow_normal
+    _sprite: {fileID: 21300000, guid: b09e13598efcc77738ea600319d6d907, type: 3}
   - _id: ART-03_cut_yellow
     _label: "\u914D\u7DDA\uFF08yellow\u30FB\u5207\u65AD\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_cut_yellow
-    _sprite: {fileID: 0}
+    _fileName: code_yellow_disconnect
+    _sprite: {fileID: 21300000, guid: 236361c08d7a91d3d19baae090459fa6, type: 3}
   - _id: ART-03_green
     _label: "\u914D\u7DDA\uFF08green\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_green
-    _sprite: {fileID: 0}
+    _fileName: code_green_normal
+    _sprite: {fileID: 21300000, guid: 74d7375007527035f37c952fd0c65e62, type: 3}
   - _id: ART-03_cut_green
     _label: "\u914D\u7DDA\uFF08green\u30FB\u5207\u65AD\uFF09"
     _size: {x: 400, y: 60}
-    _fileName: wire_cut_green
-    _sprite: {fileID: 0}
+    _fileName: code_green_disconnect
+    _sprite: {fileID: 21300000, guid: 7d0fe0cfde5b3304138625b97122a5e5, type: 3}
   - _id: ART-02
     _label: "\u5C0E\u706B\u7DDA\uFF081\u533A\u9593\u3076\u3093\u3002\u4F38\u7E2E\u3059\u308B\uFF09"
     _size: {x: 400, y: 22}
@@ -369,6 +369,7 @@ MonoBehaviour:
     _size: {x: 1870, y: 440}
     _fileName: ui_result_table
     _sprite: {fileID: 0}
-  _headingFont: {fileID: 0}
-  _numberFont: {fileID: 0}
-  _bodyFont: {fileID: 0}
+  _headingFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _numberFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _bodyFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _bombFont: {fileID: 11400000, guid: 3cad0d91795b3d3458911343c57aa69d, type: 2}

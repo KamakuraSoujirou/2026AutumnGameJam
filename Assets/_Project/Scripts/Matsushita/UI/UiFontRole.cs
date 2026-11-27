@@ -10,5 +10,8 @@ public enum UiFontRole
     Number,
 
     /// <summary>本文（Zen Kaku Gothic New）</summary>
-    Body
+    Body,
+
+    /// <summary>爆弾に書いてある文字（M PLUS 1）</summary>
+    Bomb
 }
