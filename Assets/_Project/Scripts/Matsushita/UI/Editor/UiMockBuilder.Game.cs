@@ -189,6 +189,8 @@ public static partial class UiMockBuilder
         RectTransform background = CreateStretch("Background", screen);
         AddArt(background, "ART-12", Color.white, null, false, null);
         AddWorldSprite(background.gameObject, 0, true);
+        BuildPcScreen(screen);
+        BuildConveyor(screen);
 
         UiFuse fuseLeft = BuildFuse(screen, "FuseP1", false);
         UiFuse fuseRight = BuildFuse(screen, "FuseP2", true);

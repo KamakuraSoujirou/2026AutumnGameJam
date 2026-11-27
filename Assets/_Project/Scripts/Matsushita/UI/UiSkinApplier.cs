@@ -39,5 +39,10 @@ public class UiSkinApplier : MonoBehaviour
         {
             slot.Apply(_skin);
         }
+
+        foreach (UiConveyorFlow flow in GetComponentsInChildren<UiConveyorFlow>(true))
+        {
+            flow.Apply(_skin);
+        }
     }
 }
