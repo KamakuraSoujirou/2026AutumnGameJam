@@ -143,6 +143,14 @@ public class SoundPlayer : MonoBehaviour
     }
 
     /// <summary>
+    /// 最初のシーンに合わせてBGMを鳴らす（エディタでシーンを開いたまま再生したときは sceneLoaded が来ないため）
+    /// </summary>
+    private void Start()
+    {
+        OnSceneLoaded(SceneManager.GetActiveScene(), LoadSceneMode.Single);
+    }
+
+    /// <summary>
     /// シーンが読み込まれたことを受け取れるようにする
     /// </summary>
     private void OnEnable()
