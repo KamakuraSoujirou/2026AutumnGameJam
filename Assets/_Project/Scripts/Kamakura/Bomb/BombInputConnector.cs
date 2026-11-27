@@ -37,7 +37,7 @@ public class BombInputConnector : MonoBehaviour
     private void OnEnable()
     {
         _inputReader.DirectionPressed += OnDirectionPressed;
-        _inputReader.BackPressed += _view.RequestBack;
+        _inputReader.BackPressed += OnBackPressed;
         _view.DirectionClicked += OnDirectionClicked;
         _view.RematchRequested += OnRematchRequested;
     }
@@ -48,7 +48,7 @@ public class BombInputConnector : MonoBehaviour
     private void OnDisable()
     {
         _inputReader.DirectionPressed -= OnDirectionPressed;
-        _inputReader.BackPressed -= _view.RequestBack;
+        _inputReader.BackPressed -= OnBackPressed;
         _view.DirectionClicked -= OnDirectionClicked;
         _view.RematchRequested -= OnRematchRequested;
     }
@@ -85,6 +85,20 @@ public class BombInputConnector : MonoBehaviour
         }
 
         _bombManager.TryPress(player, direction);
+    }
+
+    /// <summary>
+    /// Esc が押されたので、タイトルへ戻る。リザルト中はリザルト側（UiResultInput）が Esc を受け取ってタイトルへ戻るので、ここでは何もしない
+    /// （両方で戻ると、タイトルが2回読み込まれてしまう）
+    /// </summary>
+    private void OnBackPressed()
+    {
+        if (IsResultSelectable())
+        {
+            return;
+        }
+
+        _view.RequestBack();
     }
 
     /// <summary>

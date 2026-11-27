@@ -885,7 +885,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CpuPlayer
   _bombManager: {fileID: 484021771}
-  _gimmick: {fileID: 484021772}
+  _gimmick: {fileID: 953167110}
   _view: {fileID: 796534365}
   _forceCpu: 0
   _forcedLevel: 1
