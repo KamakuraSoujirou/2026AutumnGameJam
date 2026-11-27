@@ -33,7 +33,6 @@
         { "gimmick": "Defuse", "type": "Defuse", "text": "地球にいちばん近い恒星は？", "items": [], "choices": ["太陽", "月", "火星", "北極星"], "answer": "太陽" },
         { "gimmick": "Defuse", "type": "Defuse", "text": "水が凍る温度は？", "items": [], "choices": ["0度", "10度", "−10度", "100度"], "answer": "0度" },
         { "gimmick": "Defuse", "type": "Defuse", "text": "1メートルは何センチ？", "items": [], "choices": ["100cm", "10cm", "1000cm", "50cm"], "answer": "100cm" },
-        { "gimmick": "Defuse", "type": "Defuse", "text": "世界でいちばん大きい動物は？", "items": [], "choices": ["シロナガスクジラ", "ゾウ", "キリン", "ティラノサウルス"], "answer": "シロナガスクジラ" },
         { "gimmick": "Defuse", "type": "Defuse", "text": "月は何のまわりを回っている？", "items": [], "choices": ["地球", "太陽", "火星", "木星"], "answer": "地球" },
         { "gimmick": "Defuse", "type": "Defuse", "text": "地球が1日に1回転することを何という？", "items": [], "choices": ["自転", "公転", "台風", "地震"], "answer": "自転" },
         { "gimmick": "Defuse", "type": "Defuse", "text": "雨のあとに空にかかるのは？", "items": [], "choices": ["虹", "雲", "霧", "雷"], "answer": "虹" },

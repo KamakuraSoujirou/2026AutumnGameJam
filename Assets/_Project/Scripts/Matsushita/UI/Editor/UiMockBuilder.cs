@@ -90,6 +90,7 @@ public static partial class UiMockBuilder
 
         RectTransform background = CreateStretch("Background", screen);
         AddArt(background, "ART-13", Color.white, null, false, null);
+        SetArtFallback(background.GetComponent<UiArtSlot>(), TitleBackgroundFallbackArtId);
 
         RectTransform logo = CreateRect("Logo", screen, 610f, 25f, 700f, 130f);
         TextMeshProUGUI logoText = AddText("LogoText", logo, 0f, 0f, 700f, 130f, "あと10秒", 110f, UiFontRole.Heading, TextAlignmentOptions.Center);
@@ -164,7 +165,7 @@ public static partial class UiMockBuilder
         AddText("ControlsHeading", screen, 1290f, 245f, 440f, 64f, "操作メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
         RectTransform panel = CreateRect("ControlsPanel", screen, 1265f, 305f, 518f, 202f);
-        AddArt(panel, "UI-04", Color.white, roundSprite, false, null);
+        AddArt(panel, "UI-04b", Color.white, roundSprite, false, null);
         AddOutline(panel);
 
         AddText("MoveLabel", panel, 24f, 26f, 175f, 44f, "上下左右を選ぶ", 22f, UiFontRole.Body, TextAlignmentOptions.Left);
@@ -256,7 +257,7 @@ public static partial class UiMockBuilder
         Button dimButton = AddClickArea(dim);
 
         RectTransform drawer = CreateRect("Drawer", root, ScreenWidth, DrawerTop, DrawerWidth, DrawerHeight);
-        AddArt(drawer, "UI-04", Color.white, roundSprite, false, null);
+        AddArt(drawer, "UI-04c", Color.white, roundSprite, false, null);
         AddOutline(drawer);
         // パネルの上のクリックが、後ろの暗い幕に抜けて閉じてしまわないようにする
         drawer.GetComponent<Image>().raycastTarget = true;
@@ -266,16 +267,10 @@ public static partial class UiMockBuilder
         AddOutline(tab);
         Button tabButton = AddClickArea(tab);
 
-        // タブの文字は縦長の枠に合わせて、横書きを右へ90度回して読ませる
-        TextMeshProUGUI tabLabel = AddText("Label", tab, 0f, 0f, TabHeight, TabWidth, "ルール", 44f, UiFontRole.Heading, TextAlignmentOptions.Center);
-        RectTransform tabLabelRect = tabLabel.rectTransform;
-        tabLabelRect.anchorMin = new Vector2(0.5f, 0.5f);
-        tabLabelRect.anchorMax = new Vector2(0.5f, 0.5f);
-        tabLabelRect.pivot = new Vector2(0.5f, 0.5f);
-        tabLabelRect.anchoredPosition = Vector2.zero;
-        tabLabelRect.sizeDelta = new Vector2(TabHeight, TabWidth);
-        tabLabelRect.localRotation = Quaternion.Euler(0f, 0f, -90f);
+        // タブの文字だけ縦書きにする。TextMeshPro に縦書きはないので、1字ずつ改行して縦に積む（長音「ー」は縦棒「｜」にする）
+        AddText("Label", tab, 0f, 0f, TabWidth, TabHeight, "ル\n｜\nル", 44f, UiFontRole.Heading, TextAlignmentOptions.Center);
 
+        // パネルの中は、見出しも本文もすべて横書き
         AddText("Heading", drawer, Padding, 36f, 400f, 64f, "ルール", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
         // スクロールは付けず、全文が収まる高さに固定する。切り詰めや自動縮小もしない
@@ -663,7 +658,9 @@ public static partial class UiMockBuilder
             new UiSkinEntry("UI-01", "選択肢ボタン（選択中）", new Vector2(104f, 44f), "ui_chip_on"),
             new UiSkinEntry("UI-02", "選択肢ボタン（未選択）", new Vector2(104f, 44f), "ui_chip_off"),
             new UiSkinEntry("UI-03", "ゲームスタートボタン", new Vector2(650f, 200f), "ui_start"),
-            new UiSkinEntry("UI-04", "メニューの枠", new Vector2(456f, 478f), "ui_panel")
+            new UiSkinEntry("UI-04", "メニューの枠（対戦設定。網点）", new Vector2(456f, 478f), "ui_panel"),
+            new UiSkinEntry("UI-04b", "メニューの枠（操作メニュー。斜線）", new Vector2(518f, 202f), "ui_panel_controls"),
+            new UiSkinEntry("UI-04c", "メニューの枠（ルール。灰色の斜線の内枠）", new Vector2(720f, 540f), "ui_panel_rules")
         };
 
         bool isChanged = false;
