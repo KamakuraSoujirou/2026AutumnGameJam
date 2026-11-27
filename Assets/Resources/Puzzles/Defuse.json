@@ -1,5 +1,20 @@
 {
     "puzzles": [
-        { "gimmick": "Defuse", "type": "Defuse", "text": "パンはパンでも食べられないパンは？", "items": [], "choices": ["フライパン", "メロンパン", "食パン", "あんパン"], "answer": "フライパン" }
+        { "gimmick": "Defuse", "type": "Defuse", "text": "パンはパンでも食べられないパンは？", "items": [], "choices": ["フライパン", "メロンパン", "食パン", "あんパン"], "answer": "フライパン" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "月→火→水→□", "items": [], "choices": ["木", "金", "土", "日"], "answer": "木" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "東→南→西→□", "items": [], "choices": ["北", "中", "上", "東"], "answer": "北" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "1・1・2・3・5・□", "items": [], "choices": ["8", "6", "7", "9"], "answer": "8" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "ド・レ・ミ・□", "items": [], "choices": ["ファ", "ソ", "ラ", "シ"], "answer": "ファ" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "子・丑・寅・□", "items": [], "choices": ["卯", "辰", "巳", "午"], "answer": "卯" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "2・4・8・16・□", "items": [], "choices": ["32", "24", "20", "18"], "answer": "32" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "グーに勝つのは？", "items": [], "choices": ["パー", "チョキ", "グー", "なし"], "answer": "パー" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "い・ろ・は・□", "items": [], "choices": ["に", "ほ", "へ", "と"], "answer": "に" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "A・C・E・G・□", "items": [], "choices": ["I", "H", "J", "K"], "answer": "I" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "春の次の次の季節は？", "items": [], "choices": ["秋", "夏", "冬", "春"], "answer": "秋" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "1年でいちばん短い月は？", "items": [], "choices": ["2月", "4月", "6月", "11月"], "answer": "2月" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "「たまご」から「た」を取ると？", "items": [], "choices": ["まご", "たま", "ご", "たご"], "answer": "まご" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "3×3＋3 は？", "items": [], "choices": ["12", "9", "18", "6"], "answer": "12" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "信号機の真ん中の色は？", "items": [], "choices": ["黄", "青", "赤", "緑"], "answer": "黄" },
+        { "gimmick": "Defuse", "type": "Defuse", "text": "1ダースはいくつ？", "items": [], "choices": ["12", "10", "20", "6"], "answer": "12" }
     ]
 }
