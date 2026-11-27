@@ -21,6 +21,26 @@ public class UiArtSlot : MonoBehaviour
     public string ArtId => _artId;
 
     /// <summary>
+    /// 素材の画像が入っているか（なければ仮の四角を出している）
+    /// </summary>
+    public bool HasArt { get; private set; }
+
+    /// <summary>
+    /// 素材の縦横比を保つか
+    /// </summary>
+    public bool IsPreserveAspect => _isPreserveAspect;
+
+    /// <summary>
+    /// 素材がないときの色
+    /// </summary>
+    public Color PlaceholderColor => _placeholderColor;
+
+    /// <summary>
+    /// 素材があるときにかける色
+    /// </summary>
+    public Color ArtColor => Color.white;
+
+    /// <summary>
     /// 自分の Image を取得しておく
     /// </summary>
     private void Awake()
@@ -41,6 +61,7 @@ public class UiArtSlot : MonoBehaviour
 
         Sprite sprite = skin != null ? skin.GetSprite(_artId) : null;
         bool hasArt = sprite != null;
+        HasArt = hasArt;
 
         if (hasArt)
         {

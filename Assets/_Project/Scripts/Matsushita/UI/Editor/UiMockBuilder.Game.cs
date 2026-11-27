@@ -59,6 +59,7 @@ public static partial class UiMockBuilder
 
         GameObject root = CreateCanvasRoot("UI_Game", skin);
         RectTransform screen = (RectTransform)root.transform.Find("Screen");
+        root.AddComponent<UiWorldCanvas>();
         BuildGameContents(root, screen);
 
         root.GetComponent<UiSkinApplier>().ApplyAll();
@@ -135,6 +136,7 @@ public static partial class UiMockBuilder
 
         RectTransform background = CreateStretch("Background", screen);
         AddArt(background, "ART-12", Color.white, null, false, null);
+        AddWorldSprite(background.gameObject, 0, true);
 
         UiFuse fuseLeft = BuildFuse(screen, "FuseP1", false);
         UiFuse fuseRight = BuildFuse(screen, "FuseP2", true);
@@ -148,6 +150,7 @@ public static partial class UiMockBuilder
 
         RectTransform flyingBomb = CreateCentered("FlyingBomb", screen, 960f, 610f, 220f, 220f);
         AddArt(flyingBomb, "ART-01", GrayFill, circleSprite, true, null);
+        AddWorldSprite(flyingBomb.gameObject, 30, false);
         flyingBomb.gameObject.SetActive(false);
 
         TextMeshProUGUI[] penaltyTexts =
@@ -332,6 +335,7 @@ public static partial class UiMockBuilder
         TextMeshProUGUI label = AddText("PlaceholderLabel", visual, 0f, 200f, 342f, 200f, placeholderLabel, 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         label.textWrappingMode = TextWrappingModes.Normal;
         AddArt(visual, artId, GrayFill, null, true, label.gameObject);
+        AddWorldSprite(visual.gameObject, 10, false);
         return visual.gameObject;
     }
 
@@ -349,8 +353,10 @@ public static partial class UiMockBuilder
 
         RectTransform cap = CreateRect("Cap", bomb, 240f, -40f, 160f, 48f);
         AddArt(cap, "ART-01_cap", GrayFill, null, false, null);
+        AddWorldSprite(cap.gameObject, 20, false);
         RectTransform body = CreateStretch("Body", bomb);
         AddArt(body, "ART-01", GrayFill, circleSprite, true, null);
+        AddWorldSprite(body.gameObject, 20, false);
 
         UiWire[] wires =
         {
@@ -707,6 +713,21 @@ public static partial class UiMockBuilder
         AddArt(root, "ART-20", Color.clear, null, true, text.gameObject);
         root.gameObject.SetActive(false);
         return root;
+    }
+
+    /// <summary>
+    /// 素材があるときに 2D オブジェクト（SpriteRenderer）としても出せるようにする（UiArtSlot の後に呼ぶ）
+    /// </summary>
+    /// <param name="target">UiArtSlot が付いているオブジェクト</param>
+    /// <param name="sortingOrder">2D オブジェクトの描画順（大きいほど手前）</param>
+    /// <param name="isSolidWhenEmpty">素材がないときも色の四角を出すか（背景用）</param>
+    private static void AddWorldSprite(GameObject target, int sortingOrder, bool isSolidWhenEmpty)
+    {
+        UiWorldSprite worldSprite = target.AddComponent<UiWorldSprite>();
+        SerializedObject serialized = new SerializedObject(worldSprite);
+        serialized.FindProperty("_sortingOrder").intValue = sortingOrder;
+        serialized.FindProperty("_isSolidWhenEmpty").boolValue = isSolidWhenEmpty;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
     /// <summary>
