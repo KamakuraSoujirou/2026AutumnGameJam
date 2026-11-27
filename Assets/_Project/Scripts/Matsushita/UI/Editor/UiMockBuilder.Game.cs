@@ -36,6 +36,15 @@ public static partial class UiMockBuilder
 
     private static readonly string[] StaleArtIds = { "UI-05", "ART-19", "ART-05_normal" };
 
+    /// <summary>立ち絵の倍率（足元の中心を軸に大きくする）</summary>
+    private const float CharacterScale = 1.3f;
+
+    /// <summary>立ち絵を大きくしたぶん、足元を下げる量（1920×1080 の画面で）</summary>
+    private const float CharacterDropY = 45f;
+
+    /// <summary>立ち絵が大きくなったぶん、頭上の吹き出しを上げる量（1920×1080 の画面で）</summary>
+    private const float BubbleRiseY = 50f;
+
     /// <summary>
     /// 試合画面のプレハブとテストシーンを作る
     /// </summary>
@@ -294,7 +303,11 @@ public static partial class UiMockBuilder
         bandImage.raycastTarget = false;
         band.gameObject.SetActive(false);
 
+        // 立ち絵は、足元の中心を軸に大きくする。足元は少し下げて、頭が吹き出しにぶつからないようにする
         RectTransform character = CreateStretch("Character", panel);
+        character.pivot = new Vector2(0.5f, 0f);
+        character.anchoredPosition = new Vector2(0f, -CharacterDropY);
+        character.localScale = new Vector3(CharacterScale, CharacterScale, 1f);
         GameObject normal = CreateCharacterVisual(character, "Normal", $"{artId}_normal", $"{artId}\n{tag}");
         GameObject panic = CreateCharacterVisual(character, "Panic", panicId, $"{artId}\n{tag}\n焦り顔");
         GameObject afro = CreateCharacterVisual(character, "Afro", $"{artId}_afro", $"{artId}\n{tag}\nアフロ");
@@ -302,7 +315,7 @@ public static partial class UiMockBuilder
         afro.SetActive(false);
 
         float bubbleCenterX = isLeft ? 170.5f : 171.5f;
-        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f, 383f, 134f);
+        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f - BubbleRiseY, 383f, 134f);
         AddArt(bubble, "UI-14", GrayFill, null, false, null);
         TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
 
