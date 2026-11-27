@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca6f229714a9541179f6c9574a61bf75, type: 3}
+  m_Name: SoundLibrary
+  m_EditorClassIdentifier: Assembly-CSharp::SoundLibrary
+  _entries:
+  - _id: 0
+    _clip: {fileID: 8300000, guid: c669cec7bc1bf4ca898530e6b0c49a5f, type: 3}
+    _volume: 0.5
+  - _id: 1
+    _clip: {fileID: 8300000, guid: 545eb0719c1ef41d1a44c47765f4d716, type: 3}
+    _volume: 0.7
+  - _id: 2
+    _clip: {fileID: 8300000, guid: 2ab91d5b62733468787a1e72131e394f, type: 3}
+    _volume: 0.8
+  - _id: 3
+    _clip: {fileID: 8300000, guid: 660f6d49144474efebf0d406960082ad, type: 3}
+    _volume: 0.8
+  - _id: 4
+    _clip: {fileID: 8300000, guid: 219d6ca3475c74737b08782706dbd9ce, type: 3}
+    _volume: 0.8
+  - _id: 5
+    _clip: {fileID: 8300000, guid: a0efeafad068c45afa007524fc9bf6b2, type: 3}
+    _volume: 0.8
+  - _id: 6
+    _clip: {fileID: 8300000, guid: c3899fd2a55ad498bbd280f45a96ff64, type: 3}
+    _volume: 1
+  - _id: 7
+    _clip: {fileID: 8300000, guid: b69279a77364247c7b6461ecb7e917ed, type: 3}
+    _volume: 0.8
+  - _id: 8
+    _clip: {fileID: 8300000, guid: 70179a789105e44c38d6ba58a034a82f, type: 3}
+    _volume: 0.8
+  - _id: 9
+    _clip: {fileID: 8300000, guid: 5b4da5ad14a844e70abdf0514247d101, type: 3}
+    _volume: 0.8
+  - _id: 10
+    _clip: {fileID: 8300000, guid: fc4a8b3680c7c4ab69ba8cc3fa721dde, type: 3}
+    _volume: 0.8
+  - _id: 11
+    _clip: {fileID: 8300000, guid: de4b158e7aca545a2b48a67941a12ca5, type: 3}
+    _volume: 0.6
+  - _id: 12
+    _clip: {fileID: 8300000, guid: 9e19fd812ee7d4b94836622ecf889470, type: 3}
+    _volume: 0.8
+  - _id: 13
+    _clip: {fileID: 8300000, guid: 2f3de93796b3542f99a02bbb7f0d62d9, type: 3}
+    _volume: 0.8
+  - _id: 14
+    _clip: {fileID: 8300000, guid: 3eb2527678f254adb9512143e5a15330, type: 3}
+    _volume: 0.8
+  - _id: 15
+    _clip: {fileID: 8300000, guid: 87a5bb7917b9247f2a674ee6274d36d8, type: 3}
+    _volume: 0.35
+  - _id: 16
+    _clip: {fileID: 8300000, guid: d9dbab27df6544f8c81be77e11ee64ed, type: 3}
+    _volume: 0.35
+  - _id: 17
+    _clip: {fileID: 8300000, guid: 86dcf10508276450092801176e59aa97, type: 3}
+    _volume: 0.35
