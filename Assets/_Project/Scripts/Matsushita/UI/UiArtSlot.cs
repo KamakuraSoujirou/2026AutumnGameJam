@@ -12,13 +12,36 @@ public class UiArtSlot : MonoBehaviour
     [SerializeField, Tooltip("素材がないときの形（空なら四角）")] private Sprite _placeholderSprite;
     [SerializeField, Tooltip("素材の縦横比を保つか")] private bool _isPreserveAspect;
     [SerializeField, Tooltip("素材がないときだけ出すもの（仮の文字など）")] private GameObject _placeholderObject;
+    [SerializeField, Tooltip("素材がないときに代わりに使う素材ID（空なら使わない。例：消灯の絵が届くまで点灯の絵を暗くして使う）")] private string _fallbackArtId;
+    [SerializeField, Tooltip("代わりの素材を使うときにかける色")] private Color _fallbackColor = Color.white;
 
     private Image _image;
+    private bool _isUsingFallback;
 
     /// <summary>
     /// UiSkin の素材ID
     /// </summary>
     public string ArtId => _artId;
+
+    /// <summary>
+    /// 素材の画像が入っているか（なければ仮の四角を出している）
+    /// </summary>
+    public bool HasArt { get; private set; }
+
+    /// <summary>
+    /// 素材の縦横比を保つか
+    /// </summary>
+    public bool IsPreserveAspect => _isPreserveAspect;
+
+    /// <summary>
+    /// 素材がないときの色
+    /// </summary>
+    public Color PlaceholderColor => _placeholderColor;
+
+    /// <summary>
+    /// 素材があるときにかける色
+    /// </summary>
+    public Color ArtColor => _isUsingFallback ? _fallbackColor : Color.white;
 
     /// <summary>
     /// 自分の Image を取得しておく
@@ -40,12 +63,21 @@ public class UiArtSlot : MonoBehaviour
         }
 
         Sprite sprite = skin != null ? skin.GetSprite(_artId) : null;
+        _isUsingFallback = false;
+
+        if (sprite == null && skin != null && !string.IsNullOrEmpty(_fallbackArtId))
+        {
+            sprite = skin.GetSprite(_fallbackArtId);
+            _isUsingFallback = sprite != null;
+        }
+
         bool hasArt = sprite != null;
+        HasArt = hasArt;
 
         if (hasArt)
         {
             _image.sprite = sprite;
-            _image.color = Color.white;
+            _image.color = ArtColor;
             _image.preserveAspect = _isPreserveAspect;
         }
         else

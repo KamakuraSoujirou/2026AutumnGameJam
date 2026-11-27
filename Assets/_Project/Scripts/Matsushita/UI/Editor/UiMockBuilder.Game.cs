@@ -17,7 +17,6 @@ public static partial class UiMockBuilder
     private static readonly Color GrayFill = new Color(0.8f, 0.8f, 0.8f);
     private static readonly Color LightGray = new Color(0.9f, 0.9f, 0.9f);
     private static readonly Color SubTextColor = new Color(0.45f, 0.45f, 0.45f);
-    private static readonly Color LcdColor = new Color(0.2f, 0.22f, 0.22f);
     private static readonly Color LcdTextColor = new Color(0.65f, 1f, 0.75f);
     private static readonly Color StarLitColor = new Color(0.08f, 0.08f, 0.08f);
     private static readonly Color StarOffColor = new Color(0.75f, 0.75f, 0.75f);
@@ -25,6 +24,9 @@ public static partial class UiMockBuilder
     private static readonly Color ButtonFrameColor = new Color(0.45f, 0.47f, 0.52f);
 
     private static readonly string[] WireNames = { "red", "blue", "yellow", "green" };
+
+    /// <summary>ひし形ボタンの絵の状態（通常・マウスが重なった・押している間）</summary>
+    private static readonly string[] ButtonLookNames = { "normal", "light", "blackout" };
 
     private static readonly Color[] WireColors =
     {
@@ -34,7 +36,43 @@ public static partial class UiMockBuilder
         new Color(0.5f, 1f, 0.4f)
     };
 
-    private static readonly string[] StaleArtIds = { "UI-05", "ART-19", "ART-05_normal", "UI-19", "UI-20" };
+    /// <summary>立ち絵の倍率（足元の中心を軸に大きくする）</summary>
+    private const float CharacterScale = 1.3f;
+
+    /// <summary>立ち絵を大きくしたぶん、足元を下げる量（1920×1080 の画面で）</summary>
+    private const float CharacterDropY = 45f;
+
+    /// <summary>立ち絵が大きくなったぶん、頭上の吹き出しを上げる量（1920×1080 の画面で）</summary>
+    private const float BubbleRiseY = 50f;
+
+    /// <summary>手に持つ爆弾（と、飛ぶ爆弾）の一辺（1920×1080 の画面で）</summary>
+    private const float HeldBombSize = 130f;
+
+    /// <summary>爆弾の本体の絵に含まれる口金・液晶の枠。使わなくなった素材ID（絵が空のものだけ片付ける）</summary>
+    private static readonly string[] StaleArtIds =
+    {
+        "UI-05", "ART-19", "ART-05_normal", "UI-19", "UI-20",
+        "ART-01_cap", "UI-06", "UI-17",
+        "ART-05_red", "ART-05_blue", "ART-05_yellow", "ART-05_green"
+    };
+
+    /// <summary>爆弾の本体の絵（800×800）を、爆弾の四角（640×640）に縮めた倍率</summary>
+    private const float BombArtScale = 0.8f;
+
+    /// <summary>ひし形ボタンの絵（200×200）を置く一辺（爆弾の四角の座標）</summary>
+    private const float ButtonBoxSize = 148f;
+
+    /// <summary>つまみが右にある絵の中で、ひし形の中心がある位置（絵の幅・高さに対する割合。上が 0）。つまみが左にある絵は左右が逆になる</summary>
+    private static readonly Vector2 ButtonDiamondCenter = new Vector2(0.45f, 0.475f);
+
+    /// <summary>絵のつまみが左にあるか（赤・青・黄・緑の順。赤と青は右、黄と緑は左に描かれている）</summary>
+    private static readonly bool[] ButtonTabIsLeft = { false, false, true, true };
+
+    /// <summary>配線の仮の線を一時的に隠す（配線の絵が届いたら false にして作り直す）</summary>
+    private const bool IsWireHiddenForNow = true;
+
+    /// <summary>ランプの消灯の見た目を一時的に隠す（消灯の絵 bomb_lamp_blackout が届いたので、今は隠さない）</summary>
+    private const bool IsLampOffHiddenForNow = false;
 
     /// <summary>
     /// 試合画面のプレハブとテストシーンを作る
@@ -59,6 +97,7 @@ public static partial class UiMockBuilder
 
         GameObject root = CreateCanvasRoot("UI_Game", skin);
         RectTransform screen = (RectTransform)root.transform.Find("Screen");
+        root.AddComponent<UiWorldCanvas>();
         BuildGameContents(root, screen);
 
         root.GetComponent<UiSkinApplier>().ApplyAll();
@@ -89,9 +128,9 @@ public static partial class UiMockBuilder
             new UiSkinEntry("ART-12", "試合の背景", new Vector2(1920f, 1080f), "game_bg"),
             new UiSkinEntry("ART-02", "導火線（1区間ぶん。伸縮する）", new Vector2(400f, 22f), "fuse"),
             new UiSkinEntry("ART-08", "火花", new Vector2(130f, 130f), "spark"),
-            new UiSkinEntry("ART-01_cap", "爆弾の口金", new Vector2(176f, 48f), "bomb_cap"),
-            new UiSkinEntry("ART-04_on", "ランプ（点灯）", new Vector2(96f, 96f), "lamp_on"),
-            new UiSkinEntry("ART-04_off", "ランプ（消灯）", new Vector2(96f, 96f), "lamp_off"),
+            new UiSkinEntry("ART-01_held", "手に持つ爆弾（立ち絵の手に出す。飛ぶ爆弾も同じ絵）", new Vector2(260f, 260f), "bomb_held"),
+            new UiSkinEntry("ART-04_on", "ランプ（点灯）", new Vector2(80f, 80f), "bomb_lamp"),
+            new UiSkinEntry("ART-04_off", "ランプ（消灯。なければ点灯の絵を暗くして使う）", new Vector2(80f, 80f), "bomb_lamp_blackout"),
             new UiSkinEntry("ART-09_afro", "キャラ P1（アフロ）", new Vector2(600f, 900f), "chr_p1_afro"),
             new UiSkinEntry("ART-10_afro", "キャラ P2（アフロ）", new Vector2(600f, 900f), "chr_p2_afro"),
             new UiSkinEntry("ART-11_p1_panic", "キャラ P1（焦り顔）", new Vector2(600f, 900f), "chr_p1_panic"),
@@ -102,20 +141,22 @@ public static partial class UiMockBuilder
             new UiSkinEntry("ART-17", "ラウンド開始バナー枠", new Vector2(1200f, 400f), "banner"),
             new UiSkinEntry("ART-18", "解除中の演出", new Vector2(1000f, 300f), "defuse_caption"),
             new UiSkinEntry("ART-20", "爆発の文字", new Vector2(800f, 300f), "boom_text"),
-            new UiSkinEntry("UI-06", "爆弾の液晶（口の形）", new Vector2(860f, 250f), "ui_lcd"),
             new UiSkinEntry("UI-07", "リザルトの枠", new Vector2(1000f, 580f), "ui_result"),
             new UiSkinEntry("UI-12", "戻るボタン", new Vector2(168f, 74f), "ui_back"),
             new UiSkinEntry("UI-13", "ラウンド表示の枠", new Vector2(234f, 100f), "ui_round"),
             new UiSkinEntry("UI-14", "吹き出しの枠", new Vector2(383f, 134f), "ui_bubble"),
             new UiSkinEntry("UI-15", "下の帯（プレイヤー名と勝ち星）", new Vector2(532f, 66f), "ui_bar"),
             new UiSkinEntry("UI-16", "下の帯（ギミック名）", new Vector2(363f, 66f), "ui_bar_gimmick"),
-            new UiSkinEntry("UI-17", "爆弾のタイマー液晶", new Vector2(365f, 95f), "ui_timer"),
             new UiSkinEntry("UI-18", "解除ボタン", new Vector2(260f, 70f), "ui_defuse")
         };
 
         for (int i = 0; i < WireNames.Length; i++)
         {
-            entries.Add(new UiSkinEntry($"ART-05_{WireNames[i]}", $"ひし形ボタン（{WireNames[i]}）", new Vector2(270f, 270f), $"button_{WireNames[i]}"));
+            foreach (string look in ButtonLookNames)
+            {
+                entries.Add(new UiSkinEntry($"ART-05_{WireNames[i]}_{look}", $"ひし形ボタン（{WireNames[i]}・{look}）", new Vector2(200f, 200f), $"bomb_switch_{WireNames[i]}_{look}"));
+            }
+
             entries.Add(new UiSkinEntry($"ART-03_{WireNames[i]}", $"配線（{WireNames[i]}）", new Vector2(400f, 40f), $"wire_{WireNames[i]}"));
             entries.Add(new UiSkinEntry($"ART-03_cut_{WireNames[i]}", $"配線（{WireNames[i]}・切断）", new Vector2(400f, 40f), $"wire_cut_{WireNames[i]}"));
         }
@@ -135,19 +176,22 @@ public static partial class UiMockBuilder
 
         RectTransform background = CreateStretch("Background", screen);
         AddArt(background, "ART-12", Color.white, null, false, null);
+        AddWorldSprite(background.gameObject, 0, true);
 
         UiFuse fuseLeft = BuildFuse(screen, "FuseP1", false);
         UiFuse fuseRight = BuildFuse(screen, "FuseP2", true);
-        UiPlayerPanel panel1 = BuildPlayerPanel(screen, 0, roundSprite);
-        UiPlayerPanel panel2 = BuildPlayerPanel(screen, 1, roundSprite);
+        UiPlayerPanel panel1 = BuildPlayerPanel(screen, 0, roundSprite, circleSprite);
+        UiPlayerPanel panel2 = BuildPlayerPanel(screen, 1, roundSprite, circleSprite);
         UiBombView bomb = BuildBomb(screen, roundSprite, circleSprite, out Button defuseClick);
 
         UiGameView view = root.AddComponent<UiGameView>();
         BuildTopHud(screen, view);
         BuildBottomBars(screen, view);
 
-        RectTransform flyingBomb = CreateCentered("FlyingBomb", screen, 960f, 610f, 220f, 220f);
-        AddArt(flyingBomb, "ART-01", GrayFill, circleSprite, true, null);
+        // 飛ぶ爆弾は、立ち絵が手に持っている爆弾と同じ絵・同じ大きさ
+        RectTransform flyingBomb = CreateCentered("FlyingBomb", screen, 960f, 610f, HeldBombSize, HeldBombSize);
+        AddArt(flyingBomb, "ART-01_held", GrayFill, circleSprite, true, null);
+        AddWorldSprite(flyingBomb.gameObject, 30, false);
         flyingBomb.gameObject.SetActive(false);
 
         TextMeshProUGUI[] penaltyTexts =
@@ -208,7 +252,6 @@ public static partial class UiMockBuilder
 
         bomb.SetQuestion("赤い★の線を切れ");
         bomb.SetLamp(true);
-        bomb.SetSerial(42);
         bomb.SetInput(string.Empty);
         bomb.SetDefuseState(UiDefuseState.Locked);
 
@@ -237,7 +280,7 @@ public static partial class UiMockBuilder
         float endX = isRight ? 1828f : 92f;
         Vector2[] points =
         {
-            new Vector2(bombX, 272f),
+            new Vector2(bombX, 300f),
             new Vector2(bombX, 151f),
             new Vector2(endX, 151f),
             new Vector2(endX, 570f)
@@ -273,8 +316,9 @@ public static partial class UiMockBuilder
     /// <param name="screen">1920×1080 の土台</param>
     /// <param name="playerIndex">0：P1（左）、1：P2（右）</param>
     /// <param name="roundSprite">角丸の仮の形</param>
+    /// <param name="circleSprite">丸い仮の形（手の爆弾に使う）</param>
     /// <returns>作ったパネル</returns>
-    private static UiPlayerPanel BuildPlayerPanel(RectTransform screen, int playerIndex, Sprite roundSprite)
+    private static UiPlayerPanel BuildPlayerPanel(RectTransform screen, int playerIndex, Sprite roundSprite, Sprite circleSprite)
     {
         const float PanelWidth = 342f;
         const float PanelHeight = 548f;
@@ -296,15 +340,27 @@ public static partial class UiMockBuilder
         bandImage.raycastTarget = false;
         band.gameObject.SetActive(false);
 
+        // 立ち絵は、足元の中心を軸に大きくする。足元は少し下げて、頭が吹き出しにぶつからないようにする
         RectTransform character = CreateStretch("Character", panel);
+        character.pivot = new Vector2(0.5f, 0f);
+        character.anchoredPosition = new Vector2(0f, -CharacterDropY);
+        character.localScale = new Vector3(CharacterScale, CharacterScale, 1f);
         GameObject normal = CreateCharacterVisual(character, "Normal", $"{artId}_normal", $"{artId}\n{tag}");
         GameObject panic = CreateCharacterVisual(character, "Panic", panicId, $"{artId}\n{tag}\n焦り顔");
         GameObject afro = CreateCharacterVisual(character, "Afro", $"{artId}_afro", $"{artId}\n{tag}\nアフロ");
         panic.SetActive(false);
         afro.SetActive(false);
 
+        // 手に持つ爆弾。置き場所は、真ん中（相手側）の手の仮の位置（立ち絵を大きくする前の位置を、足元の中心から見て同じ倍率で動かした）。立ち絵の手に合わせて、Unity で動かす
+        float heldBombX = PanelWidth * 0.5f + (isLeft ? 137f : -123f) * CharacterScale;
+        float heldBombY = PanelHeight + (296f - PanelHeight) * CharacterScale + CharacterDropY;
+        RectTransform heldBomb = CreateCentered("HeldBomb", panel, heldBombX, heldBombY, HeldBombSize, HeldBombSize);
+        AddArt(heldBomb, "ART-01_held", GrayFill, circleSprite, true, null);
+        AddWorldSprite(heldBomb.gameObject, 12, false);
+        heldBomb.gameObject.SetActive(false);
+
         float bubbleCenterX = isLeft ? 170.5f : 171.5f;
-        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f, 383f, 134f);
+        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f - BubbleRiseY, 383f, 134f);
         AddArt(bubble, "UI-14", GrayFill, null, false, null);
         TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
 
@@ -315,6 +371,7 @@ public static partial class UiMockBuilder
         SetObject(playerPanel, "_bubble", bubble);
         SetObject(playerPanel, "_bubbleText", bubbleText);
         SetObject(playerPanel, "_edgeBand", bandImage);
+        SetObject(playerPanel, "_heldBomb", heldBomb);
         return playerPanel;
     }
 
@@ -332,6 +389,7 @@ public static partial class UiMockBuilder
         TextMeshProUGUI label = AddText("PlaceholderLabel", visual, 0f, 200f, 342f, 200f, placeholderLabel, 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         label.textWrappingMode = TextWrappingModes.Normal;
         AddArt(visual, artId, GrayFill, null, true, label.gameObject);
+        AddWorldSprite(visual.gameObject, 10, false);
         return visual.gameObject;
     }
 
@@ -347,53 +405,53 @@ public static partial class UiMockBuilder
     {
         RectTransform bomb = CreateRect("Bomb", screen, 640f, 290f, 640f, 640f);
 
-        RectTransform cap = CreateRect("Cap", bomb, 240f, -40f, 160f, 48f);
-        AddArt(cap, "ART-01_cap", GrayFill, null, false, null);
+        // 本体の絵（口金・X字の傷・左右のコネクタ・液晶の枠まで含む）。以下の座標は、800×800 の絵で測った位置に BombArtScale をかけたもの
         RectTransform body = CreateStretch("Body", bomb);
         AddArt(body, "ART-01", GrayFill, circleSprite, true, null);
+        AddWorldSprite(body.gameObject, 20, false);
 
+        // ひし形ボタンは、X字の4つの頂点に置く。つまみは上と左が左向き、右と下が右向き（絵のつまみは右向きなので、上と左は反転して使う）
         UiWire[] wires =
         {
-            CreateWire(bomb, "WireUp", new Vector2(320f, 72f), 80f, 168f),
-            CreateWire(bomb, "WireDown", new Vector2(320f, 279f), 392f, 268f),
-            CreateWire(bomb, "WireLeft", new Vector2(175f, 178f), -20f, 124f),
-            CreateWire(bomb, "WireRight", new Vector2(465f, 178f), 536f, 124f)
+            CreateWire(bomb, "WireUp", ArtPoint(400f, 145f), 80f, 166f, true),
+            CreateWire(bomb, "WireDown", ArtPoint(400f, 385f), 394f, 182f, false),
+            CreateWire(bomb, "WireLeft", ArtPoint(255f, 263f), 80f, 50f, true),
+            CreateWire(bomb, "WireRight", ArtPoint(545f, 263f), 510f, 66f, false)
         };
 
-        RectTransform lampOn = CreateCentered("LampOn", bomb, 320f, 170f, 38f, 38f);
+        // ランプは X字の中心。消灯の絵が届くまでは、点灯の絵を暗くして使う
+        Vector2 lampCenter = ArtPoint(400f, 263f);
+        float lampSize = 60f * BombArtScale;
+        RectTransform lampOn = CreateCentered("LampOn", bomb, lampCenter.x, lampCenter.y, lampSize, lampSize);
         AddArt(lampOn, "ART-04_on", new Color(0.95f, 0.2f, 0.2f), circleSprite, true, null);
-        RectTransform lampOff = CreateCentered("LampOff", bomb, 320f, 170f, 38f, 38f);
+        RectTransform lampOff = CreateCentered("LampOff", bomb, lampCenter.x, lampCenter.y, lampSize, lampSize);
         AddArt(lampOff, "ART-04_off", new Color(0.35f, 0.3f, 0.3f), circleSprite, true, null);
+        SetArtFallback(lampOff, "ART-04_on", new Color(0.3f, 0.3f, 0.3f));
 
-        TextMeshProUGUI serial = AddText("Serial", bomb, 95f, 377f, 100f, 36f, "42", 28f, UiFontRole.Number, TextAlignmentOptions.Center);
-
-        RectTransform timer = CreateRect("TimerLcd", bomb, 225f, 372f, 194f, 50f);
-        AddArt(timer, "UI-17", LcdColor, roundSprite, false, null);
-        AddLcdOutline(timer, ButtonFrameColor, 3f);
-        TextMeshProUGUI time = AddText("Time", timer, 0f, 0f, 194f, 50f, "10:00", 38f, UiFontRole.Number, TextAlignmentOptions.Center);
+        // 液晶の枠は本体の絵に描いてあるので、ここは文字の置き場だけ（仮の四角は出さない）
+        RectTransform timer = CreateRect("TimerLcd", bomb, 240f, 384f, 160f, 48f);
+        TextMeshProUGUI time = AddText("Time", timer, 0f, 0f, 160f, 48f, "10:00", 34f, UiFontRole.Number, TextAlignmentOptions.Center);
         time.color = LcdTextColor;
 
-        RectTransform mouth = CreateRect("MouthLcd", bomb, 98f, 436f, 457f, 133f);
-        AddArt(mouth, "UI-06", LcdColor, roundSprite, false, null);
-        AddLcdOutline(mouth, DangerRed, 5f);
+        RectTransform mouth = CreateRect("MouthLcd", bomb, 130f, 440f, 380f, 120f);
 
-        TextMeshProUGUI question = AddText("Question", mouth, 30f, 8f, 397f, 70f, "問題文がここに出る", 30f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI question = AddText("Question", mouth, 24f, 6f, 332f, 62f, "問題文がここに出る", 28f, UiFontRole.Body, TextAlignmentOptions.Center);
         question.color = LcdTextColor;
         question.textWrappingMode = TextWrappingModes.Normal;
         question.enableAutoSizing = true;
-        question.fontSizeMin = 18f;
-        question.fontSizeMax = 30f;
+        question.fontSizeMin = 16f;
+        question.fontSizeMax = 28f;
 
-        TextMeshProUGUI defuseStatus = AddText("DefuseStatus", mouth, 30f, 86f, 235f, 34f, "解除：パス5回目から", 20f, UiFontRole.Body, TextAlignmentOptions.Left);
+        TextMeshProUGUI defuseStatus = AddText("DefuseStatus", mouth, 50f, 74f, 170f, 30f, "解除：パス5回目から", 17f, UiFontRole.Body, TextAlignmentOptions.Left);
         defuseStatus.color = LcdTextColor;
 
-        RectTransform defuseButton = CreateRect("DefuseButton", mouth, 275f, 86f, 150f, 34f);
+        RectTransform defuseButton = CreateRect("DefuseButton", mouth, 232f, 74f, 110f, 30f);
         AddArt(defuseButton, "UI-18", Orange, roundSprite, false, null);
-        AddText("Label", defuseButton, 0f, 0f, 150f, 34f, "解除", 22f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        AddText("Label", defuseButton, 0f, 0f, 110f, 30f, "解除", 20f, UiFontRole.Heading, TextAlignmentOptions.Center);
         defuseClick = AddClickArea(defuseButton);
         defuseButton.gameObject.SetActive(false);
 
-        TextMeshProUGUI input = AddText("Input", bomb, 200f, 590f, 240f, 36f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI input = AddText("Input", bomb, 200f, 582f, 240f, 36f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
         input.gameObject.SetActive(false);
 
         UiBombView view = bomb.gameObject.AddComponent<UiBombView>();
@@ -401,7 +459,7 @@ public static partial class UiMockBuilder
         SetObject(view, "_timeText", time);
         SetObject(view, "_lampOn", lampOn.gameObject);
         SetObject(view, "_lampOff", lampOff.gameObject);
-        SetObject(view, "_serialText", serial);
+        SetBool(view, "_isLampOffHidden", IsLampOffHiddenForNow);
         SetObject(view, "_questionText", question);
         SetObject(view, "_defuseStatusText", defuseStatus);
         SetObject(view, "_defuseButton", defuseButton.gameObject);
@@ -411,16 +469,52 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
-    /// 液晶の枠線を付ける
+    /// 本体の絵（800×800）の上の位置を、爆弾の四角（640×640）の座標にする
     /// </summary>
-    /// <param name="target">付ける四角</param>
-    /// <param name="color">線の色</param>
-    /// <param name="distance">線の太さ</param>
-    private static void AddLcdOutline(RectTransform target, Color color, float distance)
+    /// <param name="x">絵の左からの位置</param>
+    /// <param name="y">絵の上からの位置</param>
+    /// <returns>爆弾の四角の左上からの位置</returns>
+    private static Vector2 ArtPoint(float x, float y)
     {
-        Outline outline = target.gameObject.AddComponent<Outline>();
-        outline.effectColor = color;
-        outline.effectDistance = new Vector2(distance, -distance);
+        return new Vector2(x * BombArtScale, y * BombArtScale);
+    }
+
+    /// <summary>
+    /// 素材がないときに、別の素材IDの絵を色を変えて代わりに使う指定を付ける（UiArtSlot の後に呼ぶ）
+    /// </summary>
+    /// <param name="target">UiArtSlot が付いているオブジェクト</param>
+    /// <param name="fallbackArtId">代わりに使う素材ID</param>
+    /// <param name="fallbackColor">代わりの絵にかける色</param>
+    private static void SetArtFallback(RectTransform target, string fallbackArtId, Color fallbackColor)
+    {
+        SerializedObject serialized = new SerializedObject(target.GetComponent<UiArtSlot>());
+        serialized.FindProperty("_fallbackArtId").stringValue = fallbackArtId;
+        serialized.FindProperty("_fallbackColor").colorValue = fallbackColor;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// ひし形ボタンの絵を置く四角を作る。ひし形の中心を軸にして、つまみの向きに合わせて左右反転できる
+    /// </summary>
+    /// <param name="name">オブジェクト名</param>
+    /// <param name="parent">置く場所（ひし形の中心が親の中心）</param>
+    /// <param name="isMirrored">左右反転するか</param>
+    /// <param name="isArtTabLeft">反転する前の絵のつまみが左にあるか</param>
+    /// <returns>作った四角</returns>
+    private static RectTransform CreateDiamondArea(string name, Transform parent, bool isMirrored, bool isArtTabLeft)
+    {
+        GameObject gameObject = new GameObject(name, typeof(RectTransform));
+        RectTransform rect = (RectTransform)gameObject.transform;
+        rect.SetParent(parent, false);
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        // つまみが左にある絵は、ひし形の中心も左右が逆（右寄り）になる
+        float centerX = isArtTabLeft ? 1f - ButtonDiamondCenter.x : ButtonDiamondCenter.x;
+        rect.pivot = new Vector2(centerX, 1f - ButtonDiamondCenter.y);
+        rect.anchoredPosition = Vector2.zero;
+        rect.sizeDelta = new Vector2(ButtonBoxSize, ButtonBoxSize);
+        rect.localScale = new Vector3(isMirrored ? -1f : 1f, 1f, 1f);
+        return rect;
     }
 
     /// <summary>
@@ -431,12 +525,13 @@ public static partial class UiMockBuilder
     /// <param name="buttonCenter">ボタンの中心（爆弾の左上から）</param>
     /// <param name="wireX">配線の左端</param>
     /// <param name="wireWidth">配線の長さ</param>
+    /// <param name="isTabLeft">ボタンのつまみを左に向けるか（配線が左へ伸びるなら true）。絵のつまみの向きは色ごとに違うので、合わなければ反転する</param>
     /// <returns>作った配線</returns>
-    private static UiWire CreateWire(RectTransform bomb, string name, Vector2 buttonCenter, float wireX, float wireWidth)
+    private static UiWire CreateWire(RectTransform bomb, string name, Vector2 buttonCenter, float wireX, float wireWidth, bool isTabLeft)
     {
         const float WireThickness = 16f;
-        const float ButtonBox = 144f;
-        const float DiamondSide = 100f;
+        const float ButtonBox = ButtonBoxSize;
+        const float DiamondSide = 78f;
 
         RectTransform wireRoot = CreateStretch(name, bomb);
         float wireY = buttonCenter.y - WireThickness * 0.5f;
@@ -444,6 +539,8 @@ public static partial class UiMockBuilder
         GameObject[] normalVisuals = new GameObject[WireNames.Length];
         GameObject[] cutVisuals = new GameObject[WireNames.Length];
         GameObject[] buttonVisuals = new GameObject[WireNames.Length];
+        GameObject[] lightVisuals = new GameObject[WireNames.Length];
+        GameObject[] blackoutVisuals = new GameObject[WireNames.Length];
 
         for (int i = 0; i < WireNames.Length; i++)
         {
@@ -464,35 +561,76 @@ public static partial class UiMockBuilder
 
         for (int i = 0; i < WireNames.Length; i++)
         {
-            RectTransform visual = CreateStretch($"Diamond_{WireNames[i]}", buttonRoot);
-            RectTransform quad = CreateCentered("Quad", visual, ButtonBox * 0.5f, ButtonBox * 0.5f, DiamondSide, DiamondSide);
+            // 絵の中のひし形の中心が、ボタンの中心（X字の頂点）に来るように置く
+            bool isArtTabLeft = ButtonTabIsLeft[i];
+            RectTransform visual = CreateDiamondArea($"Diamond_{WireNames[i]}", buttonRoot, isTabLeft != isArtTabLeft, isArtTabLeft);
+            float diamondCenterX = isArtTabLeft ? 1f - ButtonDiamondCenter.x : ButtonDiamondCenter.x;
+            RectTransform quad = CreateCentered("Quad", visual, ButtonBox * diamondCenterX, ButtonBox * ButtonDiamondCenter.y, DiamondSide, DiamondSide);
             quad.localRotation = Quaternion.Euler(0f, 0f, 45f);
             Image quadImage = quad.gameObject.AddComponent<Image>();
             quadImage.color = WireColors[i];
             quadImage.raycastTarget = false;
             Outline frame = quad.gameObject.AddComponent<Outline>();
             frame.effectColor = ButtonFrameColor;
-            frame.effectDistance = new Vector2(7f, -7f);
-            AddArt(visual, $"ART-05_{WireNames[i]}", Color.clear, null, true, quad.gameObject);
+            frame.effectDistance = new Vector2(5f, -5f);
+            AddArt(visual, $"ART-05_{WireNames[i]}_normal", Color.clear, null, true, quad.gameObject);
             buttonVisuals[i] = visual.gameObject;
+
+            // マウスが重なったとき（light）と押している間（blackout）の絵。両方そろっているときだけ、通常の絵の上に出る
+            lightVisuals[i] = CreateButtonLookVisual(visual, "Light", $"ART-05_{WireNames[i]}_light");
+            blackoutVisuals[i] = CreateButtonLookVisual(visual, "Blackout", $"ART-05_{WireNames[i]}_blackout");
         }
+
+        // 絵が3状態そろっていないときに、明るく／暗くするために、ひし形の上へ重ねる画像（素材があるときは素材の形、ないときは仮の四角の形）。文字より下に置く
+        RectTransform artTint = CreateDiamondArea("Tint_Art", buttonRoot, false, false);
+        Image artTintImage = artTint.gameObject.AddComponent<Image>();
+        artTintImage.color = Color.clear;
+        artTintImage.raycastTarget = false;
+        artTintImage.enabled = false;
+
+        RectTransform placeholderTint = CreateCentered("Tint_Placeholder", buttonRoot, ButtonBox * 0.5f, ButtonBox * 0.5f, DiamondSide, DiamondSide);
+        placeholderTint.localRotation = Quaternion.Euler(0f, 0f, 45f);
+        Image placeholderTintImage = placeholderTint.gameObject.AddComponent<Image>();
+        placeholderTintImage.color = Color.clear;
+        placeholderTintImage.raycastTarget = false;
 
         TextMeshProUGUI label = AddText("Label", buttonRoot, 22f, 0f, ButtonBox - 44f, ButtonBox, "赤", 44f, UiFontRole.Heading, TextAlignmentOptions.Center);
         label.enableAutoSizing = true;
         label.fontSizeMin = 16f;
         label.fontSizeMax = 44f;
-        TextMeshProUGUI symbol = AddText("Symbol", buttonRoot, 92f, 8f, 48f, 40f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI symbol = AddText("Symbol", buttonRoot, 90f, 8f, 48f, 40f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
         symbol.gameObject.SetActive(false);
 
         UiWire wire = wireRoot.gameObject.AddComponent<UiWire>();
         SetObjectArray(wire, "_normalVisuals", normalVisuals);
         SetObjectArray(wire, "_cutVisuals", cutVisuals);
         SetObjectArray(wire, "_buttonVisuals", buttonVisuals);
+        SetObjectArray(wire, "_lightVisuals", lightVisuals);
+        SetObjectArray(wire, "_blackoutVisuals", blackoutVisuals);
+        SetBool(wire, "_isWireHidden", IsWireHiddenForNow);
         SetObject(wire, "_buttonGroup", buttonGroup);
         SetObject(wire, "_clickButton", AddClickArea(buttonRoot));
+        buttonRoot.gameObject.AddComponent<UiWirePointerRelay>();
+        SetObject(wire, "_artTint", artTintImage);
+        SetObject(wire, "_placeholderTint", placeholderTintImage);
         SetObject(wire, "_label", label);
         SetObject(wire, "_symbolLabel", symbol);
         return wire;
+    }
+
+    /// <summary>
+    /// ひし形ボタンの絵の上に重ねる、light／blackout の絵の差し込み口を作る（最初は隠す）
+    /// </summary>
+    /// <param name="diamond">通常の絵の四角（この中に重ねる）</param>
+    /// <param name="name">オブジェクト名</param>
+    /// <param name="artId">素材ID</param>
+    /// <returns>作ったオブジェクト</returns>
+    private static GameObject CreateButtonLookVisual(RectTransform diamond, string name, string artId)
+    {
+        RectTransform look = CreateStretch(name, diamond);
+        AddArt(look, artId, Color.clear, null, true, null);
+        look.gameObject.SetActive(false);
+        return look.gameObject;
     }
 
     /// <summary>
@@ -710,6 +848,21 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
+    /// 素材があるときに 2D オブジェクト（SpriteRenderer）としても出せるようにする（UiArtSlot の後に呼ぶ）
+    /// </summary>
+    /// <param name="target">UiArtSlot が付いているオブジェクト</param>
+    /// <param name="sortingOrder">2D オブジェクトの描画順（大きいほど手前）</param>
+    /// <param name="isSolidWhenEmpty">素材がないときも色の四角を出すか（背景用）</param>
+    private static void AddWorldSprite(GameObject target, int sortingOrder, bool isSolidWhenEmpty)
+    {
+        UiWorldSprite worldSprite = target.AddComponent<UiWorldSprite>();
+        SerializedObject serialized = new SerializedObject(worldSprite);
+        serialized.FindProperty("_sortingOrder").intValue = sortingOrder;
+        serialized.FindProperty("_isSolidWhenEmpty").boolValue = isSolidWhenEmpty;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
     /// リザルトを作る
     /// </summary>
     /// <param name="screen">1920×1080 の土台</param>
@@ -809,6 +962,19 @@ public static partial class UiMockBuilder
     {
         SerializedObject serialized = new SerializedObject(target);
         serialized.FindProperty(fieldName).floatValue = value;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// private の true／false のフィールドに値を入れる
+    /// </summary>
+    /// <param name="target">入れる先のコンポーネント</param>
+    /// <param name="fieldName">フィールド名</param>
+    /// <param name="value">入れる値</param>
+    private static void SetBool(Object target, string fieldName, bool value)
+    {
+        SerializedObject serialized = new SerializedObject(target);
+        serialized.FindProperty(fieldName).boolValue = value;
         serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 }

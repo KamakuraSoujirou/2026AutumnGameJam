@@ -158,9 +158,9 @@ public class BombUiPresenter : MonoBehaviour
     {
         _shownHolder = BombManager.NoPlayer;
 
+        // ボタンの押し込みが終わってから飛び始めるので、爆弾の中の表示を戻すのは飛び始めるとき。
         // 飛び終わったら時間の表示を入れ直して、導火線を出す
-        _view.ThrowBomb(_bombManager.FlightTarget, _bombManager.FlightDuration, () => _shownHundredths = -1);
-        ResetBomb();
+        _view.ThrowBomb(_bombManager.FlightTarget, _bombManager.FlightDuration, () => _shownHundredths = -1, ResetBomb);
     }
 
     /// <summary>

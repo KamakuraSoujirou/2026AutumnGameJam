@@ -244,6 +244,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &422426475116028262
 GameObject:
   m_ObjectHideFlags: 0
@@ -910,7 +912,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3995493767829410838
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1414,7 +1416,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &4242398058008556211
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1642,6 +1644,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1624083978620192711
 GameObject:
   m_ObjectHideFlags: 0
@@ -1735,6 +1739,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1718136014630835775
 GameObject:
   m_ObjectHideFlags: 0
@@ -1968,6 +1974,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1832005330143456920
 GameObject:
   m_ObjectHideFlags: 0
@@ -2695,16 +2703,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 8014180507354026193, guid: 5d6cc234baef17748ac6a5c0e1362237, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -2729,6 +2737,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 1
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2170203257932491456
 GameObject:
   m_ObjectHideFlags: 0
@@ -3017,6 +3027,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2566437521129322532
 GameObject:
   m_ObjectHideFlags: 0
@@ -3268,6 +3280,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &6593185312064417276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3343,16 +3357,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 5010281268795272139, guid: bed80ba576603544f9609bbabdbceb1b, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -3377,6 +3391,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 0}
   _isPreserveAspect: 1
   _placeholderObject: {fileID: 904152083662475758}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2895093695187407682
 GameObject:
   m_ObjectHideFlags: 0
@@ -3470,6 +3486,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2974967414053109837
 GameObject:
   m_ObjectHideFlags: 0
@@ -3635,6 +3653,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3033460881187275279
 GameObject:
   m_ObjectHideFlags: 0
@@ -3728,6 +3748,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3060863438550199422
 GameObject:
   m_ObjectHideFlags: 0
@@ -4033,6 +4055,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 0}
   _isPreserveAspect: 1
   _placeholderObject: {fileID: 3176738187652518559}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3176738187652518559
 GameObject:
   m_ObjectHideFlags: 0
@@ -4334,6 +4358,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1981081411619124575
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4471,6 +4497,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3495926489804218467
 GameObject:
   m_ObjectHideFlags: 0
@@ -4619,6 +4647,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &3644200537954757426
 GameObject:
   m_ObjectHideFlags: 0
@@ -5455,6 +5485,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &4690279225664802525
 GameObject:
   m_ObjectHideFlags: 0
@@ -5548,6 +5580,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &4779238738072460848
 GameObject:
   m_ObjectHideFlags: 0
@@ -6057,6 +6091,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5099269999753921703
 GameObject:
   m_ObjectHideFlags: 0
@@ -6150,6 +6186,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5181292278315281140
 GameObject:
   m_ObjectHideFlags: 0
@@ -6243,6 +6281,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5195111775839926394
 GameObject:
   m_ObjectHideFlags: 0
@@ -6476,6 +6516,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5411830867243303532
 GameObject:
   m_ObjectHideFlags: 0
@@ -6701,6 +6743,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5667073002368862531
 GameObject:
   m_ObjectHideFlags: 0
@@ -6761,16 +6805,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0, b: 0.16, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -6770752013486566163, guid: 53da1ae873c43354d89b616d11dbcf62, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -6795,6 +6839,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 0}
   _isPreserveAspect: 1
   _placeholderObject: {fileID: 1425280791289578889}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5770947691986258280
 GameObject:
   m_ObjectHideFlags: 0
@@ -7039,6 +7085,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5848370788869061869
 GameObject:
   m_ObjectHideFlags: 0
@@ -7132,6 +7180,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &5874918070437660994
 GameObject:
   m_ObjectHideFlags: 0
@@ -7365,6 +7415,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6024337406627436354
 GameObject:
   m_ObjectHideFlags: 0
@@ -7755,6 +7807,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1470529458310662446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7863,6 +7917,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6528009046334097402
 GameObject:
   m_ObjectHideFlags: 0
@@ -7956,6 +8012,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &6925964962188656528
 GameObject:
   m_ObjectHideFlags: 0
@@ -8577,6 +8635,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7256979506528322744
 GameObject:
   m_ObjectHideFlags: 0
@@ -8670,6 +8730,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7292920747298884851
 GameObject:
   m_ObjectHideFlags: 0
@@ -8763,6 +8825,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7354991462666102576
 GameObject:
   m_ObjectHideFlags: 0
@@ -8996,6 +9060,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7656857496444005718
 GameObject:
   m_ObjectHideFlags: 0
@@ -9240,6 +9306,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &7982501508378100638
 GameObject:
   m_ObjectHideFlags: 0
@@ -9710,6 +9778,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8168097649397750600
 GameObject:
   m_ObjectHideFlags: 0
@@ -10094,6 +10164,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8630769203090450969
 GameObject:
   m_ObjectHideFlags: 0
@@ -10187,6 +10259,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8678330039939207549
 GameObject:
   m_ObjectHideFlags: 0
@@ -10280,6 +10354,8 @@ MonoBehaviour:
   _placeholderSprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
   _isPreserveAspect: 0
   _placeholderObject: {fileID: 0}
+  _fallbackArtId: 
+  _fallbackColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &8868336145443336903
 GameObject:
   m_ObjectHideFlags: 0

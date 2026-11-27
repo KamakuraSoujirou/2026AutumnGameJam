@@ -20,6 +20,7 @@ public class UiPlayerPanel : MonoBehaviour
     [SerializeField, Tooltip("吹き出しの文字")] private TMP_Text _bubbleText;
     [SerializeField, Tooltip("残り3秒以下に出す、画面の端の赤い帯")] private Image _edgeBand;
     [SerializeField, Tooltip("相手が解除中のときに出す「解除中！」")] private GameObject _defuseCaption;
+    [SerializeField, Tooltip("立ち絵が手に持っている爆弾。手の位置に合わせて動かす。爆弾が飛ぶときの出発点・到着点になる")] private RectTransform _heldBomb;
 
     private string _holdText = "あと10秒！";
     private bool _isHolding;
@@ -37,6 +38,16 @@ public class UiPlayerPanel : MonoBehaviour
     /// 吹き出しに出ている文字
     /// </summary>
     public string BubbleText => _bubbleText.text;
+
+    /// <summary>
+    /// 手に持っている爆弾の四角（爆弾が飛ぶときの出発点・到着点）。まだ置いていない古いプレハブでは、パネル全体を返す
+    /// </summary>
+    public RectTransform HeldBombRect => _heldBomb != null ? _heldBomb : (RectTransform)transform;
+
+    /// <summary>
+    /// 手に持っている爆弾が出ているか
+    /// </summary>
+    public bool IsHeldBombVisible => _heldBomb != null && _heldBomb.gameObject.activeSelf;
 
     /// <summary>
     /// 吹き出しを弾ませ、残り3秒以下は赤い帯を点滅させる
@@ -73,6 +84,18 @@ public class UiPlayerPanel : MonoBehaviour
         }
 
         RefreshBubble();
+    }
+
+    /// <summary>
+    /// 手に持っている爆弾を出す／隠す
+    /// </summary>
+    /// <param name="isVisible">出すなら true</param>
+    public void SetHeldBomb(bool isVisible)
+    {
+        if (_heldBomb != null)
+        {
+            _heldBomb.gameObject.SetActive(isVisible);
+        }
     }
 
     /// <summary>
