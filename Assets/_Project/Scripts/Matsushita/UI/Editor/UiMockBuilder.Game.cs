@@ -66,7 +66,7 @@ public static partial class UiMockBuilder
     private const string SpriteArtName = "Art";
 
     /// <summary>立ち絵の見た目の名前（通常・焦り顔・アフロ）</summary>
-    private static readonly string[] CharacterPoseNames = { "Normal", "Panic", "Afro" };
+    private static readonly string[] CharacterPoseNames = { "Normal", "Panic", "Win", "Afro" };
 
     /// <summary>爆弾の本体の絵（800×800）を、爆弾の四角（640×640）に縮めた倍率</summary>
     private const float BombArtScale = 0.8f;
@@ -156,8 +156,10 @@ public static partial class UiMockBuilder
             new UiSkinEntry("UI-07", "リザルトの枠", new Vector2(1000f, 580f), "ui_result"),
             new UiSkinEntry("UI-12", "戻るボタン", new Vector2(168f, 74f), "ui_back"),
             new UiSkinEntry("UI-13", "ラウンド表示の枠", new Vector2(234f, 100f), "ui_round"),
-            new UiSkinEntry("UI-14", "吹き出しの枠", new Vector2(383f, 134f), "ui_bubble"),
-            new UiSkinEntry("UI-15", "下の帯（プレイヤー名と勝ち星）", new Vector2(532f, 66f), "ui_bar"),
+            new UiSkinEntry("UI-14", "吹き出しの枠（P1側。右上の角が欠ける）", new Vector2(383f, 134f), "ui_bubble"),
+            new UiSkinEntry("UI-14b", "吹き出しの枠（P2側。左上の角が欠ける）", new Vector2(383f, 134f), "ui_bubble_p2"),
+            new UiSkinEntry("UI-15", "下の帯（P1側。プレイヤー名と勝ち星）", new Vector2(532f, 66f), "ui_bar"),
+            new UiSkinEntry("UI-15b", "下の帯（P2側。UI-15の鏡写し）", new Vector2(532f, 66f), "ui_bar_p2"),
             new UiSkinEntry("UI-16", "下の帯（ギミック名）", new Vector2(363f, 66f), "ui_bar_gimmick"),
             new UiSkinEntry("UI-18", "解除ボタン", new Vector2(260f, 70f), "ui_defuse")
         };
@@ -364,8 +366,11 @@ public static partial class UiMockBuilder
         character.localScale = new Vector3(CharacterScale, CharacterScale, 1f);
         GameObject normal = CreateCharacterVisual(character, "Normal", $"{artId}_normal", $"{artId}\n{tag}");
         GameObject panic = CreateCharacterVisual(character, "Panic", panicId, $"{artId}\n{tag}\n焦り顔");
+        GameObject win = CreateCharacterVisual(character, "Win", $"ART-11_{tag.ToLowerInvariant()}_win", $"{artId}\n{tag}\n勝ち顔");
         GameObject afro = CreateCharacterVisual(character, "Afro", $"{artId}_afro", $"{artId}\n{tag}\nアフロ");
+        SetCharacterVisualFallback(win, $"{artId}_normal");
         panic.SetActive(false);
+        win.SetActive(false);
         afro.SetActive(false);
 
         // 手に持つ爆弾。置き場所は、真ん中（相手側）の手の仮の位置（立ち絵を大きくする前の位置を、足元の中心から見て同じ倍率で動かした）。立ち絵の手に合わせて、Unity で動かす
@@ -378,7 +383,7 @@ public static partial class UiMockBuilder
 
         float bubbleCenterX = isLeft ? 170.5f : 171.5f;
         RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f - BubbleRiseY, 383f, 134f);
-        AddArt(bubble, "UI-14", GrayFill, null, false, null);
+        AddArt(bubble, isLeft ? "UI-14" : "UI-14b", GrayFill, null, false, null);
         TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         // 「解除された…」のような長い札でも枠からはみ出さないよう、入りきらないときだけ小さくする
@@ -390,6 +395,7 @@ public static partial class UiMockBuilder
         UiPlayerPanel playerPanel = panel.gameObject.AddComponent<UiPlayerPanel>();
         SetObject(playerPanel, "_normalVisual", normal);
         SetObject(playerPanel, "_panicVisual", panic);
+        SetObject(playerPanel, "_winVisual", win);
         SetObject(playerPanel, "_afroVisual", afro);
         SetObject(playerPanel, "_bubble", bubble);
         SetObject(playerPanel, "_bubbleText", bubbleText);
@@ -399,7 +405,117 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
-    /// キャラの見た目1つ（通常・焦り顔・アフロのどれか）を作る
+    /// キャラの見た目に付いている素材の差し込み口に、絵がないときに代わりに使う素材IDを指定する（勝ち顔の絵が届くまで、通常の絵を出すため）
+    /// </summary>
+    /// <param name="visual">キャラの見た目（Normal や Win のオブジェクト）</param>
+    /// <param name="fallbackArtId">代わりに使う素材ID</param>
+    private static void SetCharacterVisualFallback(GameObject visual, string fallbackArtId)
+    {
+        Component slot = GetCharacterArtSlot(visual);
+
+        if (slot == null)
+        {
+            return;
+        }
+
+        SerializedObject serialized = new SerializedObject(slot);
+        serialized.FindProperty("_fallbackArtId").stringValue = fallbackArtId;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    /// <summary>
+    /// 試合画面のプレハブにある各プレイヤーのキャラに、勝ち顔の見た目（Win）をその場で足して、UiPlayerPanel につなぐ。
+    /// 通常の見た目（Normal）をコピーして作るので、置き場所や大きさ・描画順は同じ。すでにあれば何もしない
+    /// </summary>
+    [MenuItem("Tools/UI仮組/試合画面のキャラに勝ち顔を足す")]
+    public static void AddWinVisualsToGamePrefab()
+    {
+        if (!File.Exists(GamePrefabPath))
+        {
+            Debug.LogWarning("UI_Game.prefab がありません。先に「試合画面を作る」を実行してください");
+            return;
+        }
+
+        GameObject contents = PrefabUtility.LoadPrefabContents(GamePrefabPath);
+
+        try
+        {
+            int addedCount = AddWinVisuals(contents);
+
+            if (addedCount > 0)
+            {
+                contents.GetComponent<UiSkinApplier>().ApplyAll();
+                PrefabUtility.SaveAsPrefabAsset(contents, GamePrefabPath);
+            }
+
+            Debug.Log($"勝ち顔の見た目を {addedCount} 件足しました：{GamePrefabPath}");
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(contents);
+        }
+    }
+
+    /// <summary>
+    /// 開いているプレハブの P1・P2 に、勝ち顔の見た目（Win）を足す（通常の見た目をコピーして作る）
+    /// </summary>
+    /// <param name="contents">試合画面のプレハブの中身</param>
+    /// <returns>足した数（すでにあるものは数えない）</returns>
+    private static int AddWinVisuals(GameObject contents)
+    {
+        Transform screen = contents.transform.Find("Screen");
+        int addedCount = 0;
+
+        foreach (string tag in new[] { "P1", "P2" })
+        {
+            Transform player = screen.Find($"Player{tag}");
+            Transform character = player != null ? player.Find("Character") : null;
+            Transform normal = character != null ? character.Find("Normal") : null;
+            UiPlayerPanel panel = player != null ? player.GetComponent<UiPlayerPanel>() : null;
+
+            if (normal == null || panel == null || character.Find("Win") != null)
+            {
+                continue;
+            }
+
+            string artPrefix = tag == "P1" ? "ART-09" : "ART-10";
+            GameObject win = Object.Instantiate(normal.gameObject, character);
+            win.name = "Win";
+            win.transform.SetSiblingIndex(normal.GetSiblingIndex() + 1);
+            win.SetActive(false);
+
+            SerializedObject slot = new SerializedObject(GetCharacterArtSlot(win));
+            slot.FindProperty("_artId").stringValue = $"ART-11_{tag.ToLowerInvariant()}_win";
+            slot.ApplyModifiedPropertiesWithoutUndo();
+            SetCharacterVisualFallback(win, $"{artPrefix}_normal");
+
+            TextMeshProUGUI label = win.GetComponentInChildren<TextMeshProUGUI>(true);
+
+            if (label != null)
+            {
+                label.text = $"{artPrefix}\n{tag}\n勝ち顔";
+            }
+
+            SetObject(panel, "_winVisual", win);
+            addedCount++;
+        }
+
+        return addedCount;
+    }
+
+    /// <summary>
+    /// キャラの見た目に付いている素材の差し込み口（2D オブジェクトの UiSpriteArtSlot、なければ UI の UiArtSlot）を返す
+    /// </summary>
+    /// <param name="visual">キャラの見た目</param>
+    /// <returns>素材の差し込み口</returns>
+    private static Component GetCharacterArtSlot(GameObject visual)
+    {
+        Component slot = visual.GetComponentInChildren<UiSpriteArtSlot>(true);
+        return slot != null ? slot : visual.GetComponent<UiArtSlot>();
+    }
+
+    /// <summary>
+    /// キャラの見た目1つ（通常・焦り顔・勝ち顔・アフロのどれか）を作る
     /// </summary>
     /// <param name="parent">置く場所</param>
     /// <param name="name">オブジェクト名</param>
@@ -721,7 +837,7 @@ public static partial class UiMockBuilder
         TextMeshProUGUI gimmick = AddText("Text", center, 0f, 0f, 363f, 66f, "ギミック名", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         RectTransform barRight = CreateRect("BarP2", screen, 1262f, 963f, 532f, 66f);
-        AddArt(barRight, "UI-15", GrayFill, null, false, null);
+        AddArt(barRight, "UI-15b", GrayFill, null, false, null);
         TextMeshProUGUI nameRight = AddText("Name", barRight, 208f, 0f, 200f, 66f, "COM", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         UiWinStars starsRight = BuildWinStars(barRight, "WinStars", 58f, 13f);
 
@@ -931,6 +1047,27 @@ public static partial class UiMockBuilder
         AssetDatabase.SaveAssets();
         ApplySkinToPrefabs();
         Debug.Log($"立ち絵を {replacedCount} 件差し替えて、プレハブに反映しました");
+    }
+
+    /// <summary>
+    /// P2 の立ち絵を、新しい絵（通常：bomb_p2_v1(透過)、焦り顔：bomb_p2_v2、勝ち顔：bomb_p2_v3、アフロ：bomb_p2_v4）に差し替えて、プレハブとタイトルに反映する。
+    /// 試合画面のキャラに勝ち顔の見た目がまだなければ、先に足す。P1 の絵は変えない
+    /// </summary>
+    [MenuItem("Tools/UI仮組/P2の立ち絵を新しい絵に差し替える")]
+    public static void ReplaceP2CharacterWithNewArt()
+    {
+        AddWinVisualsToGamePrefab();
+        UiSkin skin = LoadOrCreateSkin();
+        int replacedCount = 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-10_normal", "bomb_p2_v1(透過)") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-11_p2_panic", "bomb_p2_v2") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-11_p2_win", "bomb_p2_v3") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-10_afro", "bomb_p2_v4") ? 1 : 0;
+
+        EditorUtility.SetDirty(skin);
+        AssetDatabase.SaveAssets();
+        ApplySkinToPrefabs();
+        Debug.Log($"P2の立ち絵を {replacedCount} 件差し替えて、プレハブに反映しました");
     }
 
     /// <summary>

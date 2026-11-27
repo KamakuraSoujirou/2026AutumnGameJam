@@ -16,7 +16,6 @@
         { "name": "ウシ", "icon": "cow" },
         { "name": "ラクダ", "icon": "camel" },
         { "name": "ゾウ", "icon": "elephant" },
-        { "name": "ティラノサウルス", "icon": "dinosaur-rex" },
         { "name": "りんご", "icon": "shiny-apple" },
         { "name": "スマホ", "icon": "smartphone" },
         { "name": "えんぴつ", "icon": "pencil" },
@@ -38,6 +37,7 @@
         { "name": "月", "icon": "moon" },
         { "name": "地球", "icon": "earth-asia-oceania" },
         { "name": "木星", "icon": "jupiter" },
-        { "name": "太陽", "icon": "sun" }
+        { "name": "太陽", "icon": "sun" },
+        { "name": "ティラノサウルス", "icon": "dinosaur-rex" }
     ]
 }
