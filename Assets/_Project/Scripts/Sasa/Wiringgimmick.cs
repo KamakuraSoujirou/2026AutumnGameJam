@@ -24,6 +24,10 @@ public class Wiringgimmick : Gimmick
     private static readonly int[] EvenNumbers = { 2, 4, 6, 8 };
     private static readonly int[] OddNumbers = { 1, 3, 5, 7, 9 };
 
+    // 線の色（InputDirection の並び：上キー＝赤、下キー＝青、左＝黄、右＝緑）。
+    // 爆弾のコードの絵は色ごとに位置が決まっているので、色は入れ替えない
+    private static readonly WireColor[] FixedColors = { WireColor.Red, WireColor.Blue, WireColor.Yellow, WireColor.Green };
+
     [SerializeField] private WirePuzzleView _view;
 
     // 試合画面の爆弾（試合では、線の色・シリアル番号・ランプをここに出す。テストシーンでは空でよい）
@@ -120,32 +124,8 @@ public class Wiringgimmick : Gimmick
         // ランプの点灯・消灯をランダムに決定
         _isLampOn = Random.Range(0, 2) == 1;
 
-        // 4色を用意
-        WireColor[] colors =
-        {
-            WireColor.Red,
-            WireColor.Blue,
-            WireColor.Yellow,
-            WireColor.Green
-        };
-
-        // シャッフル
-        for (int i = colors.Length - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-
-            (colors[i], colors[j]) = (colors[j], colors[i]);
-        }
-
-        // 前回と同じ配置になった場合は2色を交換する
-        if (_currentColors != null &&
-            IsSameArrangement(colors, _currentColors))
-        {
-            (colors[0], colors[1]) = (colors[1], colors[0]);
-        }
-
-        // 現在の配線色として保存
-        _currentColors = colors;
+        // 現在の配線色として保存（色は固定。入れ替えない）
+        _currentColors = (WireColor[])FixedColors.Clone();
 
         // 記号は T7 のときだけ出すので、いったん全部消しておく
         for (int i = 0; i < WireCount; i++)
@@ -519,7 +499,7 @@ public class Wiringgimmick : Gimmick
 
     /// <summary>
     /// T8 記憶問題を生成する。相手がさっき切った線と同じ位置か、同じ色の線を正解にする
-    /// （線の並びはパスごとに変わるので、位置と色で答えが変わる）
+    /// （線の色は固定なので、位置と色のどちらで聞いても答えは同じ線になる）
     /// </summary>
     private void CreateT8Puzzle()
     {
@@ -702,27 +682,6 @@ public class Wiringgimmick : Gimmick
             default:
                 return "#FFFFFF";
         }
-    }
-
-    /// <summary>
-    /// 2つの配列の配置が同じか確認する
-    /// </summary>
-    /// <param name="a">比べる配列</param>
-    /// <param name="b">比べる配列</param>
-    /// <returns>同じ並びなら true</returns>
-    private bool IsSameArrangement(
-        WireColor[] a,
-        WireColor[] b)
-    {
-        for (int i = 0; i < a.Length; i++)
-        {
-            if (a[i] != b[i])
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     /// <summary>

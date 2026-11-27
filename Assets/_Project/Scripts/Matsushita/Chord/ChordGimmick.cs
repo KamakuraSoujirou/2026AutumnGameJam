@@ -20,6 +20,9 @@ public class ChordGimmick : Gimmick
 
     private static readonly string[] ColorNames = { "赤", "青", "黄", "緑" };
 
+    // ボタンの色（InputDirection の並び：上キー＝赤、下キー＝青、左＝黄、右＝緑）
+    private static readonly WireColor[] FixedColors = { WireColor.Red, WireColor.Blue, WireColor.Yellow, WireColor.Green };
+
     // 液晶（暗い背景）で読みやすい色。WireColor の並びと同じ
     private static readonly string[] ColorCodes = { "#FF5A5F", "#5C9DFF", "#FFD33D", "#3CE07F" };
 
@@ -57,7 +60,6 @@ public class ChordGimmick : Gimmick
     private readonly List<InputDirection> _answers = new List<InputDirection>();
 
     private readonly List<InputDirection> _single = new List<InputDirection>();
-    private bool _hasColors;
     private string _questionText = string.Empty;
     private ChordPuzzleType _lastType;
     private int _sameTypeCount;
@@ -111,12 +113,12 @@ public class ChordGimmick : Gimmick
     }
 
     /// <summary>
-    /// 爆弾を受け取るたびに呼ばれる。ボタンの色を並べ直し、段階に合った謎を作る
+    /// 爆弾を受け取るたびに呼ばれる。ボタンの色を置き、段階に合った謎を作る
     /// </summary>
     /// <param name="stage">難易度の段階（1〜4）</param>
     public override void CreatePuzzle(int stage)
     {
-        ShuffleColors();
+        SetFixedColors();
 
         for (int i = 0; i < ButtonCount; i++)
         {
@@ -194,47 +196,14 @@ public class ChordGimmick : Gimmick
     }
 
     /// <summary>
-    /// 4色を上下左右にランダムに並べる。前回と同じ並びになったら2色を入れ替える
+    /// 4色を上下左右に、いつも同じ並びで置く（爆弾のコードの絵は色ごとに位置が決まっているので、入れ替えない）
     /// </summary>
-    private void ShuffleColors()
-    {
-        WireColor[] colors = { WireColor.Red, WireColor.Blue, WireColor.Yellow, WireColor.Green };
-
-        for (int i = colors.Length - 1; i > 0; i--)
-        {
-            int j = Random.Range(0, i + 1);
-            (colors[i], colors[j]) = (colors[j], colors[i]);
-        }
-
-        if (_hasColors && IsSameArrangement(colors))
-        {
-            (colors[0], colors[1]) = (colors[1], colors[0]);
-        }
-
-        for (int i = 0; i < ButtonCount; i++)
-        {
-            _colors[i] = colors[i];
-        }
-
-        _hasColors = true;
-    }
-
-    /// <summary>
-    /// 今の色の並びと同じか調べる
-    /// </summary>
-    /// <param name="colors">調べる並び</param>
-    /// <returns>同じなら true</returns>
-    private bool IsSameArrangement(WireColor[] colors)
+    private void SetFixedColors()
     {
         for (int i = 0; i < ButtonCount; i++)
         {
-            if (colors[i] != _colors[i])
-            {
-                return false;
-            }
+            _colors[i] = FixedColors[i];
         }
-
-        return true;
     }
 
     /// <summary>
