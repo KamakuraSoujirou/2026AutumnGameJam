@@ -91,7 +91,7 @@ public class BombManager : MonoBehaviour
     public string GimmickDescription => _gimmick.Description;
 
     /// <summary>
-    /// 解除が使えるか。回答中で、スタン中でなく、パス回数（画面の「パス回数」と同じ数）が DefuseMinPass 以上なら使える
+    /// 解除が使えるか。回答中で、受け取った直後でもスタン中でもなく、パス回数（画面の「パス回数」と同じ数）が DefuseMinPass 以上なら使える
     /// </summary>
     public DefuseStatus DefuseStatus
     {
@@ -102,7 +102,7 @@ public class BombManager : MonoBehaviour
                 return DefuseStatus.Challenging;
             }
 
-            if (_state == BombState.Answering && !IsStunned && _receiveCount >= _config.DefuseMinPass)
+            if (_state == BombState.Answering && _lockTimer <= 0f && !IsStunned && _receiveCount >= _config.DefuseMinPass)
             {
                 return DefuseStatus.Available;
             }
@@ -174,7 +174,7 @@ public class BombManager : MonoBehaviour
     /// <returns>始めたら true</returns>
     public bool TryStartDefuse(int player)
     {
-        if (DefuseStatus != DefuseStatus.Available || player != _holder || _lockTimer > 0f)
+        if (DefuseStatus != DefuseStatus.Available || player != _holder)
         {
             return false;
         }
@@ -325,13 +325,18 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 受け取った直後とスタン中の、入力できない時間を進める
+    /// 受け取った直後とスタン中の、入力できない時間を進める。明けたら知らせる（解除が使えるかが変わるため）
     /// </summary>
     private void TickInputLock()
     {
         if (_lockTimer > 0f)
         {
             _lockTimer -= Time.deltaTime;
+
+            if (_lockTimer <= 0f)
+            {
+                OnChanged?.Invoke();
+            }
         }
 
         if (_stunTimer > 0f)
