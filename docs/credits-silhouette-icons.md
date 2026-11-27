@@ -5,7 +5,7 @@
 - 取得元：Game-icons.net（https://game-icons.net/）
 - ライセンス：Creative Commons Attribution 3.0（CC BY 3.0）https://creativecommons.org/licenses/by/3.0/
 - 加工：白一色のSVGを、256×256のPNGに変換しただけ（形は変えていない）
-- 画像の置き場：`Assets/_PrivateAssets/Art/Silhouettes/Resources/Silhouettes/`（非公開リポジトリ）
+- 画像の置き場：`Assets/_SilhouetteIcons/Resources/Silhouettes/`（Unity パッケージで配る。Git には入れない。入れ方は `Assets/Resources/Puzzles/README.md`）
 - 言葉と画像の対応：`Assets/Resources/Puzzles/Silhouettes.json`
 
 ゲーム内のクレジットに、次の作者名を載せること（CC BY 3.0 の条件）。
