@@ -19,6 +19,7 @@ public static partial class UiMockBuilder
     private const string TitleScenePath = SceneFolder + "/UiMock_Title.unity";
     private const float ScreenWidth = 1920f;
     private const float ScreenHeight = 1080f;
+    private const string RulesTabName = "RulesTab";
 
     private static readonly Color Orange = new Color(0.92f, 0.54f, 0f);
     private static readonly Color PaleOrange = new Color(0.98f, 0.86f, 0.68f);
@@ -99,14 +100,15 @@ public static partial class UiMockBuilder
         UiOptionRow[] rows = BuildSettingsMenu(screen, roundSprite, out CanvasGroup cpuLevelGroup);
         BuildCharacters(screen, circleSprite);
         BuildControlsMenu(screen, roundSprite);
-        BuildRules(screen);
         GameObject startFocusFrame = BuildStartButton(screen, roundSprite, out Button startButton);
+        UiRulesTab rulesTab = BuildRules(screen, roundSprite);
 
         UiTitleView view = root.AddComponent<UiTitleView>();
         SetObjectArray(view, "_rows", rows);
         SetObject(view, "_cpuLevelGroup", cpuLevelGroup);
         SetObject(view, "_startFocusFrame", startFocusFrame);
         SetObject(view, "_startButton", startButton);
+        SetObject(view, "_rulesTab", rulesTab);
         root.AddComponent<UiTitleInput>();
     }
 
@@ -175,21 +177,128 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
-    /// 右下の「ルール」を作る
+    /// すでにあるタイトルのプレハブを作り直さずに、固定表示だったルールを「飛び出すタブ」に差し替える
+    /// （プレハブを作り直すと中身のIDが変わり、Title シーン側の設定が外れることがあるため）
+    /// </summary>
+    [MenuItem("Tools/UI仮組/タイトルのルールをタブにする")]
+    public static void ReplaceTitleRulesWithTab()
+    {
+        if (!File.Exists(TitlePrefabPath))
+        {
+            Debug.LogWarning("UI_Title.prefab がありません。先に「タイトルを作る」を実行してください");
+            return;
+        }
+
+        GameObject contents = PrefabUtility.LoadPrefabContents(TitlePrefabPath);
+
+        try
+        {
+            RectTransform screen = (RectTransform)contents.transform.Find("Screen");
+            DestroyChildIfExists(screen, "RulesHeading");
+            DestroyChildIfExists(screen, "RulesText");
+            DestroyChildIfExists(screen, RulesTabName);
+
+            Sprite roundSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+            UiRulesTab rulesTab = BuildRules(screen, roundSprite);
+            SetObject(contents.GetComponent<UiTitleView>(), "_rulesTab", rulesTab);
+
+            contents.GetComponent<UiSkinApplier>().ApplyAll();
+            PrefabUtility.SaveAsPrefabAsset(contents, TitlePrefabPath);
+            Debug.Log("タイトルのルールを飛び出すタブに差し替えました");
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(contents);
+        }
+    }
+
+    /// <summary>
+    /// 名前で見つかった子を消す（なければ何もしない）
+    /// </summary>
+    /// <param name="parent">探す親</param>
+    /// <param name="childName">消す子の名前</param>
+    private static void DestroyChildIfExists(Transform parent, string childName)
+    {
+        Transform child = parent.Find(childName);
+
+        if (child != null)
+        {
+            Object.DestroyImmediate(child.gameObject);
+        }
+    }
+
+    /// <summary>
+    /// 右端から飛び出す「ルール」のタブを作る。画面の一番手前に置く（開いている間は後ろを暗くして、押せなくする）
     /// </summary>
     /// <param name="screen">1920×1080 の土台</param>
-    private static void BuildRules(RectTransform screen)
+    /// <param name="roundSprite">角丸の仮の形</param>
+    /// <returns>作ったタブの制御</returns>
+    private static UiRulesTab BuildRules(RectTransform screen, Sprite roundSprite)
     {
-        AddText("RulesHeading", screen, 1290f, 560f, 400f, 64f, "ルール", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
+        const float DrawerWidth = 720f;
+        const float DrawerHeight = 540f;
+        const float DrawerTop = 500f;
+        const float TabWidth = 88f;
+        const float TabHeight = 250f;
+        const float TabTop = 145f;
+        const float Padding = 44f;
 
+        // 画面の外にいるパネルが、横に広い画面ではみ出して見えないよう、土台の範囲で切る
+        RectTransform root = CreateStretch(RulesTabName, screen);
+        root.gameObject.AddComponent<RectMask2D>();
+
+        RectTransform dim = CreateStretch("Dim", root);
+        Image dimImage = dim.gameObject.AddComponent<Image>();
+        dimImage.color = new Color(0.04f, 0.05f, 0.07f, 0.45f);
+        CanvasGroup dimGroup = dim.gameObject.AddComponent<CanvasGroup>();
+        dimGroup.alpha = 0f;
+        dimGroup.blocksRaycasts = false;
+        Button dimButton = AddClickArea(dim);
+
+        RectTransform drawer = CreateRect("Drawer", root, ScreenWidth, DrawerTop, DrawerWidth, DrawerHeight);
+        AddArt(drawer, "UI-04", Color.white, roundSprite, false, null);
+        AddOutline(drawer);
+        // パネルの上のクリックが、後ろの暗い幕に抜けて閉じてしまわないようにする
+        drawer.GetComponent<Image>().raycastTarget = true;
+
+        RectTransform tab = CreateRect("Tab", drawer, -TabWidth, TabTop, TabWidth, TabHeight);
+        AddArt(tab, "UI-01", Orange, roundSprite, false, null);
+        AddOutline(tab);
+        Button tabButton = AddClickArea(tab);
+
+        // タブの文字は縦長の枠に合わせて、横書きを右へ90度回して読ませる
+        TextMeshProUGUI tabLabel = AddText("Label", tab, 0f, 0f, TabHeight, TabWidth, "ルール", 44f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        RectTransform tabLabelRect = tabLabel.rectTransform;
+        tabLabelRect.anchorMin = new Vector2(0.5f, 0.5f);
+        tabLabelRect.anchorMax = new Vector2(0.5f, 0.5f);
+        tabLabelRect.pivot = new Vector2(0.5f, 0.5f);
+        tabLabelRect.anchoredPosition = Vector2.zero;
+        tabLabelRect.sizeDelta = new Vector2(TabHeight, TabWidth);
+        tabLabelRect.localRotation = Quaternion.Euler(0f, 0f, -90f);
+
+        AddText("Heading", drawer, Padding, 36f, 400f, 64f, "ルール", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
+
+        // スクロールは付けず、全文が収まる高さに固定する。切り詰めや自動縮小もしない
         string rules =
             "・爆弾を受け取ったら10秒以内に謎を解いて相手に返す\n" +
             "・間違えると残り時間−2秒\n" +
             "・解除方法は爆弾に書いてある\n" +
             "・5回目のパスからは解除に挑戦できる。正解すれば即勝利、外せば即爆発。解除は1ラウンド1回まで";
-        TextMeshProUGUI rulesText = AddText("RulesText", screen, 1280f, 620f, 630f, 240f, rules, 25f, UiFontRole.Body, TextAlignmentOptions.TopLeft);
+        TextMeshProUGUI rulesText = AddText("Body", drawer, Padding, 108f, DrawerWidth - Padding * 2f, 364f, rules, 26f, UiFontRole.Body, TextAlignmentOptions.TopLeft);
         rulesText.textWrappingMode = TextWrappingModes.Normal;
+        rulesText.overflowMode = TextOverflowModes.Overflow;
+        rulesText.enableAutoSizing = false;
         rulesText.lineSpacing = 20f;
+
+        TextMeshProUGUI hint = AddText("Hint", drawer, Padding, DrawerHeight - 60f, DrawerWidth - Padding * 2f, 40f, "R か Esc で閉じる", 22f, UiFontRole.Body, TextAlignmentOptions.Right);
+        hint.color = SubTextColor;
+
+        UiRulesTab rulesTab = root.gameObject.AddComponent<UiRulesTab>();
+        SetObject(rulesTab, "_drawer", drawer);
+        SetObject(rulesTab, "_dim", dimGroup);
+        SetObject(rulesTab, "_tabButton", tabButton);
+        SetObject(rulesTab, "_dimButton", dimButton);
+        return rulesTab;
     }
 
     /// <summary>

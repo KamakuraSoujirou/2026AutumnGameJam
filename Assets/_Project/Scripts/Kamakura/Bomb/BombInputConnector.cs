@@ -24,6 +24,14 @@ public class BombInputConnector : MonoBehaviour
     }
 
     /// <summary>
+    /// CPU対戦なら、どちらのキーセットでもP1を操作できるようにする（CpuPlayer が設定を決めたあと、全部の Awake が終わってから）
+    /// </summary>
+    private void Start()
+    {
+        _inputReader.IsCpuMode = CpuSettings.IsCpuMode;
+    }
+
+    /// <summary>
     /// 入力の知らせを受け取れるようにする
     /// </summary>
     private void OnEnable()
@@ -114,10 +122,16 @@ public class BombInputConnector : MonoBehaviour
 
     /// <summary>
     /// ひし形ボタンのクリックを爆弾本体に伝える。マウスはどちらが押したか分からないので、持ち主の入力として扱う
+    /// ただしCPU対戦でCOMが持っているときは、COMの代わりに解いてしまうので無視する
     /// </summary>
     /// <param name="direction">クリックされた方向</param>
     private void OnDirectionClicked(InputDirection direction)
     {
+        if (CpuSettings.IsCpuMode && _bombManager.Holder == BombManager.PlayerCount - 1)
+        {
+            return;
+        }
+
         _bombManager.TryPress(_bombManager.Holder, direction);
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう

@@ -92,7 +92,7 @@ public class BombUiPresenter : MonoBehaviour
                 ShowExploding();
                 break;
             case BombState.MatchOver:
-                _view.ShowResult(_bombManager.MatchWinner, _bombManager.GetWins(0), _bombManager.GetWins(1));
+                // 試合が終わったあとのリザルトは、UiResultRecorder（Matsushita/UI/Result）が重ねて出す
                 break;
         }
     }
@@ -111,7 +111,7 @@ public class BombUiPresenter : MonoBehaviour
         _view.ResetEffects();
         ResetBomb();
         _view.SetRound(round);
-        _view.SetPlayerNames("P1", "P2");
+        _view.SetPlayerNames("P1", CpuSettings.IsCpuMode ? "COM" : "P2");
         _view.SetGimmickName(gimmickName);
         ShowWins();
         _view.SetPass(1, 1);

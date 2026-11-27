@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 /// <summary>
 /// タイトル画面のキー操作。↑↓（W S）で行を選び、←→（A D）で設定を変え、Space か Enter で始める。
+/// R でルールのタブを開閉し、Esc で閉じる（開いている間は他のキーを受け付けない）。
 /// マウスのクリックは UiTitleView が受け取り、ゲームスタートだけここへ知らせてくる
 /// </summary>
 [RequireComponent(typeof(UiTitleView))]
@@ -58,6 +59,21 @@ public class UiTitleInput : MonoBehaviour
             return;
         }
 
+        if (keyboard.rKey.wasPressedThisFrame)
+        {
+            _view.ToggleRules();
+        }
+
+        if (keyboard.escapeKey.wasPressedThisFrame)
+        {
+            _view.CloseRules();
+        }
+
+        if (_view.IsRulesOpen)
+        {
+            return;
+        }
+
         if (keyboard.upArrowKey.wasPressedThisFrame || keyboard.wKey.wasPressedThisFrame)
         {
             _view.MoveFocus(-1);
@@ -95,6 +111,7 @@ public class UiTitleInput : MonoBehaviour
     {
         SoundPlayer.PlaySe(SoundId.Decide);
         GameConfig.Load().SetMatchRules(_view.WinsToMatch, _view.IsShortenEnabled);
+        CpuSettings.SetFromTitle(_view.IsCpuMode, _view.CpuLevel);
         Debug.Log($"ゲームスタート（CPU対戦：{_view.IsCpuMode}、CPUの強さ：{_view.CpuLevel}、{_view.WinsToMatch}本先取、時間短縮：{_view.IsShortenEnabled}、読み上げ：{_view.IsVoiceEnabled}）");
         _onStartRequested.Invoke();
     }

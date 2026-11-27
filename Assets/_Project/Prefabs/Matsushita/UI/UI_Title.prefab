@@ -3364,7 +3364,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 5010281268795272139, guid: bed80ba576603544f9609bbabdbceb1b, type: 3}
+  m_Sprite: {fileID: 2310003547637917332, guid: 08993fe16d2c4ef4ea29766eb66ad919, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1
@@ -3946,6 +3946,7 @@ MonoBehaviour:
   _cpuLevelGroup: {fileID: 5518867959163396360}
   _startFocusFrame: {fileID: 7982501508378100638}
   _startButton: {fileID: 1981081411619124575}
+  _rulesTab: {fileID: 0}
 --- !u!114 &5187728365916723894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6812,7 +6813,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -6770752013486566163, guid: 53da1ae873c43354d89b616d11dbcf62, type: 3}
+  m_Sprite: {fileID: 17462529948901505, guid: a9c0cb0f2c18cf5469328b4b814ae0d0, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

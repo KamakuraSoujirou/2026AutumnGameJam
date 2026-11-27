@@ -56,6 +56,18 @@ public static partial class UiMockBuilder
         "ART-05_red", "ART-05_blue", "ART-05_yellow", "ART-05_green"
     };
 
+    /// <summary>立ち絵の描画順（大きいほど手前）</summary>
+    private const int CharacterSortingOrder = 10;
+
+    /// <summary>爆弾の本体の描画順（大きいほど手前）</summary>
+    private const int BombBodySortingOrder = 20;
+
+    /// <summary>素材を出す 2D オブジェクトの名前（立ち絵や爆弾の本体の子）</summary>
+    private const string SpriteArtName = "Art";
+
+    /// <summary>立ち絵の見た目の名前（通常・焦り顔・アフロ）</summary>
+    private static readonly string[] CharacterPoseNames = { "Normal", "Panic", "Afro" };
+
     /// <summary>爆弾の本体の絵（800×800）を、爆弾の四角（640×640）に縮めた倍率</summary>
     private const float BombArtScale = 0.8f;
 
@@ -388,8 +400,7 @@ public static partial class UiMockBuilder
         RectTransform visual = CreateStretch(name, parent);
         TextMeshProUGUI label = AddText("PlaceholderLabel", visual, 0f, 200f, 342f, 200f, placeholderLabel, 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         label.textWrappingMode = TextWrappingModes.Normal;
-        AddArt(visual, artId, GrayFill, null, true, label.gameObject);
-        AddWorldSprite(visual.gameObject, 10, false);
+        AddSpriteArt(visual, artId, GrayFill, null, true, label.gameObject, CharacterSortingOrder);
         return visual.gameObject;
     }
 
@@ -407,14 +418,14 @@ public static partial class UiMockBuilder
 
         // 本体の絵（口金・X字の傷・左右のコネクタ・液晶の枠まで含む）。以下の座標は、800×800 の絵で測った位置に BombArtScale をかけたもの
         RectTransform body = CreateStretch("Body", bomb);
-        AddArt(body, "ART-01", GrayFill, circleSprite, true, null);
-        AddWorldSprite(body.gameObject, 20, false);
+        AddSpriteArt(body, "ART-01", GrayFill, circleSprite, true, null, BombBodySortingOrder);
 
-        // ひし形ボタンは、X字の4つの頂点に置く。つまみは上と左が左向き、右と下が右向き（絵のつまみは右向きなので、上と左は反転して使う）
+        // ひし形ボタンは、X字の4つの頂点に置く。上と下の位置は入れ替えてある（InputDirection の「上」が画面の下の頂点、「下」が画面の上の頂点）。
+        // つまみは画面の上・左のボタンが左向き、右・下のボタンが右向き（絵のつまみは右向きなので、上と左は反転して使う）
         UiWire[] wires =
         {
-            CreateWire(bomb, "WireUp", ArtPoint(400f, 145f), 80f, 166f, true),
-            CreateWire(bomb, "WireDown", ArtPoint(400f, 385f), 394f, 182f, false),
+            CreateWire(bomb, "WireUp", ArtPoint(400f, 385f), 394f, 182f, false),
+            CreateWire(bomb, "WireDown", ArtPoint(400f, 145f), 80f, 166f, true),
             CreateWire(bomb, "WireLeft", ArtPoint(255f, 263f), 80f, 50f, true),
             CreateWire(bomb, "WireRight", ArtPoint(545f, 263f), 510f, 66f, false)
         };
@@ -845,6 +856,175 @@ public static partial class UiMockBuilder
         AddArt(root, "ART-20", Color.clear, null, true, text.gameObject);
         root.gameObject.SetActive(false);
         return root;
+    }
+
+    /// <summary>
+    /// 立ち絵（通常・焦り顔・アフロ）と爆弾の本体を、UI の Image から 2D オブジェクト（SpriteRenderer の GameObject）に変える。
+    /// すでにあるプレハブをその場で書き換えるので、他の部品の参照は壊れない
+    /// </summary>
+    [MenuItem("Tools/UI仮組/立ち絵と爆弾の本体をGameObjectにする")]
+    public static void ConvertCharactersAndBombBodyToSprites()
+    {
+        if (!File.Exists(GamePrefabPath))
+        {
+            Debug.LogWarning("UI_Game.prefab がありません。先に「試合画面を作る」を実行してください");
+            return;
+        }
+
+        GameObject contents = PrefabUtility.LoadPrefabContents(GamePrefabPath);
+
+        try
+        {
+            Transform screen = contents.transform.Find("Screen");
+            int convertedCount = 0;
+
+            foreach (string tag in new[] { "P1", "P2" })
+            {
+                foreach (string pose in CharacterPoseNames)
+                {
+                    convertedCount += ConvertToSpriteArt(screen.Find($"Player{tag}/Character/{pose}"), CharacterSortingOrder) ? 1 : 0;
+                }
+            }
+
+            convertedCount += ConvertToSpriteArt(screen.Find("Bomb/Body"), BombBodySortingOrder) ? 1 : 0;
+
+            if (convertedCount == 0)
+            {
+                Debug.Log("変換するものはありませんでした（すでに GameObject になっているか、見つかりませんでした）");
+                return;
+            }
+
+            contents.GetComponent<UiSkinApplier>().ApplyAll();
+            PrefabUtility.SaveAsPrefabAsset(contents, GamePrefabPath);
+            Debug.Log($"{convertedCount} 個を SpriteRenderer の GameObject にしました：{GamePrefabPath}");
+        }
+        finally
+        {
+            PrefabUtility.UnloadPrefabContents(contents);
+        }
+    }
+
+    /// <summary>
+    /// 立ち絵（通常）を、新しいラフ絵（P1：chr_1p_rough_v1、P2：bomb_p2_rough_v1）に差し替えて、プレハブとタイトルに反映する。
+    /// 「素材を割り当てて反映」は空いている登録にしか入れないので、すでに入っている絵はこちらで差し替える
+    /// </summary>
+    [MenuItem("Tools/UI仮組/立ち絵を新しいラフ絵に差し替える")]
+    public static void ReplaceCharactersWithNewRough()
+    {
+        UiSkin skin = LoadOrCreateSkin();
+        int replacedCount = 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-09_normal", "chr_1p_rough_v1") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-10_normal", "bomb_p2_rough_v1") ? 1 : 0;
+
+        EditorUtility.SetDirty(skin);
+        AssetDatabase.SaveAssets();
+        ApplySkinToPrefabs();
+        Debug.Log($"立ち絵を {replacedCount} 件差し替えて、プレハブに反映しました");
+    }
+
+    /// <summary>
+    /// UiSkin の登録に入っている絵を、Art/Characters の別の画像に差し替える（探すファイル名も合わせる）
+    /// </summary>
+    /// <param name="skin">素材の表</param>
+    /// <param name="artId">差し替える素材ID</param>
+    /// <param name="fileName">新しい画像のファイル名（拡張子なし。Art/Characters の中）</param>
+    /// <returns>差し替えたら true</returns>
+    private static bool ReplaceSkinSprite(UiSkin skin, string artId, string fileName)
+    {
+        string path = $"{ArtFolder}/Characters/{fileName}.png";
+        EnsureSpriteImport(path);
+
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        UiSkinEntry entry = skin.FindEntry(artId);
+
+        if (sprite == null || entry == null)
+        {
+            Debug.LogWarning($"差し替えできませんでした：{artId} ← {path}");
+            return false;
+        }
+
+        entry.Sprite = sprite;
+        skin.UpdateFileName(artId, fileName);
+        return true;
+    }
+
+    /// <summary>
+    /// UI の Image と素材の差し込み口を外し、同じ指定の 2D オブジェクト（子の Art）に置き換える
+    /// </summary>
+    /// <param name="frame">置き換える四角（なければ何もしない）</param>
+    /// <param name="sortingOrder">描画順（大きいほど手前）</param>
+    /// <returns>置き換えたら true</returns>
+    private static bool ConvertToSpriteArt(Transform frame, int sortingOrder)
+    {
+        if (frame == null || frame.Find(SpriteArtName) != null)
+        {
+            return false;
+        }
+
+        UiArtSlot oldSlot = frame.GetComponent<UiArtSlot>();
+
+        if (oldSlot == null)
+        {
+            return false;
+        }
+
+        SerializedObject old = new SerializedObject(oldSlot);
+        string artId = old.FindProperty("_artId").stringValue;
+        Color placeholderColor = old.FindProperty("_placeholderColor").colorValue;
+        Sprite placeholderSprite = old.FindProperty("_placeholderSprite").objectReferenceValue as Sprite;
+        bool isPreserveAspect = old.FindProperty("_isPreserveAspect").boolValue;
+        GameObject placeholderObject = old.FindProperty("_placeholderObject").objectReferenceValue as GameObject;
+
+        // 付け外しの順番は、依存の逆（UiWorldSprite → UiArtSlot → Image → CanvasRenderer）
+        DestroyComponentIfExists<UiWorldSprite>(frame);
+        Object.DestroyImmediate(oldSlot);
+        DestroyComponentIfExists<UnityEngine.UI.Image>(frame);
+        DestroyComponentIfExists<CanvasRenderer>(frame);
+
+        AddSpriteArt((RectTransform)frame, artId, placeholderColor, placeholderSprite, isPreserveAspect, placeholderObject, sortingOrder);
+        return true;
+    }
+
+    /// <summary>
+    /// 付いていれば、コンポーネントを外す
+    /// </summary>
+    /// <typeparam name="T">外すコンポーネントの型</typeparam>
+    /// <param name="target">外す先</param>
+    private static void DestroyComponentIfExists<T>(Component target) where T : Component
+    {
+        T component = target.GetComponent<T>();
+
+        if (component != null)
+        {
+            Object.DestroyImmediate(component);
+        }
+    }
+
+    /// <summary>
+    /// 四角の子に、素材を出す 2D オブジェクト（SpriteRenderer の GameObject）を作る。大きさと位置は四角に合わせる
+    /// </summary>
+    /// <param name="frame">この四角いっぱいに収まるよう出す</param>
+    /// <param name="artId">素材ID</param>
+    /// <param name="placeholderColor">素材がないときの色</param>
+    /// <param name="placeholderSprite">素材がないときの形（null なら四角）</param>
+    /// <param name="isPreserveAspect">素材の縦横比を保つか</param>
+    /// <param name="placeholderObject">素材がないときだけ出すもの</param>
+    /// <param name="sortingOrder">描画順（大きいほど手前）</param>
+    private static void AddSpriteArt(RectTransform frame, string artId, Color placeholderColor, Sprite placeholderSprite, bool isPreserveAspect, GameObject placeholderObject, int sortingOrder)
+    {
+        GameObject art = new GameObject(SpriteArtName);
+        art.transform.SetParent(frame, false);
+        art.transform.SetAsFirstSibling();
+
+        UiSpriteArtSlot slot = art.AddComponent<UiSpriteArtSlot>();
+        SerializedObject serialized = new SerializedObject(slot);
+        serialized.FindProperty("_artId").stringValue = artId;
+        serialized.FindProperty("_placeholderColor").colorValue = placeholderColor;
+        serialized.FindProperty("_placeholderSprite").objectReferenceValue = placeholderSprite;
+        serialized.FindProperty("_isPreserveAspect").boolValue = isPreserveAspect;
+        serialized.FindProperty("_placeholderObject").objectReferenceValue = placeholderObject;
+        serialized.FindProperty("_sortingOrder").intValue = sortingOrder;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
     }
 
     /// <summary>

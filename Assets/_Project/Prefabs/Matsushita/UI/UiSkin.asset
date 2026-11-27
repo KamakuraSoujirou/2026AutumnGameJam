@@ -26,13 +26,13 @@ MonoBehaviour:
   - _id: ART-09_normal
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p1_normal
-    _sprite: {fileID: -6770752013486566163, guid: 53da1ae873c43354d89b616d11dbcf62, type: 3}
+    _fileName: chr_1p_rough_v1
+    _sprite: {fileID: 17462529948901505, guid: a9c0cb0f2c18cf5469328b4b814ae0d0, type: 3}
   - _id: ART-10_normal
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p2_normal
-    _sprite: {fileID: 5010281268795272139, guid: bed80ba576603544f9609bbabdbceb1b, type: 3}
+    _fileName: bomb_p2_rough_v1
+    _sprite: {fileID: 2310003547637917332, guid: 08993fe16d2c4ef4ea29766eb66ad919, type: 3}
   - _id: ART-01
     _label: "\u7206\u5F3E\u672C\u4F53"
     _size: {x: 800, y: 800}

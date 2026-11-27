@@ -41,6 +41,27 @@ public class RoundGimmickSwitcher : Gimmick
     public override InputDirection NextAnswer => _current != null ? _current.NextAnswer : InputDirection.Up;
 
     /// <summary>
+    /// 今のラウンドのギミックの、謎の重さ
+    /// </summary>
+    public override float ThinkWeight => _current != null ? _current.ThinkWeight : 1f;
+
+    /// <summary>
+    /// 今のラウンドのギミックの、定番の間違い
+    /// </summary>
+    /// <param name="decoy">定番の間違いの方向</param>
+    /// <returns>定番の間違いがあれば true</returns>
+    public override bool TryGetDecoy(out InputDirection decoy)
+    {
+        if (_current != null)
+        {
+            return _current.TryGetDecoy(out decoy);
+        }
+
+        decoy = InputDirection.Up;
+        return false;
+    }
+
+    /// <summary>
     /// 試合が始まる前は、どのギミックも見せない
     /// </summary>
     private void Awake()

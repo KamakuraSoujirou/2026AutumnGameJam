@@ -29,6 +29,24 @@ public abstract class Gimmick : MonoBehaviour
     public abstract InputDirection NextAnswer { get; }
 
     /// <summary>
+    /// 謎の重さ（0.7〜1.6、初期値1）。COMの考える時間に掛けるので、考えるのに時間がかかる謎ほど大きくする
+    /// 上書きしなければ1のまま
+    /// </summary>
+    public virtual float ThinkWeight => 1f;
+
+    /// <summary>
+    /// 今の問題の「定番の間違い」の方向を返す（COMが間違えるとき、ひっかけに引っかかる動きに使う）
+    /// 上書きしなければ「なし」で、COMはランダムに間違える
+    /// </summary>
+    /// <param name="decoy">定番の間違いの方向。正解とは違う方向を返すこと</param>
+    /// <returns>定番の間違いがあれば true</returns>
+    public virtual bool TryGetDecoy(out InputDirection decoy)
+    {
+        decoy = InputDirection.Up;
+        return false;
+    }
+
+    /// <summary>
     /// ラウンドの最初に呼ばれる
     /// </summary>
     public virtual void ResetRound()

@@ -11,7 +11,9 @@ using UnityEngine.UI;
 /// </summary>
 public static partial class UiMockBuilder
 {
-    private const string ResultPrefabPath = PrefabFolder + "/UI_Result.prefab";
+    // 試合中に UiResultRecorder が Resources.Load で読むので、Resources の下に置く
+    private const string ResultPrefabFolder = "Assets/Resources/UI";
+    private const string ResultPrefabPath = ResultPrefabFolder + "/UI_Result.prefab";
     private const string ResultScenePath = SceneFolder + "/UiMock_Result.unity";
     private const int ResultRowCount = 5;
 
@@ -46,7 +48,7 @@ public static partial class UiMockBuilder
             }
         }
 
-        EnsureFolder(PrefabFolder);
+        EnsureFolder(ResultPrefabFolder);
         EnsureFolder(SceneFolder);
         UiSkin skin = LoadOrCreateSkin();
 

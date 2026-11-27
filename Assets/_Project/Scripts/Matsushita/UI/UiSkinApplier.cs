@@ -30,6 +30,11 @@ public class UiSkinApplier : MonoBehaviour
             slot.Apply(_skin);
         }
 
+        foreach (UiSpriteArtSlot slot in GetComponentsInChildren<UiSpriteArtSlot>(true))
+        {
+            slot.Apply(_skin);
+        }
+
         foreach (UiFontSlot slot in GetComponentsInChildren<UiFontSlot>(true))
         {
             slot.Apply(_skin);
