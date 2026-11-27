@@ -378,7 +378,14 @@ public class UiGameView : MonoBehaviour
     /// <param name="delta">左なら -1、右なら 1</param>
     public void MoveResultFocus(int delta)
     {
-        _resultFocusIndex = Mathf.Clamp(_resultFocusIndex + delta, 0, _resultButtons.Length - 1);
+        int next = Mathf.Clamp(_resultFocusIndex + delta, 0, _resultButtons.Length - 1);
+
+        if (next != _resultFocusIndex)
+        {
+            SoundPlayer.PlaySe(SoundId.Cursor);
+        }
+
+        _resultFocusIndex = next;
         RefreshResultFocus();
     }
 
@@ -387,6 +394,8 @@ public class UiGameView : MonoBehaviour
     /// </summary>
     public void DecideResult()
     {
+        SoundPlayer.PlaySe(SoundId.Decide);
+
         if (_resultFocusIndex == RematchIndex)
         {
             RematchRequested?.Invoke();
