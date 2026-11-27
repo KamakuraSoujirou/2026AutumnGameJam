@@ -4,7 +4,7 @@ using UnityEngine;
 
 /// <summary>
 /// 爆弾本体の進行役。2人の入力をギミックに渡し、パス・時間切れ・勝敗（何本先取かは GameConfig）を管理する
-/// キーやマウスは直接読まない。入力は TryPress と TryRematch で受け取り、受け付けるかどうかはここで決める
+/// キーやマウスは直接読まない。入力は TryPress・TryStartDefuse・TryRematch で受け取り、受け付けるかどうかはここで決める
 /// </summary>
 public class BombManager : MonoBehaviour
 {
@@ -23,6 +23,7 @@ public class BombManager : MonoBehaviour
     private readonly List<InputDirection> _chordPressed = new List<InputDirection>();
 
     private GameConfig _config;
+    private DefuseChallenge _defuse;
     private BombState _state;
     private int _holder;
     private int _flightTarget;
@@ -95,6 +96,33 @@ public class BombManager : MonoBehaviour
     /// <summary>今のギミックの一行説明</summary>
     public string GimmickDescription => _gimmick.Description;
 
+    /// <summary>
+    /// 解除が使えるか。回答中で、受け取った直後でもスタン中でもなく、パス回数（画面の「パス回数」と同じ数）が DefuseMinPass 以上なら使える
+    /// </summary>
+    public DefuseStatus DefuseStatus
+    {
+        get
+        {
+            if (_state == BombState.Defusing)
+            {
+                return DefuseStatus.Challenging;
+            }
+
+            if (_state == BombState.Answering && _lockTimer <= 0f && !IsStunned && _receiveCount >= _config.DefuseMinPass)
+            {
+                return DefuseStatus.Available;
+            }
+
+            return DefuseStatus.Locked;
+        }
+    }
+
+    /// <summary>解除中の問題文</summary>
+    public string DefuseQuestionText => _defuse.QuestionText;
+
+    /// <summary>解除中の、正解の選択肢がある方向（CPUが使う）</summary>
+    public InputDirection DefuseAnswer => _defuse.CorrectDirection;
+
     /// <summary>今の待ち時間（開始・飛行・爆発）がどこまで進んだか（0〜1）</summary>
     public float PhaseProgress => _phaseDuration > 0f ? 1f - Mathf.Clamp01(_phaseTimer / _phaseDuration) : 1f;
 
@@ -109,7 +137,18 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 解除中の、指定した方向のボタンに出す選択肢を返す
+    /// </summary>
+    /// <param name="direction">ボタンの方向</param>
+    /// <returns>選択肢の文字（解除中でなければ空）</returns>
+    public string GetDefuseChoice(InputDirection direction)
+    {
+        return _defuse.GetChoice(direction);
+    }
+
+    /// <summary>
     /// 方向の入力を受け取る。持っている人の入力だけを受け付け、受け取った直後とスタン中は受け付けない
+    /// 解除中は、ギミックではなく解除の4択の答えとして受け取る
     /// </summary>
     /// <param name="player">押したプレイヤーの番号（0 か 1）</param>
     /// <param name="direction">押された方向</param>
@@ -117,6 +156,13 @@ public class BombManager : MonoBehaviour
     /// <returns>受け付けたら true</returns>
     public bool TryPress(int player, InputDirection direction, bool isMouse = false)
     {
+        if (_state == BombState.Defusing && player == _holder)
+        {
+            OnPressed?.Invoke(direction);
+            AnswerDefuse(direction);
+            return true;
+        }
+
         if (_state != BombState.Answering || player != _holder || _lockTimer > 0f || _stunTimer > 0f)
         {
             return false;
@@ -130,6 +176,30 @@ public class BombManager : MonoBehaviour
 
         OnPressed?.Invoke(direction);
         Press(direction);
+        return true;
+    }
+
+    /// <summary>
+    /// 解除の挑戦を始める。持っている人が、スタン中でも受け取った直後でもなく、パス回数が足りているときだけ始まる
+    /// 始めたらキャンセルできない。挑戦すると成功でも失敗でもラウンドが終わるので、使ったかどうかは覚えない
+    /// </summary>
+    /// <param name="player">解除を押したプレイヤーの番号（0 か 1）</param>
+    /// <returns>始めたら true</returns>
+    public bool TryStartDefuse(int player)
+    {
+        if (DefuseStatus != DefuseStatus.Available || player != _holder)
+        {
+            return false;
+        }
+
+        if (!_defuse.TryCreate())
+        {
+            Debug.LogWarning("[BombManager] 解除の問題がないので、解除を始められません（Resources/Puzzles/Defuse.json）");
+            return false;
+        }
+
+        Debug.Log($"[BombManager] P{_holder + 1} が解除に挑戦（{_receiveCount}回目、正解：{_defuse.CorrectDirection}）");
+        BeginPhase(BombState.Defusing, 0f);
         return true;
     }
 
@@ -154,6 +224,7 @@ public class BombManager : MonoBehaviour
     private void Awake()
     {
         _config = GameConfig.Load();
+        _defuse = new DefuseChallenge();
     }
 
     /// <summary>
@@ -204,6 +275,7 @@ public class BombManager : MonoBehaviour
                 }
                 break;
             case BombState.Exploding:
+            case BombState.Defused:
                 if (TickPhase())
                 {
                     FinishRound();
@@ -223,6 +295,7 @@ public class BombManager : MonoBehaviour
         }
 
         _matchWinner = NoPlayer;
+        _defuse.ResetMatch();
         StartRound(UnityEngine.Random.Range(0, PlayerCount));
     }
 
@@ -268,13 +341,18 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 受け取った直後とスタン中の、入力できない時間を進める
+    /// 受け取った直後とスタン中の、入力できない時間を進める。明けたら知らせる（解除が使えるかが変わるため）
     /// </summary>
     private void TickInputLock()
     {
         if (_lockTimer > 0f)
         {
             _lockTimer -= Time.deltaTime;
+
+            if (_lockTimer <= 0f)
+            {
+                OnChanged?.Invoke();
+            }
         }
 
         if (_stunTimer > 0f)
@@ -406,21 +484,51 @@ public class BombManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 時間切れで爆発する。持っていた人の負けで、相手がラウンドを取る
+    /// 解除の4択に答える。正解なら持っていた人のラウンド勝ち、不正解ならその場で爆発する
+    /// </summary>
+    /// <param name="direction">押された方向</param>
+    private void AnswerDefuse(InputDirection direction)
+    {
+        if (_defuse.IsCorrect(direction))
+        {
+            Debug.Log($"[BombManager] 解除成功！ P{_holder + 1} の勝ち");
+            EndRound(_holder, BombState.Defused);
+            return;
+        }
+
+        Debug.Log($"[BombManager] P{_holder + 1} 解除失敗（{direction}）");
+        Explode();
+    }
+
+    /// <summary>
+    /// 爆発する（時間切れか、解除の失敗）。持っていた人の負けで、相手がラウンドを取る
     /// </summary>
     private void Explode()
     {
-        if (_state != BombState.Answering)
+        if (_state != BombState.Answering && _state != BombState.Defusing)
         {
             return;
         }
 
+        Debug.Log($"[BombManager] 爆発！ P{_holder + 1} の負け");
+        EndRound(GetOpponent(_holder), BombState.Exploding);
+    }
+
+    /// <summary>
+    /// ラウンドの勝者を決めて、決着の待ち時間（爆発か解除成功の演出）に入る。負けの処理はすべてここを通す
+    /// </summary>
+    /// <param name="winner">ラウンドを取るプレイヤー</param>
+    /// <param name="endState">決着の状態（Exploding か Defused）</param>
+    private void EndRound(int winner, BombState endState)
+    {
+        _bombTimer.StopTimer();
         _stunTimer = 0f;
         CloseChord();
-        _roundWinner = GetOpponent(_holder);
+        _roundWinner = winner;
         _wins[_roundWinner]++;
-        Debug.Log($"[BombManager] 爆発！ P{_holder + 1} の負け（P1 {_wins[0]} - {_wins[1]} P2）");
-        BeginPhase(BombState.Exploding, _config.ExplosionDuration);
+        _defuse.Clear();
+        Debug.Log($"[BombManager] P{winner + 1} がラウンドを取った（P1 {_wins[0]} - {_wins[1]} P2）");
+        BeginPhase(endState, _config.ExplosionDuration);
     }
 
     /// <summary>

@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 /// </summary>
 /// <remarks>
 /// 再戦は結果を閉じて BombManager.TryRematch を呼ぶ。HOME は Title シーンを読み込む。
-/// 今の BombManager は爆発でしかラウンドが終わらないので、決着はすべて「爆発」で記録する
+/// ラウンドは爆発（Exploding）か解除成功（Defused）で終わるので、どちらで決着したかも記録する
 /// </remarks>
 [RequireComponent(typeof(BombManager))]
 public class UiResultRecorder : MonoBehaviour
@@ -93,7 +93,10 @@ public class UiResultRecorder : MonoBehaviour
                 OnRoundStart();
                 break;
             case BombState.Exploding:
-                RecordRound();
+                RecordRound(false);
+                break;
+            case BombState.Defused:
+                RecordRound(true);
                 break;
             case BombState.MatchOver:
                 ShowResult();
@@ -115,12 +118,13 @@ public class UiResultRecorder : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆発したラウンドの結果を記録する（取ったのは持っていた人の相手）
+    /// 終わったラウンドの結果を記録する（取った人は BombManager が決めている）
     /// </summary>
-    private void RecordRound()
+    /// <param name="isDefused">解除成功で決着したなら true、爆発なら false</param>
+    private void RecordRound(bool isDefused)
     {
         string gimmickName = string.IsNullOrEmpty(_bombManager.GimmickName) ? FallbackGimmickName : _bombManager.GimmickName;
-        _rounds.Add(new UiResultRound(gimmickName, _bombManager.RoundWinner, false, _bombManager.ReceiveCount));
+        _rounds.Add(new UiResultRound(gimmickName, _bombManager.RoundWinner, isDefused, _bombManager.ReceiveCount));
     }
 
     /// <summary>
