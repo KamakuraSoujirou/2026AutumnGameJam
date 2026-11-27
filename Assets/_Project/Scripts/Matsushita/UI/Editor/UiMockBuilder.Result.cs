@@ -82,6 +82,10 @@ public static partial class UiMockBuilder
             new UiSkinEntry("ART-11_p2_win", "キャラ P2（勝ち顔）", new Vector2(600f, 900f), "chr_p2_win"),
             new UiSkinEntry("ART-22", "「WIN」の文字", new Vector2(380f, 150f), "result_win"),
             new UiSkinEntry("ART-23", "「LOSE」の文字", new Vector2(400f, 150f), "result_lose"),
+            new UiSkinEntry("UI-23", "リザルトのスコア板（斜線）", new Vector2(730f, 145f), "ui_result_score"),
+            new UiSkinEntry("UI-24", "リザルトのP1の後ろの六角形（網点）", new Vector2(535f, 360f), "ui_result_hex_p1"),
+            new UiSkinEntry("UI-25", "リザルトのP2の後ろの六角形（UI-24の鏡写し）", new Vector2(535f, 360f), "ui_result_hex_p2"),
+            new UiSkinEntry("UI-26", "リザルトの結果表の枠（左オレンジ・右ピンクの網点）", new Vector2(1870f, 440f), "ui_result_table"),
             new UiSkinEntry("UI-21", "リザルトのHOMEボタン", new Vector2(135f, 115f), "ui_result_home"),
             new UiSkinEntry("UI-22", "リザルトの再戦ボタン（丸）", new Vector2(146f, 146f), "ui_result_restart")
         };
@@ -185,6 +189,10 @@ public static partial class UiMockBuilder
 
         RectTransform player = CreateStretch($"Player{tag}", screen);
 
+        // キャラの後ろの六角形（見本画像で、左は x75〜610、右は x1465〜2000、y190〜550）。キャラより奥に描く
+        RectTransform hexagon = MockRect("Hexagon", player, isLeft ? 75f : 1465f, 190f, 535f, 360f);
+        AddArt(hexagon, isLeft ? "UI-24" : "UI-25", Color.clear, null, false, null);
+
         // キャラは中心が見本画像の 342（左）／1735（右）あたり。勝ちの文字は内側の高い位置、負けの文字は内側の低い位置
         float characterX = isLeft ? 195f : 1588f;
         RectTransform character = MockRect("Character", player, characterX, 55f, 295f, 493f);
@@ -259,6 +267,10 @@ public static partial class UiMockBuilder
     /// <param name="player2Score">P2の勝ち数の文字</param>
     private static void BuildResultScore(RectTransform screen, out TextMeshProUGUI player1Score, out TextMeshProUGUI player2Score)
     {
+        // 勝ち数の後ろの斜線の板（見本画像で x640〜1400、y15〜165）
+        RectTransform plate = MockRect("ScorePlate", screen, 640f, 15f, 760f, 150f);
+        AddArt(plate, "UI-23", Color.clear, null, false, null);
+
         CreateMockLine("ScoreDividerLeft", screen, 935f, 8f, 5f, 540f, StrongLineColor);
         CreateMockLine("ScoreDividerRight", screen, 1148f, 0f, 5f, 548f, StrongLineColor);
 
@@ -280,6 +292,10 @@ public static partial class UiMockBuilder
         const float RowHeight = (TableBottom - HeaderBottom) / ResultRowCount;
 
         RectTransform table = CreateStretch("Table", screen);
+
+        // 表の後ろの大きい斜めの枠（見本画像で x45〜1915、y560〜1020）。線や文字より奥に描く
+        RectTransform tableFrame = MockRect("TableFrame", table, 45f, 560f, 1870f, 460f);
+        AddArt(tableFrame, "UI-26", Color.clear, null, false, null);
 
         CreateMockLine("HeaderTopLine", table, 0f, HeaderTop, 2000f, 2f, WeakLineColor);
         CreateMockLine("HeaderBottomLine", table, 0f, HeaderBottom, 2000f, 3f, StrongLineColor);

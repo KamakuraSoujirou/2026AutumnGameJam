@@ -16,6 +16,7 @@ public class UiPlayerPanel : MonoBehaviour
     [SerializeField, Tooltip("通常のキャラ")] private GameObject _normalVisual;
     [SerializeField, Tooltip("残り3秒以下の焦り顔のキャラ")] private GameObject _panicVisual;
     [SerializeField, Tooltip("爆発後のアフロ頭のキャラ")] private GameObject _afroVisual;
+    [SerializeField, Tooltip("ラウンドに勝ったときの勝ち顔のキャラ。なければ通常のキャラのまま")] private GameObject _winVisual;
     [SerializeField, Tooltip("頭上の吹き出し")] private RectTransform _bubble;
     [SerializeField, Tooltip("吹き出しの文字")] private TMP_Text _bubbleText;
     [SerializeField, Tooltip("残り3秒以下に出す、画面の端の赤い帯")] private Image _edgeBand;
@@ -31,6 +32,7 @@ public class UiPlayerPanel : MonoBehaviour
     private bool _isThinking;
     private bool _isDanger;
     private bool _isAfro;
+    private bool _isWin;
     private float _popElapsed = PopSeconds;
 
     /// <summary>
@@ -222,13 +224,30 @@ public class UiPlayerPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 状態に合ったキャラの見た目を1つだけ出す（アフロ、焦り顔、通常の順に優先）
+    /// ラウンドに勝った勝ち顔の見た目に切り替える
+    /// </summary>
+    /// <param name="isWin">勝ち顔なら true</param>
+    public void SetWin(bool isWin)
+    {
+        _isWin = isWin;
+        RefreshVisual();
+    }
+
+    /// <summary>
+    /// 状態に合ったキャラの見た目を1つだけ出す（アフロ、勝ち顔、焦り顔、通常の順に優先）。勝ち顔の見た目がなければ、勝ち顔は出さない
     /// </summary>
     private void RefreshVisual()
     {
+        bool isWinFace = _isWin && _winVisual != null && !_isAfro;
+
+        if (_winVisual != null)
+        {
+            _winVisual.SetActive(isWinFace);
+        }
+
         _afroVisual.SetActive(_isAfro);
-        _panicVisual.SetActive(!_isAfro && _isDanger);
-        _normalVisual.SetActive(!_isAfro && !_isDanger);
+        _panicVisual.SetActive(!_isAfro && !isWinFace && _isDanger);
+        _normalVisual.SetActive(!_isAfro && !isWinFace && !_isDanger);
     }
 
     /// <summary>

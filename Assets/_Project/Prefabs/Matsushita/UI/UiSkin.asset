@@ -31,8 +31,8 @@ MonoBehaviour:
   - _id: ART-10_normal
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: bomb_p2_rough_v1
-    _sprite: {fileID: 2310003547637917332, guid: 08993fe16d2c4ef4ea29766eb66ad919, type: 3}
+    _fileName: "bomb_p2_v1(\u900F\u904E)"
+    _sprite: {fileID: -2489372255496809080, guid: 354543b334f3a13469b01dabcea2db8f, type: 3}
   - _id: ART-01
     _label: "\u7206\u5F3E\u672C\u4F53"
     _size: {x: 800, y: 800}
@@ -86,8 +86,8 @@ MonoBehaviour:
   - _id: ART-10_afro
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u30A2\u30D5\u30ED\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p2_afro
-    _sprite: {fileID: 0}
+    _fileName: bomb_p2_v4
+    _sprite: {fileID: -8196348692581814665, guid: 71ba83336790eb8468d2da2cf1c855a6, type: 3}
   - _id: ART-15_on
     _label: "\u52DD\u3061\u661F\uFF08\u70B9\u706F\uFF09"
     _size: {x: 64, y: 64}
@@ -176,8 +176,8 @@ MonoBehaviour:
   - _id: ART-11_p2_panic
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u7126\u308A\u9854\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p2_panic
-    _sprite: {fileID: 0}
+    _fileName: bomb_p2_v2
+    _sprite: {fileID: 5921618926676696330, guid: 684fc5ab92049704da8fc99128f81c56, type: 3}
   - _id: UI-12
     _label: "\u623B\u308B\u30DC\u30BF\u30F3"
     _size: {x: 168, y: 74}
@@ -221,8 +221,8 @@ MonoBehaviour:
   - _id: ART-11_p2_win
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u52DD\u3061\u9854\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p2_win
-    _sprite: {fileID: 0}
+    _fileName: bomb_p2_v3
+    _sprite: {fileID: 7427729498959187706, guid: f03639a88a23da546b3d462b3cc50ffb, type: 3}
   - _id: ART-01_held
     _label: "\u624B\u306B\u6301\u3064\u7206\u5F3E\uFF08\u7ACB\u3061\u7D75\u306E\u624B\u306B\u51FA\u3059\u3002\u98DB\u3076\u7206\u5F3E\u3082\u540C\u3058\u7D75\uFF09"
     _size: {x: 260, y: 260}
@@ -329,6 +329,46 @@ MonoBehaviour:
     _size: {x: 1920, y: 1080}
     _fileName: game_pc
     _sprite: {fileID: 21300000, guid: 8dd8087a01666414795ddbf1de5d009b, type: 3}
+  - _id: UI-04b
+    _label: "\u30E1\u30CB\u30E5\u30FC\u306E\u67A0\uFF08\u64CD\u4F5C\u30E1\u30CB\u30E5\u30FC\u3002\u659C\u7DDA\uFF09"
+    _size: {x: 518, y: 202}
+    _fileName: ui_panel_controls
+    _sprite: {fileID: 0}
+  - _id: UI-04c
+    _label: "\u30E1\u30CB\u30E5\u30FC\u306E\u67A0\uFF08\u30EB\u30FC\u30EB\u3002\u7070\u8272\u306E\u659C\u7DDA\u306E\u5185\u67A0\uFF09"
+    _size: {x: 720, y: 540}
+    _fileName: ui_panel_rules
+    _sprite: {fileID: 0}
+  - _id: UI-14b
+    _label: "\u5439\u304D\u51FA\u3057\u306E\u67A0\uFF08P2\u5074\u3002\u5DE6\u4E0A\u306E\u89D2\u304C\u6B20\u3051\u308B\uFF09"
+    _size: {x: 383, y: 134}
+    _fileName: ui_bubble_p2
+    _sprite: {fileID: 0}
+  - _id: UI-15b
+    _label: "\u4E0B\u306E\u5E2F\uFF08P2\u5074\u3002UI-15\u306E\u93E1\u5199\u3057\uFF09"
+    _size: {x: 532, y: 66}
+    _fileName: ui_bar_p2
+    _sprite: {fileID: 0}
+  - _id: UI-23
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u30B9\u30B3\u30A2\u677F\uFF08\u659C\u7DDA\uFF09"
+    _size: {x: 730, y: 145}
+    _fileName: ui_result_score
+    _sprite: {fileID: 0}
+  - _id: UI-24
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306EP1\u306E\u5F8C\u308D\u306E\u516D\u89D2\u5F62\uFF08\u7DB2\u70B9\uFF09"
+    _size: {x: 535, y: 360}
+    _fileName: ui_result_hex_p1
+    _sprite: {fileID: 0}
+  - _id: UI-25
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306EP2\u306E\u5F8C\u308D\u306E\u516D\u89D2\u5F62\uFF08UI-24\u306E\u93E1\u5199\u3057\uFF09"
+    _size: {x: 535, y: 360}
+    _fileName: ui_result_hex_p2
+    _sprite: {fileID: 0}
+  - _id: UI-26
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u7D50\u679C\u8868\u306E\u67A0\uFF08\u5DE6\u30AA\u30EC\u30F3\u30B8\u30FB\u53F3\u30D4\u30F3\u30AF\u306E\u7DB2\u70B9\uFF09"
+    _size: {x: 1870, y: 440}
+    _fileName: ui_result_table
+    _sprite: {fileID: 0}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}
   _bodyFont: {fileID: 0}

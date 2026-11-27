@@ -410,7 +410,7 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆発の演出を出す。負けた側のキャラはアフロ頭になる
+    /// 爆発の演出を出す。負けた側のキャラはアフロ頭になり、勝った側（もう一方）は勝ち顔になる
     /// </summary>
     /// <param name="loserIndex">負けた側（0：P1、1：P2）</param>
     public void ShowExplosion(int loserIndex)
@@ -419,6 +419,7 @@ public class UiGameView : MonoBehaviour
         _explosionText.gameObject.SetActive(true);
         SetHolder(-1);
         _panels[loserIndex].SetAfro(true);
+        _panels[1 - loserIndex].SetWin(true);
 
         if (Application.isPlaying)
         {
@@ -427,7 +428,7 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 解除成功の演出を出す。「解除成功！」を出し（閃光は出さない）、勝った側の吹き出しを「解除成功！」、負けた側を「解除された…」にして、負けた側をアフロ頭にする
+    /// 解除成功の演出を出す。「解除成功！」を出し（閃光は出さない）、勝った側の吹き出しを「解除成功！」、負けた側を「解除された…」にして、負けた側をアフロ頭に、勝った側を勝ち顔にする
     /// </summary>
     /// <param name="winnerIndex">解除に成功して勝った側（0：P1、1：P2）</param>
     public void ShowDefuseSuccess(int winnerIndex)
@@ -444,6 +445,7 @@ public class UiGameView : MonoBehaviour
         _panels[winnerIndex].SetCaption(DefuseWinnerCaption);
         _panels[loserIndex].SetCaption(DefuseLoserCaption);
         _panels[loserIndex].SetAfro(true);
+        _panels[winnerIndex].SetWin(true);
 
         if (Application.isPlaying)
         {
@@ -465,6 +467,7 @@ public class UiGameView : MonoBehaviour
         foreach (UiPlayerPanel panel in _panels)
         {
             panel.SetAfro(false);
+            panel.SetWin(false);
             panel.SetCaption(null);
         }
     }
