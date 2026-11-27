@@ -461,28 +461,28 @@ public static partial class UiMockBuilder
 
         // 液晶の枠は本体の絵に描いてあるので、ここは文字の置き場だけ（仮の四角は出さない）
         RectTransform timer = CreateRect("TimerLcd", bomb, 240f, 384f, 160f, 48f);
-        TextMeshProUGUI time = AddText("Time", timer, 0f, 0f, 160f, 48f, "10:00", 34f, UiFontRole.Number, TextAlignmentOptions.Center);
+        TextMeshProUGUI time = AddText("Time", timer, 0f, 0f, 160f, 48f, "10:00", 34f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         time.color = LcdTextColor;
 
         RectTransform mouth = CreateRect("MouthLcd", bomb, 130f, 440f, 380f, 120f);
 
-        TextMeshProUGUI question = AddText("Question", mouth, 24f, 6f, 332f, 62f, "問題文がここに出る", 28f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI question = AddText("Question", mouth, 24f, 6f, 332f, 62f, "問題文がここに出る", 28f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         question.color = LcdTextColor;
         question.textWrappingMode = TextWrappingModes.Normal;
         question.enableAutoSizing = true;
         question.fontSizeMin = 16f;
         question.fontSizeMax = 28f;
 
-        TextMeshProUGUI defuseStatus = AddText("DefuseStatus", mouth, 50f, 74f, 170f, 30f, "解除：パス5回目から", 17f, UiFontRole.Body, TextAlignmentOptions.Left);
+        TextMeshProUGUI defuseStatus = AddText("DefuseStatus", mouth, 50f, 74f, 170f, 30f, "解除：パス5回目から", 17f, UiFontRole.Bomb, TextAlignmentOptions.Left);
         defuseStatus.color = LcdTextColor;
 
         RectTransform defuseButton = CreateRect("DefuseButton", mouth, 232f, 74f, 110f, 30f);
         AddArt(defuseButton, "UI-18", Orange, roundSprite, false, null);
-        AddText("Label", defuseButton, 0f, 0f, 110f, 30f, "解除", 20f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        AddText("Label", defuseButton, 0f, 0f, 110f, 30f, "解除", 20f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         defuseClick = AddClickArea(defuseButton);
         defuseButton.gameObject.SetActive(false);
 
-        TextMeshProUGUI input = AddText("Input", bomb, 200f, 582f, 240f, 36f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI input = AddText("Input", bomb, 200f, 582f, 240f, 36f, string.Empty, 28f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         input.gameObject.SetActive(false);
 
         UiBombView view = bomb.gameObject.AddComponent<UiBombView>();
@@ -621,11 +621,11 @@ public static partial class UiMockBuilder
         placeholderTintImage.color = Color.clear;
         placeholderTintImage.raycastTarget = false;
 
-        TextMeshProUGUI label = AddText("Label", buttonRoot, 22f, 0f, ButtonBox - 44f, ButtonBox, "赤", 44f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        TextMeshProUGUI label = AddText("Label", buttonRoot, 22f, 0f, ButtonBox - 44f, ButtonBox, "赤", 44f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         label.enableAutoSizing = true;
         label.fontSizeMin = 16f;
         label.fontSizeMax = 44f;
-        TextMeshProUGUI symbol = AddText("Symbol", buttonRoot, 90f, 8f, 48f, 40f, string.Empty, 28f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI symbol = AddText("Symbol", buttonRoot, 90f, 8f, 48f, 40f, string.Empty, 28f, UiFontRole.Bomb, TextAlignmentOptions.Center);
         symbol.gameObject.SetActive(false);
 
         UiWire wire = wireRoot.gameObject.AddComponent<UiWire>();

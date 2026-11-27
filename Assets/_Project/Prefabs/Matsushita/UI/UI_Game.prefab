@@ -245,7 +245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &28957516677460538
 GameObject:
   m_ObjectHideFlags: 0
@@ -1022,7 +1022,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 0
+  _role: 3
 --- !u!1 &165723658622095451
 GameObject:
   m_ObjectHideFlags: 0
@@ -4778,7 +4778,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &1083494642770967498
 GameObject:
   m_ObjectHideFlags: 0
@@ -12273,7 +12273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &3660956068519828239
 GameObject:
   m_ObjectHideFlags: 0
@@ -13411,7 +13411,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 1
+  _role: 3
 --- !u!1 &3871498903166483494
 GameObject:
   m_ObjectHideFlags: 0
@@ -16183,7 +16183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &4680654975463303511
 GameObject:
   m_ObjectHideFlags: 0
@@ -16616,7 +16616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &4759844641108722382
 GameObject:
   m_ObjectHideFlags: 0
@@ -16767,7 +16767,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 0
+  _role: 3
 --- !u!1 &4798077033458927253
 GameObject:
   m_ObjectHideFlags: 0
@@ -21657,7 +21657,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 0
+  _role: 3
 --- !u!1 &6197341885907307975
 GameObject:
   m_ObjectHideFlags: 0
@@ -21808,7 +21808,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 0
+  _role: 3
 --- !u!1 &6248117953253363968
 GameObject:
   m_ObjectHideFlags: 0
@@ -22309,7 +22309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 0
+  _role: 3
 --- !u!1 &6396449989985364778
 GameObject:
   m_ObjectHideFlags: 0
@@ -26373,7 +26373,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &7695872605601809223
 GameObject:
   m_ObjectHideFlags: 0
@@ -27092,7 +27092,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ff10172d91f87648b0702f5ebfdcf20, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UiFontSlot
-  _role: 2
+  _role: 3
 --- !u!1 &8173336304267340142
 GameObject:
   m_ObjectHideFlags: 0

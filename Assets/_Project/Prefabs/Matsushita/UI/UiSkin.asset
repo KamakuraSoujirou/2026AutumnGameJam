@@ -329,6 +329,7 @@ MonoBehaviour:
     _size: {x: 1920, y: 1080}
     _fileName: game_pc
     _sprite: {fileID: 21300000, guid: 8dd8087a01666414795ddbf1de5d009b, type: 3}
-  _headingFont: {fileID: 0}
-  _numberFont: {fileID: 0}
-  _bodyFont: {fileID: 0}
+  _headingFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _numberFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _bodyFont: {fileID: 11400000, guid: 99b3db65b7059874f946f074c89d20aa, type: 2}
+  _bombFont: {fileID: 11400000, guid: 3cad0d91795b3d3458911343c57aa69d, type: 2}

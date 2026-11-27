@@ -12,6 +12,7 @@ public class UiSkin : ScriptableObject
     [SerializeField, Tooltip("ロゴ・見出しのフォント（Dela Gothic One）")] private TMP_FontAsset _headingFont;
     [SerializeField, Tooltip("数字のフォント（DotGothic16）")] private TMP_FontAsset _numberFont;
     [SerializeField, Tooltip("本文のフォント（Zen Kaku Gothic New）")] private TMP_FontAsset _bodyFont;
+    [SerializeField, Tooltip("爆弾に書いてある文字のフォント（M PLUS 1）")] private TMP_FontAsset _bombFont;
 
     /// <summary>
     /// 素材の一覧
@@ -60,6 +61,8 @@ public class UiSkin : ScriptableObject
                 return _headingFont;
             case UiFontRole.Number:
                 return _numberFont;
+            case UiFontRole.Bomb:
+                return _bombFont;
             default:
                 return _bodyFont;
         }
