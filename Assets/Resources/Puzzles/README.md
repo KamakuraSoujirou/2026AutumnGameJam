@@ -24,9 +24,9 @@ orderDatabase.ResetUsed();                    // 試合の最初に呼ぶ（出�
 
 | ファイル | 中身 | 目標の数 | 主な担当 |
 | --- | --- | --- | --- |
-| `WireAssociation.json` | 謎A T3 連想 | 16問 | 配線（笹） |
+| `WireAssociation.json` | 謎A T3 連想 | 16問（入力済み） | 配線（笹） |
 | `OrderSwitch.json` | 謎C C2 五十音・C3 時間・C4 大きさ | 8組・7組・6組（入力済み） | 順番スイッチ（賀来） |
-| `Defuse.json` | 解除（ひらめき謎、4択） | 15問 | 解除 |
+| `Defuse.json` | 解除（ひらめき謎、4択） | 15問（入力済み。サンプル1問を含め16問） | 解除 |
 
 ## 形式（v1）
 
