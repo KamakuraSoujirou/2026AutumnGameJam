@@ -2,8 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 /// <summary>
-/// リザルト画面のキー操作。Space か Enter でメニューを開き、メニューでは ↑↓（W S）で選んで Space か Enter で決める。
-/// Esc はメニューを閉じる（メニューが閉じているときはタイトルへ）
+/// リザルト画面のキー操作。←→（A D）で HOME と再戦を選び、Space か Enter で決める。Esc は HOME（タイトルへ）
 /// </summary>
 [RequireComponent(typeof(UiResultView))]
 public class UiResultInput : MonoBehaviour
@@ -32,8 +31,18 @@ public class UiResultInput : MonoBehaviour
 
         if (keyboard.escapeKey.wasPressedThisFrame)
         {
-            HandleBack();
+            _view.RequestTitle();
             return;
+        }
+
+        if (keyboard.leftArrowKey.wasPressedThisFrame || keyboard.aKey.wasPressedThisFrame)
+        {
+            _view.MoveFocus(-1);
+        }
+
+        if (keyboard.rightArrowKey.wasPressedThisFrame || keyboard.dKey.wasPressedThisFrame)
+        {
+            _view.MoveFocus(1);
         }
 
         bool isDecidePressed = keyboard.spaceKey.wasPressedThisFrame
@@ -42,53 +51,7 @@ public class UiResultInput : MonoBehaviour
 
         if (isDecidePressed)
         {
-            HandleDecide();
-            return;
-        }
-
-        if (!_view.IsMenuOpen)
-        {
-            return;
-        }
-
-        if (keyboard.upArrowKey.wasPressedThisFrame || keyboard.wKey.wasPressedThisFrame)
-        {
-            _view.MoveMenuFocus(-1);
-        }
-
-        if (keyboard.downArrowKey.wasPressedThisFrame || keyboard.sKey.wasPressedThisFrame)
-        {
-            _view.MoveMenuFocus(1);
-        }
-    }
-
-    /// <summary>
-    /// 決定キー：メニューが閉じていれば開き、開いていれば選んでいるものを決める
-    /// </summary>
-    private void HandleDecide()
-    {
-        if (_view.IsMenuOpen)
-        {
-            _view.DecideMenu();
-        }
-        else
-        {
-            _view.OpenMenu();
-        }
-    }
-
-    /// <summary>
-    /// Esc：メニューが開いていれば閉じ、閉じていればタイトルへ戻る
-    /// </summary>
-    private void HandleBack()
-    {
-        if (_view.IsMenuOpen)
-        {
-            _view.CloseMenu();
-        }
-        else
-        {
-            _view.RequestTitle();
+            _view.DecideFocus();
         }
     }
 }

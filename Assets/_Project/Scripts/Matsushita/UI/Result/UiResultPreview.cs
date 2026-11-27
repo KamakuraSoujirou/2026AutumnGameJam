@@ -10,8 +10,6 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(UiResultView))]
 public class UiResultPreview : MonoBehaviour
 {
-    private static readonly int[] SampleRoundWinners = { 0, 1, 0 };
-
     private UiResultView _view;
 
     /// <summary>
@@ -29,7 +27,7 @@ public class UiResultPreview : MonoBehaviour
     /// </summary>
     private void Start()
     {
-        _view.Show(0, "P1", "COM", SampleRoundWinners);
+        ShowSample(0);
     }
 
     /// <summary>
@@ -55,28 +53,47 @@ public class UiResultPreview : MonoBehaviour
 
         if (keyboard.digit1Key.wasPressedThisFrame)
         {
-            _view.Show(0, "P1", "COM", SampleRoundWinners);
+            ShowSample(0);
         }
 
         if (keyboard.digit2Key.wasPressedThisFrame)
         {
-            _view.Show(1, "P1", "COM", new[] { 1, 0, 1 });
+            ShowSample(1);
         }
     }
 
     /// <summary>
-    /// リスタートが選ばれたことをコンソールに出す
+    /// 仮の結果（5ラウンド、3勝2敗）を出す。勝者が P2 のときは、勝ち負けを入れ替える
     /// </summary>
-    private void OnRestartRequested()
+    /// <param name="winnerIndex">試合に勝った側（0：P1、1：P2）</param>
+    private void ShowSample(int winnerIndex)
     {
-        Debug.Log("リスタート（本番では試合を最初からやり直す）");
+        int loserIndex = 1 - winnerIndex;
+        UiResultRound[] rounds =
+        {
+            new UiResultRound("配線切断式", winnerIndex, false, 3),
+            new UiResultRound("暗号式", loserIndex, true, 5),
+            new UiResultRound("順番スイッチ式", loserIndex, false, 2),
+            new UiResultRound("配線切断式", winnerIndex, false, 4),
+            new UiResultRound("仲間外れ式", winnerIndex, false, 6)
+        };
+
+        _view.Show(winnerIndex, "P1", "COM", rounds);
     }
 
     /// <summary>
-    /// タイトルへが選ばれたことをコンソールに出す
+    /// 再戦が選ばれたことをコンソールに出す
+    /// </summary>
+    private void OnRestartRequested()
+    {
+        Debug.Log("再戦（本番では試合を最初からやり直す）");
+    }
+
+    /// <summary>
+    /// HOMEが選ばれたことをコンソールに出す
     /// </summary>
     private void OnTitleRequested()
     {
-        Debug.Log("タイトルへ（本番ではタイトルのシーンへ切り替える）");
+        Debug.Log("HOME（本番ではタイトルのシーンへ切り替える）");
     }
 }

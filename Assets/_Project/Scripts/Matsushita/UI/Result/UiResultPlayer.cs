@@ -2,16 +2,14 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// リザルト画面のキャラ1人分（勝ち／負けの見た目、「勝ち」「負け」の札、名前）
+/// リザルト画面のキャラ1人分（勝ち／負けの見た目、「WIN」「LOSE」の文字、名前）
 /// </summary>
 public class UiResultPlayer : MonoBehaviour
 {
-    private static readonly Color WinColor = new Color(0.92f, 0.54f, 0f);
-    private static readonly Color LoseColor = new Color(0.45f, 0.45f, 0.45f);
-
     [SerializeField, Tooltip("勝ったときの見た目（勝ち顔）")] private GameObject _winVisual;
     [SerializeField, Tooltip("負けたときの見た目（アフロ）")] private GameObject _loseVisual;
-    [SerializeField, Tooltip("「勝ち」「負け」の札")] private TMP_Text _tagText;
+    [SerializeField, Tooltip("勝ったときに出す「WIN」の文字")] private GameObject _winTag;
+    [SerializeField, Tooltip("負けたときに出す「LOSE」の文字")] private GameObject _loseTag;
     [SerializeField, Tooltip("プレイヤー名")] private TMP_Text _nameText;
 
     /// <summary>
@@ -23,8 +21,8 @@ public class UiResultPlayer : MonoBehaviour
     {
         _winVisual.SetActive(isWinner);
         _loseVisual.SetActive(!isWinner);
-        _tagText.text = isWinner ? "勝ち" : "負け";
-        _tagText.color = isWinner ? WinColor : LoseColor;
+        _winTag.SetActive(isWinner);
+        _loseTag.SetActive(!isWinner);
         _nameText.text = playerName;
     }
 }

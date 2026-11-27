@@ -34,7 +34,7 @@ public static partial class UiMockBuilder
         new Color(0.5f, 1f, 0.4f)
     };
 
-    private static readonly string[] StaleArtIds = { "UI-05", "ART-19", "ART-05_normal" };
+    private static readonly string[] StaleArtIds = { "UI-05", "ART-19", "ART-05_normal", "UI-19", "UI-20" };
 
     /// <summary>
     /// 試合画面のプレハブとテストシーンを作る
@@ -170,7 +170,7 @@ public static partial class UiMockBuilder
         explosionFlash.SetActive(false);
         RectTransform explosionText = BuildExplosionText(screen);
 
-        BuildResult(screen, roundSprite, out GameObject resultRoot, out TextMeshProUGUI resultTitle, out TextMeshProUGUI resultScore);
+        BuildResult(screen, roundSprite, out GameObject resultRoot, out TextMeshProUGUI resultTitle, out TextMeshProUGUI resultScore, out Button[] resultButtons, out GameObject[] resultFocusFrames);
 
         SetObject(view, "_bomb", bomb);
         SetObject(view, "_defuseButton", defuseClick);
@@ -188,6 +188,8 @@ public static partial class UiMockBuilder
         SetObject(view, "_resultRoot", resultRoot);
         SetObject(view, "_resultTitle", resultTitle);
         SetObject(view, "_resultScore", resultScore);
+        SetObjectArray(view, "_resultButtons", resultButtons);
+        SetObjectArray(view, "_resultFocusFrames", resultFocusFrames);
 
         SetInitialGameState(view, bomb);
     }
@@ -715,7 +717,9 @@ public static partial class UiMockBuilder
     /// <param name="root">リザルト全体</param>
     /// <param name="title">勝者の表示</param>
     /// <param name="score">勝ち星の数の表示</param>
-    private static void BuildResult(RectTransform screen, Sprite roundSprite, out GameObject root, out TextMeshProUGUI title, out TextMeshProUGUI score)
+    /// <param name="buttons">「再戦」「タイトルへ」のボタン（この順）</param>
+    /// <param name="focusFrames">選んでいるボタンに出す枠（ボタンと同じ順）</param>
+    private static void BuildResult(RectTransform screen, Sprite roundSprite, out GameObject root, out TextMeshProUGUI title, out TextMeshProUGUI score, out Button[] buttons, out GameObject[] focusFrames)
     {
         RectTransform result = CreateStretch("Result", screen);
         Image dim = result.gameObject.AddComponent<Image>();
@@ -728,7 +732,25 @@ public static partial class UiMockBuilder
 
         title = AddText("Title", panel, 0f, 60f, 1000f, 170f, "P1の勝ち！", 140f, UiFontRole.Heading, TextAlignmentOptions.Center);
         score = AddText("Score", panel, 0f, 250f, 1000f, 130f, "2 − 0", 110f, UiFontRole.Number, TextAlignmentOptions.Center);
-        AddText("Hint", panel, 0f, 450f, 1000f, 70f, "ボタンを押すと もう一度", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
+        string[] labels = { "再戦", "タイトルへ" };
+        float[] buttonXs = { 70f, 530f };
+        buttons = new Button[labels.Length];
+        focusFrames = new GameObject[labels.Length];
+
+        for (int i = 0; i < labels.Length; i++)
+        {
+            RectTransform frame = CreateRect($"ResultFocusFrame{i}", panel, buttonXs[i] - 12f, 408f, 424f, 134f);
+            AddFocusFrame(frame, roundSprite, Image.Type.Sliced);
+            focusFrames[i] = frame.gameObject;
+
+            RectTransform button = CreateRect($"ResultButton{i}", panel, buttonXs[i], 420f, 400f, 110f);
+            Image buttonImage = button.gameObject.AddComponent<Image>();
+            buttonImage.sprite = roundSprite;
+            buttonImage.type = Image.Type.Sliced;
+            buttonImage.color = Orange;
+            AddText("Label", button, 0f, 0f, 400f, 110f, labels[i], 56f, UiFontRole.Heading, TextAlignmentOptions.Center);
+            buttons[i] = AddClickArea(button);
+        }
 
         result.gameObject.SetActive(false);
         root = result.gameObject;

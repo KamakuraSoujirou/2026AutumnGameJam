@@ -602,6 +602,11 @@ public static partial class UiMockBuilder
 
         int assignedCount = 0;
 
+        foreach (string textureGuid in AssetDatabase.FindAssets("t:Texture2D", new[] { ArtFolder }))
+        {
+            EnsureSpriteImport(AssetDatabase.GUIDToAssetPath(textureGuid));
+        }
+
         foreach (string guid in AssetDatabase.FindAssets("t:Sprite", new[] { ArtFolder }))
         {
             string path = AssetDatabase.GUIDToAssetPath(guid);
