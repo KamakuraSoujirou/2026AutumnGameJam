@@ -58,6 +58,7 @@ public class OrderGimmick : Gimmick
     private PuzzleDatabase _database;
     private string _questionText = string.Empty;
     private int _clearCount;
+    private bool _isSilhouette;
     private OrderPuzzleType _lastType;
     private int _sameTypeCount;
 
@@ -129,6 +130,9 @@ public class OrderGimmick : Gimmick
             Array.Reverse(orderedItems);
             _questionText += ReverseSuffix;
         }
+
+        // 大きさの問題は、4つともシルエットがあるときだけ、文字の代わりに絵だけで出す（ひとつでも無ければ全部文字）
+        _isSilhouette = type == OrderPuzzleType.Size && Array.TrueForAll(orderedItems, word => UiSilhouetteLibrary.Find(word) != null);
 
         // 4つの言葉を、上下左右のスイッチにランダムに割り振る
         InputDirection[] directions = { InputDirection.Up, InputDirection.Down, InputDirection.Left, InputDirection.Right };
@@ -381,6 +385,7 @@ public class OrderGimmick : Gimmick
             if (_bombView != null)
             {
                 _bombView.SetButtonLabel(direction, _labels[i]);
+                _bombView.SetButtonSilhouette(direction, _isSilhouette ? _labels[i] : string.Empty);
                 _bombView.SetWireSymbol(direction, orderText);
             }
         }
@@ -401,7 +406,8 @@ public class OrderGimmick : Gimmick
 
         if (_bombView != null)
         {
-            _bombView.SetInput(entered);
+            // 絵だけの問題では、押した言葉の名前を文字で出さない（押した順の番号は、ボタンの隅に出る）
+            _bombView.SetInput(_isSilhouette ? string.Empty : entered);
         }
     }
 

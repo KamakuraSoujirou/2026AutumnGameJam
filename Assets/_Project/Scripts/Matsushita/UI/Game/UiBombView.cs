@@ -132,6 +132,17 @@ public class UiBombView : MonoBehaviour
     }
 
     /// <summary>
+    /// ボタンの文字の代わりに、言葉に合うシルエットを出す（大きさの問題で使う）。
+    /// 先に SetButtonLabel で文字を設定してから呼ぶ。合う画像が無い言葉は、文字のまま出る
+    /// </summary>
+    /// <param name="direction">どの方向のボタンか</param>
+    /// <param name="word">ボタンの言葉（例：「ゾウ」）。空にするとシルエットを消して文字に戻す</param>
+    public void SetButtonSilhouette(InputDirection direction, string word)
+    {
+        _wires[(int)direction].SetSilhouette(UiSilhouetteLibrary.Find(word));
+    }
+
+    /// <summary>
     /// 配線の記号を設定する（仲間外れの謎と、ランプ条件のときだけ使う）
     /// </summary>
     /// <param name="direction">どの方向の線か</param>

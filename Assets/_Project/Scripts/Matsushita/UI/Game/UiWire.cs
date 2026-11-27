@@ -19,6 +19,9 @@ public class UiWire : MonoBehaviour
     private const float WrapLabelHeight = 64f;
     private const float WrapLabelMinFontSize = 10f;
 
+    // シルエットの画像の大きさ（ひし形の中に収まる大きさ）
+    private const float SilhouetteSize = 64f;
+
     [SerializeField, Tooltip("つながっている配線の見た目（赤・青・黄・緑の順）")] private GameObject[] _normalVisuals = new GameObject[ColorCount];
     [SerializeField, Tooltip("切れている配線の見た目（赤・青・黄・緑の順）")] private GameObject[] _cutVisuals = new GameObject[ColorCount];
     [SerializeField, Tooltip("ひし形ボタンの見た目（赤・青・黄・緑の順）")] private GameObject[] _buttonVisuals = new GameObject[ColorCount];
@@ -64,6 +67,8 @@ public class UiWire : MonoBehaviour
     private Vector2 _labelSingleLineSize;
     private float _labelSingleLineMinFontSize;
     private bool _isLabelPrepared;
+    private Sprite _silhouette;
+    private Image _silhouetteImage;
 
     /// <summary>
     /// ボタンをマウスで押すためのボタン
@@ -197,7 +202,19 @@ public class UiWire : MonoBehaviour
     public void SetLabel(string text)
     {
         _customLabel = text;
+        _silhouette = null;
         RefreshLabel();
+    }
+
+    /// <summary>
+    /// ボタンに文字の代わりにシルエットの画像を出す（大きさの問題で使う）。null を渡すと文字に戻る。
+    /// 新しい問題では先に SetLabel で文字を設定してから呼ぶ（SetLabel は画像を消す）
+    /// </summary>
+    /// <param name="sprite">シルエットの画像。出さないときは null</param>
+    public void SetSilhouette(Sprite sprite)
+    {
+        _silhouette = sprite;
+        ShowSilhouette();
     }
 
     /// <summary>
@@ -218,6 +235,58 @@ public class UiWire : MonoBehaviour
         string text = string.IsNullOrEmpty(_customLabel) ? ColorNames[_colorIndex] : _customLabel;
         FitLabel(text);
         _label.text = text;
+        ShowSilhouette();
+    }
+
+    /// <summary>
+    /// シルエットがあれば画像を出して文字を隠し、なければ文字を出す
+    /// </summary>
+    private void ShowSilhouette()
+    {
+        PrepareLabel();
+
+        if (_silhouette == null)
+        {
+            _label.enabled = true;
+
+            if (_silhouetteImage != null)
+            {
+                _silhouetteImage.gameObject.SetActive(false);
+            }
+
+            return;
+        }
+
+        if (_silhouetteImage == null)
+        {
+            _silhouetteImage = CreateSilhouetteImage();
+        }
+
+        _silhouetteImage.sprite = _silhouette;
+        _silhouetteImage.gameObject.SetActive(true);
+        _label.enabled = false;
+    }
+
+    /// <summary>
+    /// シルエットを出す画像を作る。文字と同じ中心に置き、文字のすぐ上の階層に並べる
+    /// </summary>
+    /// <returns>作った画像</returns>
+    private Image CreateSilhouetteImage()
+    {
+        GameObject imageObject = new GameObject("Silhouette", typeof(RectTransform), typeof(Image));
+        RectTransform rect = (RectTransform)imageObject.transform;
+        rect.SetParent(_labelRect.parent, false);
+        rect.SetSiblingIndex(_labelRect.GetSiblingIndex() + 1);
+        rect.anchorMin = _labelRect.anchorMin;
+        rect.anchorMax = _labelRect.anchorMax;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.sizeDelta = new Vector2(SilhouetteSize, SilhouetteSize);
+        rect.anchoredPosition = _labelCenter;
+
+        Image image = imageObject.GetComponent<Image>();
+        image.preserveAspect = true;
+        image.raycastTarget = false;
+        return image;
     }
 
     /// <summary>
