@@ -80,8 +80,17 @@ public static partial class UiMockBuilder
     /// <summary>絵のつまみが左にあるか（赤・青・黄・緑の順。赤と青は右、黄と緑は左に描かれている）</summary>
     private static readonly bool[] ButtonTabIsLeft = { false, false, true, true };
 
-    /// <summary>配線の仮の線を一時的に隠す（配線の絵が届いたら false にして作り直す）</summary>
-    private const bool IsWireHiddenForNow = true;
+    /// <summary>
+    /// コードの絵を置く四角（本体の絵 800×800 の上で測った、左上の位置と大きさ。赤・青・黄・緑の順）。
+    /// コードの形はボタンの位置ごとに描かれているので、その色がいつもいる位置（赤＝下、青＝上、黄＝左、緑＝右）に置く
+    /// </summary>
+    private static readonly Rect[] CodeArtRects =
+    {
+        new Rect(452f, 129f, 360f, 350f),
+        new Rect(81f, 82f, 265f, 105f),
+        new Rect(9f, 142f, 190f, 180f),
+        new Rect(588f, 128f, 210f, 170f)
+    };
 
     /// <summary>ランプの消灯の見た目を一時的に隠す（消灯の絵 bomb_lamp_blackout が届いたので、今は隠さない）</summary>
     private const bool IsLampOffHiddenForNow = false;
@@ -169,8 +178,8 @@ public static partial class UiMockBuilder
                 entries.Add(new UiSkinEntry($"ART-05_{WireNames[i]}_{look}", $"ひし形ボタン（{WireNames[i]}・{look}）", new Vector2(200f, 200f), $"bomb_switch_{WireNames[i]}_{look}"));
             }
 
-            entries.Add(new UiSkinEntry($"ART-03_{WireNames[i]}", $"配線（{WireNames[i]}）", new Vector2(400f, 40f), $"wire_{WireNames[i]}"));
-            entries.Add(new UiSkinEntry($"ART-03_cut_{WireNames[i]}", $"配線（{WireNames[i]}・切断）", new Vector2(400f, 40f), $"wire_cut_{WireNames[i]}"));
+            entries.Add(new UiSkinEntry($"ART-03_{WireNames[i]}", $"配線（{WireNames[i]}）", CodeArtRects[i].size, GetCodeFileName(i, false)));
+            entries.Add(new UiSkinEntry($"ART-03_cut_{WireNames[i]}", $"配線（{WireNames[i]}・切断）", CodeArtRects[i].size, GetCodeFileName(i, true)));
         }
 
         return entries;
@@ -435,10 +444,10 @@ public static partial class UiMockBuilder
         // つまみは画面の上・左のボタンが左向き、右・下のボタンが右向き（絵のつまみは右向きなので、上と左は反転して使う）
         UiWire[] wires =
         {
-            CreateWire(bomb, "WireUp", ArtPoint(400f, 385f), 394f, 182f, false),
-            CreateWire(bomb, "WireDown", ArtPoint(400f, 145f), 80f, 166f, true),
-            CreateWire(bomb, "WireLeft", ArtPoint(255f, 263f), 80f, 50f, true),
-            CreateWire(bomb, "WireRight", ArtPoint(545f, 263f), 510f, 66f, false)
+            CreateWire(bomb, "WireUp", ArtPoint(400f, 385f), false),
+            CreateWire(bomb, "WireDown", ArtPoint(400f, 145f), true),
+            CreateWire(bomb, "WireLeft", ArtPoint(255f, 263f), true),
+            CreateWire(bomb, "WireRight", ArtPoint(545f, 263f), false)
         };
 
         // ランプは X字の中心。消灯の絵が届くまでは、点灯の絵を暗くして使う
@@ -540,23 +549,19 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
-    /// ひし形ボタン1つと、そこから横へ伸びる配線（赤・青・黄・緑それぞれの、つながった状態と切れた状態）を作る
+    /// ひし形ボタン1つと、そこからコネクタへ伸びるコード（赤・青・黄・緑それぞれの、つながった状態と切れた状態）を作る
     /// </summary>
     /// <param name="bomb">爆弾</param>
     /// <param name="name">オブジェクト名</param>
     /// <param name="buttonCenter">ボタンの中心（爆弾の左上から）</param>
-    /// <param name="wireX">配線の左端</param>
-    /// <param name="wireWidth">配線の長さ</param>
     /// <param name="isTabLeft">ボタンのつまみを左に向けるか（配線が左へ伸びるなら true）。絵のつまみの向きは色ごとに違うので、合わなければ反転する</param>
     /// <returns>作った配線</returns>
-    private static UiWire CreateWire(RectTransform bomb, string name, Vector2 buttonCenter, float wireX, float wireWidth, bool isTabLeft)
+    private static UiWire CreateWire(RectTransform bomb, string name, Vector2 buttonCenter, bool isTabLeft)
     {
-        const float WireThickness = 16f;
         const float ButtonBox = ButtonBoxSize;
         const float DiamondSide = 78f;
 
         RectTransform wireRoot = CreateStretch(name, bomb);
-        float wireY = buttonCenter.y - WireThickness * 0.5f;
 
         GameObject[] normalVisuals = new GameObject[WireNames.Length];
         GameObject[] cutVisuals = new GameObject[WireNames.Length];
@@ -564,17 +569,17 @@ public static partial class UiMockBuilder
         GameObject[] lightVisuals = new GameObject[WireNames.Length];
         GameObject[] blackoutVisuals = new GameObject[WireNames.Length];
 
+        // コードは、その色がいつもいる位置に置く（絵がないときは何も出さない）
         for (int i = 0; i < WireNames.Length; i++)
         {
-            RectTransform normal = CreateRect($"Wire_{WireNames[i]}", wireRoot, wireX, wireY, wireWidth, WireThickness);
-            AddArt(normal, $"ART-03_{WireNames[i]}", WireColors[i], null, false, null);
+            Rect codeRect = GetCodeRect(i);
+
+            RectTransform normal = CreateRect($"Wire_{WireNames[i]}", wireRoot, codeRect.x, codeRect.y, codeRect.width, codeRect.height);
+            AddArt(normal, $"ART-03_{WireNames[i]}", Color.clear, null, false, null);
             normalVisuals[i] = normal.gameObject;
 
-            RectTransform cut = CreateRect($"WireCut_{WireNames[i]}", wireRoot, wireX, wireY, wireWidth, WireThickness);
-            RectTransform pieces = CreateStretch("Pieces", cut);
-            CreateWirePiece(pieces, "Left", 0f, 0.42f, WireColors[i]);
-            CreateWirePiece(pieces, "Right", 0.58f, 1f, WireColors[i]);
-            AddArt(cut, $"ART-03_cut_{WireNames[i]}", Color.clear, null, false, pieces.gameObject);
+            RectTransform cut = CreateRect($"WireCut_{WireNames[i]}", wireRoot, codeRect.x, codeRect.y, codeRect.width, codeRect.height);
+            AddArt(cut, $"ART-03_cut_{WireNames[i]}", Color.clear, null, false, null);
             cutVisuals[i] = cut.gameObject;
         }
 
@@ -629,7 +634,6 @@ public static partial class UiMockBuilder
         SetObjectArray(wire, "_buttonVisuals", buttonVisuals);
         SetObjectArray(wire, "_lightVisuals", lightVisuals);
         SetObjectArray(wire, "_blackoutVisuals", blackoutVisuals);
-        SetBool(wire, "_isWireHidden", IsWireHiddenForNow);
         SetObject(wire, "_buttonGroup", buttonGroup);
         SetObject(wire, "_clickButton", AddClickArea(buttonRoot));
         buttonRoot.gameObject.AddComponent<UiWirePointerRelay>();
@@ -653,27 +657,6 @@ public static partial class UiMockBuilder
         AddArt(look, artId, Color.clear, null, true, null);
         look.gameObject.SetActive(false);
         return look.gameObject;
-    }
-
-    /// <summary>
-    /// 切れた配線の、片側の欠片を作る
-    /// </summary>
-    /// <param name="parent">置く場所</param>
-    /// <param name="name">オブジェクト名</param>
-    /// <param name="minX">左端（0〜1）</param>
-    /// <param name="maxX">右端（0〜1）</param>
-    /// <param name="color">色</param>
-    private static void CreateWirePiece(RectTransform parent, string name, float minX, float maxX, Color color)
-    {
-        RectTransform piece = CreateStretch(name, parent);
-        piece.anchorMin = new Vector2(minX, 0f);
-        piece.anchorMax = new Vector2(maxX, 1f);
-        piece.offsetMin = Vector2.zero;
-        piece.offsetMax = Vector2.zero;
-
-        Image image = piece.gameObject.AddComponent<Image>();
-        image.color = color;
-        image.raycastTarget = false;
     }
 
     /// <summary>
