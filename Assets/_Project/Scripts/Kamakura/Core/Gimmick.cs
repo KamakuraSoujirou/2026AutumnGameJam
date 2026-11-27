@@ -83,6 +83,14 @@ public abstract class Gimmick : MonoBehaviour
     }
 
     /// <summary>
+    /// 爆弾を受け取るたびに、CreatePuzzle の直前に呼ばれる。ラリー回数を謎に使うギミックだけが上書きする
+    /// </summary>
+    /// <param name="receiveCount">そのラウンドで何回目の受け取りか（画面の「ラリー N回目」と同じ数。最初が1）</param>
+    public virtual void SetReceiveCount(int receiveCount)
+    {
+    }
+
+    /// <summary>
     /// 爆弾を受け取るたびに呼ばれる
     /// </summary>
     /// <param name="stage">難易度の段階（1〜4）</param>

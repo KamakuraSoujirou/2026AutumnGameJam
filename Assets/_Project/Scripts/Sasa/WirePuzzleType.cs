@@ -10,8 +10,8 @@ public enum WirePuzzleType
     /// <summary>T2 文字と色の食い違い（青い字の「あか」→ 赤の線）</summary>
     ColorWord,
 
-    /// <summary>T4 シリアル番号の条件</summary>
-    Serial,
+    /// <summary>T4 ラリー回数の条件（「ラリーが偶数回目なら赤、奇数回目なら青」。番号は変えない：プレハブには番号で保存されている）</summary>
+    Rally,
 
     /// <summary>T5 ランプ（点灯なら★の反対側、消灯なら★の線）</summary>
     Lamp,

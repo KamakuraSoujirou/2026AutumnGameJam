@@ -443,6 +443,10 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 2754221024123853875, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 488.6
+      objectReference: {fileID: 0}
     - target: {fileID: 2794953716164269802, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4279505940
@@ -870,6 +874,30 @@ PrefabInstance:
     - target: {fileID: 8455968532133843623, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 886.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -85.38
+      objectReference: {fileID: 0}
+    - target: {fileID: 8607095546817842389, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8720942783418411404, guid: 8f25089e835a09442bf7514bfbf7a3b5, type: 3}
       propertyPath: m_fontAsset

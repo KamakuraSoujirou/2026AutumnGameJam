@@ -330,6 +330,7 @@ public class BombManager : MonoBehaviour
         _receiveCount++;
         CloseChord();
         _stage = DifficultyCalculator.GetStage(_receiveCount, _config.StagePasses);
+        _gimmick.SetReceiveCount(_receiveCount);
         _gimmick.CreatePuzzle(_stage);
         _lockTimer = _config.ReceiveLockDuration;
         _stunTimer = 0f;
