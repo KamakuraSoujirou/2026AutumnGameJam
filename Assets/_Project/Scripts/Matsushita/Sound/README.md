@@ -39,11 +39,19 @@ SoundPlayer.PlayLoop(SoundId.Heartbeat);   // ループで鳴らす（StopLoop �
 
 ## 音ファイルの入れ方
 
-音ファイル（バックアップ素材）はリポジトリに入れず、`BackupSound.unitypackage` で配っています。
+音ファイル（バックアップ素材）はリポジトリに入れず、種類ごとの unitypackage で配っています。
 
-1. 松下から `BackupSound.unitypackage` を受け取る（公開の場所には置かない）
+| パッケージ | 中身 |
+| --- | --- |
+| `BackupSound_SE.unitypackage` | 効果音（SE-01〜13、50個） |
+| `BackupSound_BGM.unitypackage` | BGM（BGM-01〜03、6個） |
+| `BackupSound_Voice.unitypackage` | ボイス（VO-01〜06、31個。まだゲームでは使っていない） |
+
+どのパッケージにも README・CREDITS・対応表・ライセンスが入っています（何個読み込んでも同じものなので問題ありません）。
+
+1. 松下から必要なパッケージを受け取る（公開の場所には置かない）
 2. Unity で **Assets > Import Package > Custom Package...** から読み込み、全部にチェックを入れたまま Import する
-3. `Assets/_PrivateAssets/ThirdParty/BackupSound/` に入れば完了。`SoundLibrary.asset` が自動でつながる
+3. `Assets/_PrivateAssets/ThirdParty/BackupSound/` に入れば完了。`SoundLibrary.asset` が自動でつながる（SE と BGM の両方を入れるとすべて鳴る）
 
 - 効果音ラボのボイスなど再配布できない素材が入っているので、チーム外に渡したり、公開リポジトリにコミットしたりしないでください。
 - 入れていなくても、音が鳴らないだけでエラーにはなりません。
