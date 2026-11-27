@@ -1,0 +1,759 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>株タワーバトル（プロトタイプ）</title>
+<style>
+:root{
+  --bg:#0e141c; --panel:#16202c; --line:#26364a; --text:#e6edf5; --muted:#8fa3b8;
+  --up:#3ddc97; --down:#ff5c6c; --accent:#ffc857;
+  --B:#e2a35c; --H:#6fb3d9; --S:#b58be0; --R:#7fc27a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Yu Gothic UI","Hiragino Sans",Meiryo,system-ui,sans-serif;line-height:1.5}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 20px;padding:12px 16px;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:20px}
+header small{color:var(--muted);font-weight:normal;font-size:13px}
+#roundInfo{margin-left:auto;font-weight:bold;color:var(--accent)}
+#banner{min-height:44px;padding:10px 16px;background:#101b27;border-bottom:1px solid var(--line);font-size:15px}
+#boards{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:16px;padding:16px}
+.side{width:min(calc((100vh - 230px) * 0.8667), 720px);min-width:380px;max-width:100%}
+.hud{display:flex;align-items:center;gap:12px;padding:8px 12px;background:var(--panel);border:1px solid var(--line);border-radius:10px 10px 0 0}
+.hud .name{font-weight:bold}
+.hud .flag{font-size:12px;padding:2px 8px;border-radius:99px;background:var(--accent);color:#1b1500;visibility:hidden}
+.side.active .hud .flag{visibility:visible}
+.side.active .hud{border-color:var(--accent)}
+.hud .content{margin-left:auto;font-size:26px;font-weight:bold;font-variant-numeric:tabular-nums;color:var(--up)}
+.hud .content.neg{color:var(--down)}
+.sub{padding:4px 12px;font-size:12px;color:var(--muted);background:#121b26;border:1px solid var(--line);border-top:0}
+.panel{position:relative;overflow:hidden;border:1px solid var(--line);border-top:0;border-radius:0 0 10px 10px;background:#0b1118}
+.side.active .panel{border-color:var(--accent)}
+.stage{transform-origin:50% 100%}
+.stage.tilt{animation:sway 1.4s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.blind{position:absolute;inset:0;pointer-events:none}
+.ad{position:absolute;padding:10px 14px;border:3px solid #fff;background:#d6336c;color:#fff;font-weight:bold;font-size:18px;box-shadow:0 4px 16px #000a;transform:rotate(var(--r,0deg))}
+.ad i{position:absolute;top:-12px;right:-12px;width:24px;height:24px;border-radius:50%;background:#222;color:#fff;font-style:normal;text-align:center;line-height:24px;font-size:14px}
+#center{width:300px;flex:none;align-self:flex-start;padding:10px;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+#shopTitle{margin:0 0 8px;font-weight:bold;font-size:13px;text-align:center;color:var(--accent)}
+#shop{display:grid;grid-template-columns:1fr;gap:8px}
+.card{position:relative;display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:0 8px;padding:6px 10px;text-align:left;color:var(--text);background:var(--panel);border:2px solid var(--line);border-radius:10px;font:inherit;cursor:pointer}
+.card:hover:not(:disabled){border-color:var(--accent);transform:translateY(-2px)}
+.card .em{font-size:30px;line-height:1.2;text-align:center}
+.card .rt{text-align:right}
+.card .nm{font-weight:bold}
+.card .tag{display:inline-block;margin:2px 0;padding:0 8px;border-radius:99px;font-size:11px;color:#111}
+.card .price{font-size:18px;font-weight:bold;color:var(--down)}
+.card .price.hike{color:#ff9f1c;text-decoration:underline wavy}
+.card .gain{font-size:13px;color:var(--up)}
+.card .key{position:absolute;top:4px;left:8px;font-size:11px;color:var(--muted)}
+.card.dead{background:#000;border-color:#000;color:#555}
+.card.dead .tag,.card.dead .price,.card.dead .gain{filter:grayscale(1);opacity:.35}
+.card.dead .em{filter:brightness(0)}
+.card:disabled:not(.dead){opacity:.6;cursor:default}
+#controls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+#controls .btn{padding:8px 6px;font-size:13px}
+#controls .wide{grid-column:1 / -1}
+button.btn{padding:8px 16px;font:inherit;color:var(--text);background:#22344a;border:1px solid var(--line);border-radius:8px;cursor:pointer}
+button.btn:hover:not(:disabled){background:#2c4561}
+button.btn:disabled{opacity:.35;cursor:default}
+button.btn.primary{background:var(--accent);color:#1b1500;font-weight:bold;border-color:var(--accent)}
+#log{margin-top:10px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);min-height:100px}
+#log div{padding:1px 0}
+details{max-width:1100px;margin:0 auto 12px;padding:0 16px}
+details summary{cursor:pointer;color:var(--accent)}
+details table{border-collapse:collapse;margin:8px 0;font-size:13px}
+details td,details th{border:1px solid var(--line);padding:4px 10px;text-align:left}
+details ul{margin:6px 0;padding-left:20px;font-size:13px;color:var(--muted)}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000c;z-index:10;padding:16px}
+#overlay.hidden{display:none}
+.modal{width:560px;max-width:100%;max-height:92vh;overflow:auto;padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:14px}
+.modal h2{margin:0 0 8px}
+.modal p,.modal li{font-size:14px;color:var(--muted)}
+.modal label{display:block;margin:8px 0;font-size:14px}
+.modal select{margin-left:8px;padding:4px 8px;font:inherit;color:var(--text);background:#0e141c;border:1px solid var(--line);border-radius:6px}
+.modal .big{font-size:22px;font-weight:bold;color:var(--accent);margin:6px 0}
+@media (max-width:1240px){
+  #center{order:-1;width:100%;max-width:520px;align-self:center}
+  #shop{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>📈 株タワーバトル <small>プロトタイプ（テーマ：不安定）</small></h1>
+  <div id="roundInfo"></div>
+</header>
+<div id="banner">「ゲーム開始」を押してください。</div>
+
+<main id="boards">
+  <section class="side" id="side0">
+    <div class="hud"><span class="name">PLAYER 1</span><span class="flag">手番</span><span class="content" id="content0">100.0%</span></div>
+    <div class="sub" id="sub0"></div>
+    <div class="panel" id="panel0"><div class="stage" id="stage0"><canvas id="cv0" width="520" height="600"></canvas></div><div class="blind" id="blind0"></div></div>
+  </section>
+
+  <section id="center">
+    <div id="shopTitle">ショップ</div>
+    <div id="shop"></div>
+    <div id="controls">
+      <button class="btn wide" id="btnPass">パス (P)</button>
+      <button class="btn" id="btnLeft">◀ 左</button>
+      <button class="btn" id="btnRight">右 ▶</button>
+      <button class="btn" id="btnRotL">⟲ 回転 Q</button>
+      <button class="btn" id="btnRotR">回転 E ⟳</button>
+      <button class="btn primary wide" id="btnDrop">落とす (Space)</button>
+    </div>
+    <div id="log"></div>
+  </section>
+
+  <section class="side" id="side1">
+    <div class="hud"><span class="name">PLAYER 2</span><span class="flag">手番</span><span class="content" id="content1">100.0%</span></div>
+    <div class="sub" id="sub1"></div>
+    <div class="panel" id="panel1"><div class="stage" id="stage1"><canvas id="cv1" width="520" height="600"></canvas></div><div class="blind" id="blind1"></div></div>
+  </section>
+</main>
+
+<details>
+  <summary>ルールと隣接の組み合わせ表（仮置き）</summary>
+  <ul>
+    <li>各自、含有量 100% からスタート。ショップ4枚から1つ買い、回転・移動して落とします。</li>
+    <li>置いたあと約1秒静止すれば成功。獲得額 × 隣接倍率ぶん含有量が増えます。</li>
+    <li>台から落ちたら購入金額と同額をさらに減点。すでに積んだピースが崩れて落ちた場合は、そのピースの獲得額と購入金額も減点。</li>
+    <li>買えない／パスを2ターン連続すると負け。規定ラウンド終了時は含有量が多い方の勝ち（同点なら盤上のピースが多い方）。</li>
+    <li>操作: マウス移動 / ←→ で位置、Q・E・ホイールで回転、クリック / Space / ↓ で落下、1〜4 で購入、P でパス。</li>
+  </ul>
+  <table id="comboTable"></table>
+</details>
+
+<div id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<script>
+(() => {
+'use strict';
+const { Engine, Bodies, Body, Composite, Events } = Matter;
+
+/* ===================== 仮置きの設定（ここを書き換えて調整） ===================== */
+const W = 520, H = 600;
+const PLAT_W = 300, PLAT_H = 24, PLAT_Y = 520;      // 台
+const SPAWN_Y = 64;                                  // 落とす前のピースの高さ
+const FALL_Y = PLAT_Y + 30;                          // 中心がここより下なら「落ちた」
+const SETTLE_FRAMES = 60;                            // 静止とみなす時間（60フレーム = 約1秒）
+const MOVE_THR = 0.25, ANG_THR = 0.012;              // 静止判定のしきい値
+const TIMEOUT_FRAMES = 60 * 14;                      // 静止しない場合の打ち切り
+const INITIAL_CONTENT = 100;                         // 初期の含有量（%）
+const ROT_STEP = Math.PI / 12;                       // 回転の刻み（15度）
+const GROW_BOARD = 1.3;                              // 盤上ピースの拡大率
+const GROW_NEXT = 1.5;                               // 次のピースの拡大率
+const PRICE_HIKE = 2;                                // 高額化の倍率
+
+const ATTRS = {
+  B: { name: '建物',   color: '#e2a35c' },
+  H: { name: 'ハード', color: '#6fb3d9' },
+  S: { name: '食品',   color: '#b58be0' },
+  R: { name: '資源',   color: '#7fc27a' },
+};
+
+const PIECES = [
+  { id: 'bld_s', name: '小ビル',       emoji: '🏢', attr: 'B', shape: 'rect',   w: 56,  h: 90,  price: 8,  gain: 12 },
+  { id: 'bld_t', name: '高層ビル',     emoji: '🏙️', attr: 'B', shape: 'rect',   w: 48,  h: 140, price: 14, gain: 24 },
+  { id: 'hq',    name: '本社ビル',     emoji: '🏛️', attr: 'B', shape: 'rect',   w: 110, h: 80,  price: 12, gain: 17 },
+  { id: 'fac',   name: '工場',         emoji: '🏭', attr: 'B', shape: 'rect',   w: 120, h: 60,  price: 10, gain: 14 },
+  { id: 'gpu',   name: 'グラボ',       emoji: '🎛️', attr: 'H', shape: 'rect',   w: 110, h: 44,  price: 9,  gain: 14 },
+  { id: 'cpu',   name: 'CPU',          emoji: '🔲', attr: 'H', shape: 'rect',   w: 56,  h: 56,  price: 7,  gain: 10 },
+  { id: 'rack',  name: 'サーバー',     emoji: '🗄️', attr: 'H', shape: 'rect',   w: 60,  h: 110, price: 13, gain: 20 },
+  { id: 'phone', name: 'スマホ',       emoji: '📱', attr: 'H', shape: 'rect',   w: 36,  h: 72,  price: 6,  gain: 9  },
+  { id: 'gamebox', name: 'ゲーム箱',   emoji: '🎮', attr: 'H', shape: 'rect',   w: 50,  h: 70,  price: 7,  gain: 11 },
+  { id: 'disc',  name: 'ディスク',     emoji: '💿', attr: 'H', shape: 'circle', w: 60,  h: 60,  price: 6,  gain: 9  },
+  { id: 'sweets', name: '菓子箱',       emoji: '🍫', attr: 'S', shape: 'rect',   w: 50,  h: 70,  price: 7,  gain: 11 },
+  { id: 'pizza',  name: 'ピザ',         emoji: '🍕', attr: 'S', shape: 'circle', w: 60,  h: 60,  price: 6,  gain: 9  },
+  { id: 'bento', name: '弁当',         emoji: '🍱', attr: 'S', shape: 'rect',   w: 100, h: 50,  price: 9,  gain: 13 },
+  { id: 'noodle', name: 'カップ麺',     emoji: '🍜', attr: 'S', shape: 'rect',   w: 64,  h: 64,  price: 8,  gain: 12 },
+  { id: 'oil',   name: '石油樽',       emoji: '🛢️', attr: 'R', shape: 'rect',   w: 50,  h: 64,  price: 7,  gain: 10 },
+  { id: 'gold',  name: '金塊',         emoji: '🪙', attr: 'R', shape: 'trap',   w: 80,  h: 40,  price: 10, gain: 15 },
+  { id: 'wafer', name: 'ウエハ',       emoji: '💽', attr: 'R', shape: 'circle', w: 72,  h: 72,  price: 8,  gain: 12 },
+  { id: 'solar', name: '太陽光パネル', emoji: '☀️', attr: 'R', shape: 'rect',   w: 120, h: 30,  price: 8,  gain: 12 },
+];
+
+// 接触した属性の組み合わせ（キーは属性コードをアルファベット順に並べたもの）
+const COMBOS = {
+  'B-B': { mult: 1.2 },
+  'H-H': { mult: 1.2, fx: 'tilt' },
+  'R-R': { mult: 1.2 },
+  'S-S': { mult: 1.2, fx: 'blind' },
+  'B-H': { mult: 1.5 },
+  'H-S': { mult: 1.5 },
+  'B-S': { mult: 1.1 },
+  'B-R': { mult: 1.3, fx: 'boardGrow' },
+  'H-R': { mult: 1.0, fx: 'nextGrow' },
+  'R-S': { mult: 1.0, fx: 'price' },
+};
+const FX_TEXT = {
+  tilt: '📉 画面が傾く',
+  blind: '📢 視界を遮る広告',
+  boardGrow: '📈 盤上のピースが膨張',
+  nextGrow: '🎈 次のピースが巨大化',
+  price: '💸 次ラウンド高額化',
+};
+const FX_DESC = {
+  tilt: '相手の次の手番、画面が傾く（見た目のみ）',
+  blind: '相手の次の手番、広告で視界が遮られる',
+  boardGrow: '相手の盤上のピース1個が×1.3に膨張',
+  nextGrow: '相手が次に買うピースが×1.5に巨大化',
+  price: '相手の次ラウンドのショップで、置いたピースと同じ属性が2倍の価格',
+};
+/* ============================================================================ */
+
+const $ = (id) => document.getElementById(id);
+const comboKey = (a, b) => [a, b].sort().join('-');
+const rnd = (a, b) => a + Math.random() * (b - a);
+const round1 = (v) => Math.round(v * 10) / 10;
+
+let speed = 1, gameId = 0, phase = 'idle', round = 0, turn = 0;
+let shop = [], deck = [], held = null, mon = null, players = [];
+let cfg = { rounds: 8, modes: ['human', 'human'] };
+const STEP = 1000 / 60;
+
+/* ---------------- ユーティリティ ---------------- */
+function later(ms, fn) { const gid = gameId; setTimeout(() => { if (gid === gameId) fn(); }, ms / speed); }
+function setBanner(html) { $('banner').innerHTML = html; }
+function log(html) {
+  const el = document.createElement('div'); el.innerHTML = html;
+  const box = $('log'); box.prepend(el);
+  while (box.children.length > 8) box.lastChild.remove();
+}
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function drawShop() {
+  const out = [];
+  while (out.length < 4) {
+    if (deck.length === 0) deck = shuffle(PIECES.slice());
+    out.push(deck.pop());
+  }
+  return out;
+}
+function priceOf(p, d) { return round1(d.price * p.priceMult[d.attr]); }
+function addPopup(p, text, x, y, color) { p.popups.push({ text, x, y, color: color || '#fff', life: 90 }); }
+
+/* ---------------- 盤面 ---------------- */
+function makePlayer(i) {
+  const engine = Engine.create({ positionIterations: 10, velocityIterations: 8 });
+  engine.gravity.y = 1;
+  const plat = Bodies.rectangle(W / 2, PLAT_Y + PLAT_H / 2, PLAT_W, PLAT_H, { isStatic: true, friction: 1, frictionStatic: 1, label: 'platform' });
+  Composite.add(engine.world, plat);
+  const p = {
+    idx: i, mode: cfg.modes[i], engine, plat, bodies: [], popups: [],
+    content: INITIAL_CONTENT, passes: 0,
+    pending: { tilt: false, blind: false, nextScale: 1 },
+    fx: { tilt: false, blind: false },
+    priceMult: { B: 1, H: 1, S: 1, R: 1 }, nextPriceMult: { B: 1, H: 1, S: 1, R: 1 },
+    canvas: $('cv' + i), ctx: $('cv' + i).getContext('2d'),
+    chart: Array.from({ length: 40 }, () => rnd(-1, 1)),
+  };
+  Events.on(engine, 'collisionStart', (e) => {
+    if (!mon || mon.board !== i || !mon.nb) return;
+    for (const pr of e.pairs) { if (pr.bodyA === mon.nb || pr.bodyB === mon.nb) { mon.touched = true; } }
+  });
+  return p;
+}
+
+function createBody(def, scale) {
+  const opts = { friction: 0.8, frictionStatic: 1.0, restitution: 0.02, density: 0.002, label: def.id };
+  let b;
+  if (def.shape === 'circle') { b = Bodies.circle(W / 2, SPAWN_Y, def.w / 2, opts); }
+  else if (def.shape === 'trap') { b = Bodies.trapezoid(W / 2, SPAWN_Y, def.w, def.h, 0.3, opts); }
+  else { b = Bodies.rectangle(W / 2, SPAWN_Y, def.w, def.h, opts); }
+  if (scale !== 1) { Body.scale(b, scale, scale); }
+  return b;
+}
+
+/* ---------------- ゲーム進行 ---------------- */
+function startGame() {
+  gameId++;
+  cfg.rounds = parseInt($('optRounds').value, 10);
+  cfg.modes = [$('optP1').value, $('optP2').value];
+  speed = $('optFast').checked ? 4 : 1;
+  players = [makePlayer(0), makePlayer(1)];
+  deck = shuffle(PIECES.slice());
+  round = 0; turn = 0; held = null; mon = null; phase = 'idle';
+  $('log').innerHTML = '';
+  $('overlay').classList.add('hidden');
+  [0, 1].forEach((i) => applyFxVisual(players[i]));
+  startRound();
+}
+
+function startRound() {
+  round++;
+  if (round > cfg.rounds) { endGame('rounds'); return; }
+  shop = drawShop();
+  players.forEach((p) => { p.priceMult = p.nextPriceMult; p.nextPriceMult = { B: 1, H: 1, S: 1, R: 1 }; });
+  turn = 0;
+  log(`<b style="color:var(--accent)">── ラウンド ${round} / ${cfg.rounds} ──</b>`);
+  const hiked = players.map((p, i) => ({ p, i, list: Object.keys(p.priceMult).filter((k) => p.priceMult[k] > 1) })).filter((o) => o.list.length);
+  hiked.forEach((o) => log(`💸 PLAYER ${o.i + 1} のショップ：${o.list.map((k) => ATTRS[k].name).join('・')}が${PRICE_HIKE}倍`));
+  startTurn();
+}
+
+function startTurn() {
+  const p = players[turn];
+  p.fx = { tilt: p.pending.tilt, blind: p.pending.blind };
+  p.pending.tilt = false; p.pending.blind = false;
+  applyFxVisual(p);
+  phase = 'shop';
+  const affordable = shop.some((d) => p.content >= priceOf(p, d));
+  setBanner(`<b>PLAYER ${turn + 1}</b> の手番：ショップから1つ選んでください。` +
+    (p.fx.tilt ? ' <span style="color:#ff9f1c">📉 画面が傾いている！</span>' : '') +
+    (p.fx.blind ? ' <span style="color:#ff9f1c">📢 広告で視界が遮られている！</span>' : '') +
+    (p.mode === 'npc' ? ' （NPC）' : ''));
+  updateUI();
+  if (!affordable) {
+    log(`PLAYER ${turn + 1}：買えるピースがないのでパス`);
+    later(1400, () => { if (phase === 'shop') { doPass(); } });
+    return;
+  }
+  if (p.mode === 'npc') { npcTurn(); }
+}
+
+function buy(i) {
+  if (phase !== 'shop') { return; }
+  const p = players[turn];
+  const d = shop[i];
+  const price = priceOf(p, d);
+  if (!d || p.content < price) { return; }
+  p.content = round1(p.content - price);
+  p.passes = 0;
+  const scale = p.pending.nextScale;
+  p.pending.nextScale = 1;
+  const body = createBody(d, scale);
+  body.meta = { def: d, price, gain: 0, scale };
+  body.isSensor = true;
+  Body.setStatic(body, true);
+  Composite.add(p.engine.world, body);
+  p.bodies.push(body);
+  held = { body, x: W / 2, angle: 0 };
+  phase = 'place';
+  addPopup(p, `-${price}%`, W / 2, 120, '#ff8a8a');
+  log(`PLAYER ${turn + 1} が ${d.emoji}${d.name} を購入（-${price}%）${scale > 1 ? ' <span style="color:#ff9f1c">巨大化中！</span>' : ''}`);
+  setBanner(`<b>PLAYER ${turn + 1}</b>：位置と角度を決めて落としてください。`);
+  updateUI();
+}
+
+function doPass() {
+  if (phase !== 'shop') { return; }
+  const p = players[turn];
+  p.passes++;
+  log(`PLAYER ${turn + 1} がパス（連続 ${p.passes}/2）`);
+  if (p.passes >= 2) { endGame('pass', turn); return; }
+  endTurn();
+}
+
+function dropHeld() {
+  if (phase !== 'place' || !held) { return; }
+  const p = players[turn];
+  const b = held.body;
+  Body.setPosition(b, { x: held.x, y: SPAWN_Y });
+  Body.setAngle(b, held.angle);
+  b.isSensor = false;
+  Body.setStatic(b, false);
+  Body.setVelocity(b, { x: 0, y: 0 });
+  Body.setAngularVelocity(b, 0);
+  mon = { board: p.idx, nb: b, still: 0, total: 0, touched: false, nbFell: false };
+  held = null;
+  phase = 'sim';
+  setBanner(`<b>PLAYER ${turn + 1}</b>：落下中… 約1秒静止すれば成功！`);
+  updateUI();
+}
+
+/* ---------------- 静止・落下の監視 ---------------- */
+function stepSim() {
+  if (!mon) { return; }
+  const p = players[mon.board];
+  Engine.update(p.engine, STEP);
+  tickMonitor(p);
+}
+
+function tickMonitor(p) {
+  const m = mon;
+  m.total++;
+  for (const body of p.bodies.slice()) {
+    const pos = body.position;
+    if (pos.y > FALL_Y || pos.x < -60 || pos.x > W + 60) { handleFall(p, body); }
+  }
+  const ready = !m.nb || m.nbFell || m.touched;
+  if (ready) {
+    let still = true;
+    for (const body of p.bodies) {
+      if (body.speed > MOVE_THR || body.angularSpeed > ANG_THR) { still = false; break; }
+    }
+    m.still = still ? m.still + 1 : 0;
+  }
+  if (m.still >= SETTLE_FRAMES || m.total > TIMEOUT_FRAMES) { finishMonitor(); }
+}
+
+function handleFall(p, body) {
+  const isNew = mon && body === mon.nb;
+  const meta = body.meta;
+  const penalty = round1(meta.price + (isNew ? 0 : meta.gain));
+  p.content = round1(p.content - penalty);
+  const x = Math.min(W - 60, Math.max(60, body.position.x));
+  addPopup(p, `落下！ -${penalty}%`, x, FALL_Y - 40, '#ff5c6c');
+  log(`<span style="color:var(--down)">PLAYER ${p.idx + 1}：${meta.def.emoji}${meta.def.name} が落下！ -${penalty}%${isNew ? '' : '（崩れた）'}</span>`);
+  Composite.remove(p.engine.world, body);
+  p.bodies.splice(p.bodies.indexOf(body), 1);
+  if (isNew) { mon.nbFell = true; mon.nb = null; mon.nbFellFlag = true; }
+}
+
+function getTouching(p, nb) {
+  const set = new Set();
+  for (const pair of p.engine.pairs.list) {
+    if (!pair.isActive) { continue; }
+    const a = pair.bodyA, b = pair.bodyB;
+    if (a === nb && b.meta) { set.add(b); }
+    else if (b === nb && a.meta) { set.add(a); }
+  }
+  return Array.from(set);
+}
+
+function finishMonitor() {
+  const m = mon;
+  mon = null;
+  const p = players[m.board];
+  const opp = players[1 - m.board];
+  let growCount = 0;
+  if (m.nb && !m.nbFell) {
+    const nb = m.nb;
+    const touching = getTouching(p, nb);
+    let mult = 1;
+    const fxs = [];
+    touching.forEach((o) => {
+      const c = COMBOS[comboKey(nb.meta.def.attr, o.meta.def.attr)];
+      if (c) { mult *= c.mult; if (c.fx) { fxs.push(c.fx); } }
+    });
+    const base = nb.meta.def.gain;
+    const gain = round1(base * mult);
+    p.content = round1(p.content + gain);
+    nb.meta.gain = gain;
+    addPopup(p, `+${gain}%${mult !== 1 ? ` (×${mult.toFixed(2)})` : ''}`, nb.position.x, nb.position.y - 30, '#3ddc97');
+    log(`<span style="color:var(--up)">PLAYER ${p.idx + 1}：成功！ +${gain}%（基本 ${base}% × 隣接 ${mult.toFixed(2)}）</span>`);
+    fxs.forEach((fx) => {
+      addPopup(opp, FX_TEXT[fx], W / 2, 200 + Math.random() * 60, '#ffc857');
+      log(`<span style="color:var(--accent)">⚡ 妨害発動 → PLAYER ${opp.idx + 1}：${FX_TEXT[fx]}（${FX_DESC[fx]}）</span>`);
+      if (fx === 'tilt') { opp.pending.tilt = true; }
+      if (fx === 'blind') { opp.pending.blind = true; }
+      if (fx === 'nextGrow') { opp.pending.nextScale = GROW_NEXT; }
+      if (fx === 'price') { opp.nextPriceMult[nb.meta.def.attr] = PRICE_HIKE; }
+      if (fx === 'boardGrow') { growCount++; }
+    });
+  }
+  if (growCount > 0 && opp.bodies.length > 0) {
+    for (let k = 0; k < growCount; k++) {
+      const target = opp.bodies[Math.floor(Math.random() * opp.bodies.length)];
+      Body.scale(target, GROW_BOARD, GROW_BOARD);
+      target.meta.scale *= GROW_BOARD;
+    }
+    phase = 'aftermath';
+    mon = { board: opp.idx, nb: null, still: 0, total: 0, touched: false, nbFell: false };
+    setBanner(`PLAYER ${opp.idx + 1} の盤面が膨張！ 崩れないか…`);
+    updateUI();
+    return;
+  }
+  endTurn();
+}
+
+function endTurn() {
+  const p = players[turn];
+  p.fx = { tilt: false, blind: false };
+  applyFxVisual(p);
+  turn++;
+  if (turn >= 2) { startRound(); } else { startTurn(); }
+}
+
+function endGame(reason, loser) {
+  phase = 'over';
+  mon = null; held = null;
+  players.forEach((p) => applyFxVisual({ idx: p.idx, fx: { tilt: false, blind: false } }));
+  const a = players[0], b = players[1];
+  let result, detail;
+  if (reason === 'pass') {
+    result = `PLAYER ${(1 - loser) + 1} の勝ち！`;
+    detail = `PLAYER ${loser + 1} が2ターン連続で置けなかったため`;
+  } else if (Math.abs(a.content - b.content) >= 0.05) {
+    const w = a.content > b.content ? 0 : 1;
+    result = `PLAYER ${w + 1} の勝ち！`;
+    detail = '規定ラウンド終了：含有量が多い方の勝ち';
+  } else if (a.bodies.length !== b.bodies.length) {
+    const w = a.bodies.length > b.bodies.length ? 0 : 1;
+    result = `PLAYER ${w + 1} の勝ち！`;
+    detail = '含有量が同点のため、盤上のピースが多い方の勝ち';
+  } else {
+    result = 'PLAYER 2 の勝ち！';
+    detail = '含有量・ピース数ともに同じため、後攻の勝ち';
+  }
+  setBanner(`<b>ゲーム終了：</b>${result}`);
+  $('modal').innerHTML = `
+    <h2>ゲーム終了</h2>
+    <div class="big">${result}</div>
+    <p>${detail}</p>
+    <p>PLAYER 1：<b>${a.content.toFixed(1)}%</b>（盤上 ${a.bodies.length}個）<br>
+       PLAYER 2：<b>${b.content.toFixed(1)}%</b>（盤上 ${b.bodies.length}個）</p>
+    <button class="btn primary" id="btnAgain">もう一度（設定画面へ）</button>`;
+  $('overlay').classList.remove('hidden');
+  $('btnAgain').onclick = showStart;
+  updateUI();
+}
+
+/* ---------------- NPC ---------------- */
+function npcTurn() {
+  const p = players[turn];
+  later(800, () => {
+    if (phase !== 'shop') { return; }
+    const opts = shop.map((d, i) => ({ d, i, price: priceOf(p, d) })).filter((o) => p.content >= o.price);
+    if (!opts.length) { return; }
+    opts.forEach((o) => { o.score = o.d.gain / o.price + Math.random() * 0.4; });
+    opts.sort((x, y) => y.score - x.score);
+    buy(opts[0].i);
+    later(600, () => {
+      if (phase !== 'place' || !held) { return; }
+      held.x = W / 2 + rnd(-90, 90);
+      held.angle = (Math.random() < 0.5 ? 0 : Math.PI / 2) + rnd(-0.15, 0.15);
+      later(600, dropHeld);
+    });
+  });
+}
+
+/* ---------------- 見た目・UI ---------------- */
+function applyFxVisual(p) {
+  const i = p.idx;
+  $('stage' + i).classList.toggle('tilt', !!p.fx.tilt);
+  const blind = $('blind' + i);
+  blind.innerHTML = '';
+  if (p.fx.blind) {
+    const texts = ['📢 今すぐ急騰銘柄を買え！', '🔥 限定セール 99%OFF', '💹 いまが買い時です', '⚠ ウイルスに感染しました', '🎁 当選おめでとう！'];
+    for (let k = 0; k < 4; k++) {
+      const ad = document.createElement('div');
+      ad.className = 'ad';
+      ad.style.left = rnd(0, 55) + '%';
+      ad.style.top = rnd(8, 75) + '%';
+      ad.style.setProperty('--r', rnd(-6, 6) + 'deg');
+      ad.innerHTML = texts[Math.floor(Math.random() * texts.length)] + '<i>×</i>';
+      blind.appendChild(ad);
+    }
+  }
+}
+
+function updateUI() {
+  const cur = players[turn];
+  const humanTurn = cur && cur.mode === 'human';
+  [0, 1].forEach((i) => $('side' + i).classList.toggle('active', phase !== 'over' && phase !== 'idle' && turn === i));
+  $('roundInfo').textContent = round >= 1 && round <= cfg.rounds ? `ラウンド ${round} / ${cfg.rounds}` : '';
+  $('shopTitle').textContent = cur && phase !== 'over' ? `ショップ（P${turn + 1}の価格）` : 'ショップ';
+  const shopEl = $('shop');
+  shopEl.innerHTML = '';
+  if (cur && phase !== 'idle') {
+    shop.forEach((d, i) => {
+      const price = priceOf(cur, d);
+      const ok = cur.content >= price;
+      const card = document.createElement('button');
+      card.className = 'card' + (ok ? '' : ' dead');
+      card.disabled = !(phase === 'shop' && ok && humanTurn);
+      const hike = price > d.price;
+      card.innerHTML = `<span class="key">${i + 1}</span><div class="em">${d.emoji}</div>` +
+        `<div class="mid"><div class="nm">${d.name}</div><span class="tag" style="background:${ATTRS[d.attr].color}">${ATTRS[d.attr].name}</span></div>` +
+        `<div class="rt"><div class="price${hike ? ' hike' : ''}">-${price}%</div><div class="gain">成功 +${d.gain}%</div></div>`;
+      card.onclick = () => buy(i);
+      shopEl.appendChild(card);
+    });
+  }
+  $('btnPass').disabled = !(phase === 'shop' && humanTurn);
+  const placing = phase === 'place' && humanTurn;
+  ['btnLeft', 'btnRight', 'btnRotL', 'btnRotR', 'btnDrop'].forEach((id) => { $(id).disabled = !placing; });
+}
+
+function updateHUD() {
+  players.forEach((p, i) => {
+    const c = $('content' + i);
+    const t = p.content.toFixed(1) + '%';
+    if (c.textContent !== t) { c.textContent = t; }
+    c.classList.toggle('neg', p.content < 0);
+    const s = $('sub' + i);
+    const st = `盤上 ${p.bodies.length}個 ・ 連続パス ${p.passes}/2 ・ ${p.mode === 'npc' ? 'NPC' : '人間'}` +
+      (p.pending.nextScale > 1 ? ' ・ 🎈次のピース巨大化' : '') +
+      (Object.keys(p.nextPriceMult).some((k) => p.nextPriceMult[k] > 1) ? ' ・ 💸次ラウンド高額化' : '');
+    if (s.textContent !== st) { s.textContent = st; }
+  });
+}
+
+/* ---------------- 描画 ---------------- */
+function drawBody(ctx, body, alpha) {
+  const meta = body.meta;
+  const def = meta.def;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = ATTRS[def.attr].color;
+  ctx.strokeStyle = '#10161d';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  if (body.circleRadius) {
+    ctx.arc(body.position.x, body.position.y, body.circleRadius, 0, Math.PI * 2);
+  } else {
+    const v = body.vertices;
+    ctx.moveTo(v[0].x, v[0].y);
+    for (let k = 1; k < v.length; k++) { ctx.lineTo(v[k].x, v[k].y); }
+    ctx.closePath();
+  }
+  ctx.fill();
+  ctx.stroke();
+  const size = Math.min(def.w, def.h) * meta.scale;
+  const fs = Math.max(14, Math.min(64, size * 0.75));
+  ctx.translate(body.position.x, body.position.y);
+  ctx.rotate(body.angle);
+  ctx.font = `${fs}px "Segoe UI Emoji","Apple Color Emoji",sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(def.emoji, 0, 2);
+  ctx.restore();
+}
+
+function drawBoard(p, t) {
+  const ctx = p.ctx;
+  ctx.clearRect(0, 0, W, H);
+  const g = ctx.createLinearGradient(0, 0, 0, H);
+  g.addColorStop(0, '#0f1a27'); g.addColorStop(1, '#0a1017');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  // 背景の株価チャート風ライン
+  ctx.strokeStyle = '#1b2a3b'; ctx.lineWidth = 1;
+  for (let y = 60; y < H; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.strokeStyle = '#1f4a45'; ctx.lineWidth = 2; ctx.beginPath();
+  const off = (t / 40) % 1;
+  p.chart.forEach((v, k) => {
+    const x = (k - off) * (W / 36);
+    const y = 220 + v * 70 + Math.sin(t / 700 + k) * 6;
+    if (k === 0) { ctx.moveTo(x, y); } else { ctx.lineTo(x, y); }
+  });
+  ctx.stroke();
+  // 落下エリア
+  const dg = ctx.createLinearGradient(0, PLAT_Y + PLAT_H, 0, H);
+  dg.addColorStop(0, '#3a1018'); dg.addColorStop(1, '#16060a');
+  ctx.fillStyle = dg; ctx.fillRect(0, PLAT_Y + PLAT_H, W, H - PLAT_Y - PLAT_H);
+  ctx.fillStyle = '#ff5c6c88'; ctx.font = '13px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('⚠ ここに落ちると損失', W / 2, H - 14);
+  // 台
+  ctx.fillStyle = '#3b4d63'; ctx.strokeStyle = '#7e93ab'; ctx.lineWidth = 2;
+  ctx.fillRect(W / 2 - PLAT_W / 2, PLAT_Y, PLAT_W, PLAT_H);
+  ctx.strokeRect(W / 2 - PLAT_W / 2, PLAT_Y, PLAT_W, PLAT_H);
+  // ピース
+  p.bodies.forEach((b) => { if (!(held && held.body === b)) { drawBody(ctx, b, 1); } });
+  if (held && players[turn] === p) {
+    ctx.save(); ctx.setLineDash([6, 6]); ctx.strokeStyle = '#ffc85788'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(held.body.position.x, held.body.position.y); ctx.lineTo(held.body.position.x, PLAT_Y); ctx.stroke(); ctx.restore();
+    drawBody(ctx, held.body, 0.85);
+  }
+  // ポップアップ
+  ctx.font = 'bold 20px sans-serif'; ctx.textAlign = 'center';
+  p.popups.forEach((pp) => {
+    ctx.globalAlpha = Math.min(1, pp.life / 30);
+    ctx.fillStyle = '#000'; ctx.fillText(pp.text, pp.x + 1, pp.y + 1);
+    ctx.fillStyle = pp.color; ctx.fillText(pp.text, pp.x, pp.y);
+    ctx.globalAlpha = 1;
+  });
+}
+
+/* ---------------- メインループ ---------------- */
+let last = performance.now(), acc = 0;
+function frame(t) {
+  const dt = Math.min(100, t - last); last = t;
+  acc += dt * speed;
+  let n = 0;
+  while (acc >= STEP && n < 12) { stepSim(); acc -= STEP; n++; }
+  if (n >= 12) { acc = 0; }
+  if (held) {
+    held.x = Math.max(30, Math.min(W - 30, held.x));
+    Body.setPosition(held.body, { x: held.x, y: SPAWN_Y });
+    Body.setAngle(held.body, held.angle);
+  }
+  players.forEach((p) => {
+    p.popups.forEach((pp) => { pp.life--; pp.y -= 0.4; });
+    p.popups = p.popups.filter((pp) => pp.life > 0);
+    drawBoard(p, t);
+  });
+  updateHUD();
+  requestAnimationFrame(frame);
+}
+
+/* ---------------- 入力 ---------------- */
+function isHumanPlacing() { return phase === 'place' && held && players[turn].mode === 'human'; }
+function pointerToX(e, i) {
+  const r = $('panel' + i).getBoundingClientRect();
+  return (e.clientX - r.left) / r.width * W;
+}
+[0, 1].forEach((i) => {
+  const panel = $('panel' + i);
+  panel.addEventListener('pointermove', (e) => { if (isHumanPlacing() && turn === i) { held.x = pointerToX(e, i); } });
+  panel.addEventListener('pointerdown', (e) => { if (isHumanPlacing() && turn === i) { held.x = pointerToX(e, i); } });
+  panel.addEventListener('click', () => { if (isHumanPlacing() && turn === i) { dropHeld(); } });
+  panel.addEventListener('wheel', (e) => {
+    if (isHumanPlacing() && turn === i) { e.preventDefault(); held.angle += (e.deltaY > 0 ? 1 : -1) * ROT_STEP; }
+  }, { passive: false });
+});
+addEventListener('keydown', (e) => {
+  if (phase === 'shop' && players[turn].mode === 'human') {
+    if (e.code >= 'Digit1' && e.code <= 'Digit4') { buy(parseInt(e.code.slice(5), 10) - 1); return; }
+    if (e.code === 'KeyP') { doPass(); return; }
+  }
+  if (!isHumanPlacing()) { return; }
+  switch (e.code) {
+    case 'ArrowLeft': held.x -= 10; break;
+    case 'ArrowRight': held.x += 10; break;
+    case 'KeyQ': held.angle -= ROT_STEP; break;
+    case 'KeyE': held.angle += ROT_STEP; break;
+    case 'Space': case 'ArrowDown': dropHeld(); break;
+    default: return;
+  }
+  e.preventDefault();
+});
+$('btnPass').onclick = doPass;
+$('btnLeft').onclick = () => { if (isHumanPlacing()) { held.x -= 20; } };
+$('btnRight').onclick = () => { if (isHumanPlacing()) { held.x += 20; } };
+$('btnRotL').onclick = () => { if (isHumanPlacing()) { held.angle -= ROT_STEP; } };
+$('btnRotR').onclick = () => { if (isHumanPlacing()) { held.angle += ROT_STEP; } };
+$('btnDrop').onclick = dropHeld;
+
+/* ---------------- 開始画面 ---------------- */
+function showStart() {
+  $('modal').innerHTML = `
+    <h2>📈 株タワーバトル</h2>
+    <p>持ち株（含有量）からピースを買って積み上げ、最終的な含有量を競う2人対戦の落ち物パズルです。物理演算で積むので、タワーは常に不安定です。</p>
+    <label>ラウンド数（仮）
+      <select id="optRounds"><option>4</option><option>6</option><option selected>8</option><option>10</option><option>12</option></select></label>
+    <label>PLAYER 1
+      <select id="optP1"><option value="human" selected>人間</option><option value="npc">NPC</option></select></label>
+    <label>PLAYER 2
+      <select id="optP2"><option value="human" selected>人間</option><option value="npc">NPC</option></select></label>
+    <label><input type="checkbox" id="optFast"> 演出を速くする（4倍速）</label>
+    <button class="btn primary" id="btnStart">ゲーム開始</button>`;
+  $('overlay').classList.remove('hidden');
+  $('btnStart').onclick = startGame;
+}
+
+function buildComboTable() {
+  const rows = Object.keys(COMBOS).map((k) => {
+    const [a, b] = k.split('-');
+    const c = COMBOS[k];
+    return `<tr><td>${ATTRS[a].name} × ${ATTRS[b].name}</td><td>獲得額 ×${c.mult.toFixed(1)}</td><td>${c.fx ? FX_TEXT[c.fx] + '：' + FX_DESC[c.fx] : '―'}</td></tr>`;
+  }).join('');
+  $('comboTable').innerHTML = `<tr><th>接触した属性</th><th>倍率</th><th>相手への妨害</th></tr>${rows}`;
+}
+
+buildComboTable();
+showStart();
+requestAnimationFrame(frame);
+
+window.__game = { get state() { return { phase, round, turn, players, shop, mon }; }, buy, dropHeld, doPass, startGame, applyFxVisual };
+})();
+</script>
+</body>
+</html>
