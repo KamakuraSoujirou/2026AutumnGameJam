@@ -30,20 +30,21 @@ public class Wiringgimmick : Gimmick
 
     [SerializeField] private WirePuzzleView _view;
 
-    // 試合画面の爆弾（試合では、線の色・シリアル番号・ランプをここに出す。テストシーンでは空でよい）
+    // 試合画面の爆弾（試合では、線の色・ランプをここに出す。テストシーンでは空でよい）
     [SerializeField] private UiBombView _bombView;
 
     [SerializeField, FormerlySerializedAs("_Question")] private Text _questionLabel;
-    [SerializeField] private Text _serialNumberText;
     [SerializeField] private Text _lampText;
 
     // 難易度ごとに出す謎の種類（Notion「難易度の段階」の表のとおり）
     [SerializeField] private WirePuzzleType[] _stage1Types = { WirePuzzleType.ColorMark };
     [SerializeField] private WirePuzzleType[] _stage2Types = { WirePuzzleType.ColorMark, WirePuzzleType.ColorWord, WirePuzzleType.OddOneOut };
-    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Association, WirePuzzleType.Serial, WirePuzzleType.Memory };
-    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Association, WirePuzzleType.Serial, WirePuzzleType.Lamp, WirePuzzleType.Reverse, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage3Types = { WirePuzzleType.ColorWord, WirePuzzleType.Association, WirePuzzleType.Rally, WirePuzzleType.Memory };
+    [SerializeField] private WirePuzzleType[] _stage4Types = { WirePuzzleType.Association, WirePuzzleType.Rally, WirePuzzleType.Lamp, WirePuzzleType.Reverse, WirePuzzleType.OddOneOut, WirePuzzleType.Memory };
 
-    private int _serialNumber;
+    // そのラウンドで何回目の受け取りか（T4 の条件に使う。画面の「ラリー N回目」と同じ数）
+    private int _receiveCount = 1;
+
     // ランプの点灯状態
     private bool _isLampOn;
 
@@ -113,14 +114,20 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
+    /// ラリー回数を受け取る（T4 の条件に使う）
+    /// </summary>
+    /// <param name="receiveCount">そのラウンドで何回目の受け取りか（最初が1）</param>
+    public override void SetReceiveCount(int receiveCount)
+    {
+        _receiveCount = receiveCount;
+    }
+
+    /// <summary>
     /// 配線と問題を生成する
     /// </summary>
     /// <param name="stage">難易度の段階（1〜4）</param>
     public override void CreatePuzzle(int stage)
     {
-        // シリアル番号をランダム生成（10～99）
-        _serialNumber = Random.Range(10, 100);
-
         // ランプの点灯・消灯をランダムに決定
         _isLampOn = Random.Range(0, 2) == 1;
 
@@ -144,7 +151,7 @@ public class Wiringgimmick : Gimmick
             case WirePuzzleType.ColorWord:
                 CreateT2Puzzle();
                 break;
-            case WirePuzzleType.Serial:
+            case WirePuzzleType.Rally:
                 CreateT4Puzzle();
                 break;
             case WirePuzzleType.Lamp:
@@ -295,7 +302,7 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
-    /// T4 シリアル番号条件問題を生成
+    /// T4 ラリー条件問題を生成。条件に使うのは、そのラウンドのラリー回数（画面の「ラリー N回目」）
     /// </summary>
     private void CreateT4Puzzle()
     {
@@ -309,24 +316,20 @@ public class Wiringgimmick : Gimmick
         {
             case 0:
                 // 偶奇判定
-                result = _serialNumber % 2 == 0;
-                _questionText = "シリアルが偶数なら赤、奇数なら青";
+                result = _receiveCount % 2 == 0;
+                _questionText = "ラリーが偶数回目なら赤、奇数回目なら青";
                 break;
 
             case 1:
-                // 50以上判定
-                result = _serialNumber >= 50;
-                _questionText = "シリアルが50以上なら赤、未満なら青";
+                // 3の倍数判定
+                result = _receiveCount % 3 == 0;
+                _questionText = "ラリーが3の倍数回目なら赤、それ以外なら青";
                 break;
 
             case 2:
-                // 各桁の和判定
-                int digitSum =
-                    _serialNumber / 10 +
-                    _serialNumber % 10;
-
-                result = digitSum >= 10;
-                _questionText = "各桁の和が10以上なら赤、未満なら青";
+                // 8回目以降判定
+                result = _receiveCount >= 8;
+                _questionText = "ラリーが8回目以降なら赤、7回目までなら青";
                 break;
         }
 
@@ -591,7 +594,7 @@ public class Wiringgimmick : Gimmick
     }
 
     /// <summary>
-    /// 配線・記号・シリアル番号・ランプ・問題文を画面に出す（置いていないものは飛ばす）
+    /// 配線・記号・ランプ・問題文を画面に出す（置いていないものは飛ばす）
     /// </summary>
     private void ShowPuzzle()
     {
@@ -611,13 +614,7 @@ public class Wiringgimmick : Gimmick
                 _bombView.SetButtonLabel(direction, _symbols[i]);
             }
 
-            _bombView.SetSerial(_serialNumber);
             _bombView.SetLamp(_isLampOn);
-        }
-
-        if (_serialNumberText != null)
-        {
-            _serialNumberText.text = _serialNumber.ToString();
         }
 
         if (_lampText != null)

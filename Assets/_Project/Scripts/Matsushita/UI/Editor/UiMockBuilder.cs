@@ -92,14 +92,16 @@ public static partial class UiMockBuilder
         AddArt(background, "ART-13", Color.white, null, false, null);
         SetArtFallback(background.GetComponent<UiArtSlot>(), TitleBackgroundFallbackArtId);
 
-        RectTransform logo = CreateRect("Logo", screen, 610f, 25f, 700f, 130f);
-        TextMeshProUGUI logoText = AddText("LogoText", logo, 0f, 0f, 700f, 130f, "あと10秒", 110f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        // 奥から順に：爆弾・キャラ → ロゴ・サブタイトル（キャラの足元に重なる）→ メニュー
+        BuildCharacters(screen, circleSprite);
+
+        RectTransform logo = CreateRect("Logo", screen, 605f, 442f, 670f, 442f);
+        TextMeshProUGUI logoText = AddText("LogoText", logo, 0f, 0f, 670f, 442f, "あと10秒", 100f, UiFontRole.Heading, TextAlignmentOptions.Center);
         AddArt(logo, "ART-14", Color.clear, null, true, logoText.gameObject);
 
-        AddText("Subtitle", screen, 360f, 140f, 1200f, 64f, "謎を解いて、10秒以内に爆弾を相手に押し付けろ", 44f, UiFontRole.Body, TextAlignmentOptions.Center);
+        AddText("Subtitle", screen, 360f, 884f, 1200f, 48f, "謎を解いて、10秒以内に爆弾を相手に押し付けろ！！", 36f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         UiOptionRow[] rows = BuildSettingsMenu(screen, roundSprite, out CanvasGroup cpuLevelGroup);
-        BuildCharacters(screen, circleSprite);
         BuildControlsMenu(screen, roundSprite);
         GameObject startFocusFrame = BuildStartButton(screen, roundSprite, out Button startButton);
         UiRulesTab rulesTab = BuildRules(screen, roundSprite);
@@ -124,9 +126,9 @@ public static partial class UiMockBuilder
     {
         AddText("SettingsHeading", screen, 40f, 240f, 440f, 64f, "対戦設定メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
+        // 枠の絵は、中身より奥に描くため先に作る（見本の位置と大きさ）
+        AddFrameArt(screen, "SettingsFrame", "UI-04", 40f, 304f, 462f, 560f, Color.white, roundSprite);
         RectTransform panel = CreateRect("SettingsPanel", screen, 20f, 320f, 456f, 478f);
-        AddArt(panel, "UI-04", Color.white, roundSprite, false, null);
-        AddOutline(panel);
 
         UiOptionRow[] rows =
         {
@@ -148,11 +150,15 @@ public static partial class UiMockBuilder
     /// <param name="circleSprite">丸の仮の形</param>
     private static void BuildCharacters(RectTransform screen, Sprite circleSprite)
     {
-        CreateCharacter(screen, "CharacterP1", "ART-09_normal", "ART-09\nP1", 566f, 240f, 240f, 310f, new Color(1f, 0f, 0.16f));
-        CreateCharacter(screen, "CharacterP2", "ART-10_normal", "ART-10\nP2", 1037f, 528f, 212f, 293f, new Color(0f, 0.1f, 1f));
-
-        RectTransform bomb = CreateRect("Bomb", screen, 833f, 453f, 190f, 200f);
+        // 爆弾は、キャラの奥に大きく置く（本体の絵に、ひし形ボタン・ランプ・時間の表示を重ねる）
+        RectTransform bomb = CreateRect("Bomb", screen, TitleBombX, TitleBombY, 640f, 640f);
+        bomb.localScale = new Vector3(TitleBombScale, TitleBombScale, 1f);
         AddArt(bomb, "ART-01", Color.black, circleSprite, true, null);
+        AddTitleBombParts(bomb);
+
+        // キャラは大きく置く（更新後の絵は 600×900。頭の位置と足元の高さを見本に合わせる）
+        CreateCharacter(screen, "CharacterP1", "ART-09_normal", "ART-09\nP1", TitleP1X, TitleP1Y, TitleP1Width, TitleP1Height, new Color(1f, 0f, 0.16f));
+        CreateCharacter(screen, "CharacterP2", "ART-10_normal", "ART-10\nP2", TitleP2X, TitleP2Y, TitleP2Width, TitleP2Height, new Color(0f, 0.1f, 1f));
     }
 
     /// <summary>
@@ -164,9 +170,8 @@ public static partial class UiMockBuilder
     {
         AddText("ControlsHeading", screen, 1290f, 245f, 440f, 64f, "操作メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
-        RectTransform panel = CreateRect("ControlsPanel", screen, 1265f, 305f, 518f, 202f);
-        AddArt(panel, "UI-04b", Color.white, roundSprite, false, null);
-        AddOutline(panel);
+        AddFrameArt(screen, "ControlsFrame", "UI-04b", 1224f, 293f, 613f, 227f, Color.white, roundSprite);
+        RectTransform panel = CreateRect("ControlsPanel", screen, 1290f, 319f, 518f, 202f);
 
         AddText("MoveLabel", panel, 24f, 26f, 175f, 44f, "上下左右を選ぶ", 22f, UiFontRole.Body, TextAlignmentOptions.Left);
         CreateChip(panel, "MoveP1", "WASD", 205f, 26f, 100f, 44f, roundSprite).SetSelected(true);
@@ -305,16 +310,16 @@ public static partial class UiMockBuilder
     /// <returns>選んでいるときに出す枠</returns>
     private static GameObject BuildStartButton(RectTransform screen, Sprite roundSprite, out Button startButton)
     {
-        RectTransform focusFrame = CreateRect("StartFocusFrame", screen, 596f, 843f, 674f, 224f);
+        RectTransform focusFrame = CreateRect("StartFocusFrame", screen, 596f, 918f, 674f, 124f);
         Image frameImage = focusFrame.gameObject.AddComponent<Image>();
         frameImage.sprite = roundSprite;
         frameImage.type = Image.Type.Sliced;
         frameImage.color = FocusFrameColor;
         frameImage.raycastTarget = false;
 
-        RectTransform button = CreateRect("StartButton", screen, 608f, 855f, 650f, 200f);
+        RectTransform button = CreateRect("StartButton", screen, 608f, 930f, 650f, 100f);
         AddArt(button, "UI-03", Orange, roundSprite, false, null);
-        AddText("Label", button, 0f, 0f, 650f, 200f, "ゲームスタート", 84f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        AddText("Label", button, 0f, 0f, 650f, 100f, "ゲームスタート", 66f, UiFontRole.Heading, TextAlignmentOptions.Center);
         startButton = AddClickArea(button);
 
         return focusFrame.gameObject;
@@ -651,7 +656,7 @@ public static partial class UiMockBuilder
         UiSkinEntry[] titleEntries =
         {
             new UiSkinEntry("ART-13", "タイトル背景", new Vector2(1920f, 1080f), "title_bg"),
-            new UiSkinEntry("ART-14", "タイトルロゴ", new Vector2(700f, 130f), "title_logo"),
+            new UiSkinEntry("ART-14", "タイトルロゴ（ボン！ボン！ボンバーラボ）", new Vector2(718f, 474f), "ui_title"),
             new UiSkinEntry("ART-09_normal", "キャラ P1（通常）", new Vector2(600f, 900f), "chr_p1_normal"),
             new UiSkinEntry("ART-10_normal", "キャラ P2（通常）", new Vector2(600f, 900f), "chr_p2_normal"),
             new UiSkinEntry("ART-01", "爆弾本体", new Vector2(800f, 800f), "bomb_core"),
@@ -691,6 +696,7 @@ public static partial class UiMockBuilder
         }
 
         // 爆弾の素材のファイル名が決まったので、すでにある登録の探すファイル名を合わせる
+        isChanged |= skin.UpdateFileName("ART-14", "ui_title");
         isChanged |= skin.UpdateFileName("ART-04_on", "bomb_lamp");
         isChanged |= skin.UpdateFileName("ART-04_off", "bomb_lamp_blackout");
 

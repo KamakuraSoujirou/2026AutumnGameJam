@@ -28,8 +28,8 @@ public static partial class UiMockBuilder
     private static readonly Color StrongLineColor = new Color(0.1f, 0.1f, 0.1f);
     private static readonly Color WeakLineColor = new Color(0.6f, 0.6f, 0.6f);
 
-    // 表の列の境目（見本画像の座標）：ラウンド｜仕組み｜P1｜決着｜P2｜パス回数
-    private static readonly float[] ResultColumnEdges = { 0f, 190f, 813f, 938f, 1152f, 1278f, 2000f };
+    // 表の列の境目（見本画像の座標）。表の枠（UI-26）の内側に、全部収まる範囲：ラウンド｜仕組み｜P1｜決着｜P2｜パス回数
+    private static readonly float[] ResultColumnEdges = { 171.9f, 328.1f, 869.8f, 994.8f, 1192.7f, 1317.7f, 1791.7f };
 
     /// <summary>
     /// リザルト画面のプレハブとテストシーンを作る
@@ -82,10 +82,10 @@ public static partial class UiMockBuilder
             new UiSkinEntry("ART-11_p2_win", "キャラ P2（勝ち顔）", new Vector2(600f, 900f), "chr_p2_win"),
             new UiSkinEntry("ART-22", "「WIN」の文字", new Vector2(380f, 150f), "result_win"),
             new UiSkinEntry("ART-23", "「LOSE」の文字", new Vector2(400f, 150f), "result_lose"),
-            new UiSkinEntry("UI-23", "リザルトのスコア板（斜線）", new Vector2(730f, 145f), "ui_result_score"),
-            new UiSkinEntry("UI-24", "リザルトのP1の後ろの六角形（網点）", new Vector2(535f, 360f), "ui_result_hex_p1"),
-            new UiSkinEntry("UI-25", "リザルトのP2の後ろの六角形（UI-24の鏡写し）", new Vector2(535f, 360f), "ui_result_hex_p2"),
-            new UiSkinEntry("UI-26", "リザルトの結果表の枠（左オレンジ・右ピンクの網点）", new Vector2(1870f, 440f), "ui_result_table"),
+            new UiSkinEntry("UI-23", "リザルトのスコア板（斜線）", new Vector2(756f, 165f), "ui_result_score"),
+            new UiSkinEntry("UI-24", "リザルトのP1の後ろの六角形（網点）", new Vector2(519f, 353f), "ui_result_hex_p1"),
+            new UiSkinEntry("UI-25", "リザルトのP2の後ろの六角形（UI-24の鏡写し）", new Vector2(518f, 353f), "ui_result_hex_p2"),
+            new UiSkinEntry("UI-26", "リザルトの結果表の枠（左オレンジ・右ピンクの網点）", new Vector2(1802f, 457f), "ui_result_table"),
             new UiSkinEntry("UI-21", "リザルトのHOMEボタン", new Vector2(135f, 115f), "ui_result_home"),
             new UiSkinEntry("UI-22", "リザルトの再戦ボタン（丸）", new Vector2(146f, 146f), "ui_result_restart")
         };
@@ -189,8 +189,8 @@ public static partial class UiMockBuilder
 
         RectTransform player = CreateStretch($"Player{tag}", screen);
 
-        // キャラの後ろの六角形（見本画像で、左は x75〜610、右は x1465〜2000、y190〜550）。キャラより奥に描く
-        RectTransform hexagon = MockRect("Hexagon", player, isLeft ? 75f : 1465f, 190f, 535f, 360f);
+        // キャラの後ろの六角形（1920×1080 の座標。見本の位置と大きさ）。キャラより奥に描く
+        RectTransform hexagon = CreateRect("Hexagon", player, isLeft ? 76f : 1324f, 140f, 519f, 353f);
         AddArt(hexagon, isLeft ? "UI-24" : "UI-25", Color.clear, null, false, null);
 
         // キャラは中心が見本画像の 342（左）／1735（右）あたり。勝ちの文字は内側の高い位置、負けの文字は内側の低い位置
@@ -267,16 +267,16 @@ public static partial class UiMockBuilder
     /// <param name="player2Score">P2の勝ち数の文字</param>
     private static void BuildResultScore(RectTransform screen, out TextMeshProUGUI player1Score, out TextMeshProUGUI player2Score)
     {
-        // 勝ち数の後ろの斜線の板（見本画像で x640〜1400、y15〜165）
-        RectTransform plate = MockRect("ScorePlate", screen, 640f, 15f, 760f, 150f);
+        // 勝ち数の後ろの斜線の板（1920×1080 の座標。見本の位置と大きさ）
+        RectTransform plate = CreateRect("ScorePlate", screen, 590f, 19f, 756f, 165f);
         AddArt(plate, "UI-23", Color.clear, null, false, null);
 
         CreateMockLine("ScoreDividerLeft", screen, 935f, 8f, 5f, 540f, StrongLineColor);
         CreateMockLine("ScoreDividerRight", screen, 1148f, 0f, 5f, 548f, StrongLineColor);
 
-        player1Score = AddText("Player1Score", screen, M(740f), 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
-        AddText("ScoreDash", screen, M(930f), 0f, M(220f), M(180f), "ー", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
-        player2Score = AddText("Player2Score", screen, M(1133f), 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        player1Score = AddText("Player1Score", screen, 684.4f, 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        AddText("ScoreDash", screen, 864.4f, 0f, M(220f), M(180f), "ー", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        player2Score = AddText("Player2Score", screen, 1059.4f, 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
     }
 
     /// <summary>
@@ -286,23 +286,26 @@ public static partial class UiMockBuilder
     /// <returns>上から順の行</returns>
     private static UiResultRow[] BuildResultTable(RectTransform screen)
     {
-        const float HeaderTop = 548f;
-        const float HeaderBottom = 590f;
-        const float TableBottom = 998f;
+        // 枠（UI-26）の内側：1920×1080 で x165〜1720、y590〜965 に収める（見本画像の値に直してある）
+        const float HeaderTop = 614.6f;
+        const float HeaderBottom = 666.7f;
+        const float TableBottom = 1005.2f;
         const float RowHeight = (TableBottom - HeaderBottom) / ResultRowCount;
 
         RectTransform table = CreateStretch("Table", screen);
 
-        // 表の後ろの大きい斜めの枠（見本画像で x45〜1915、y560〜1020）。線や文字より奥に描く
-        RectTransform tableFrame = MockRect("TableFrame", table, 45f, 560f, 1870f, 460f);
+        // 表の後ろの大きい斜めの枠（1920×1080 の座標。見本の位置と大きさ）。線や文字より奥に描く
+        RectTransform tableFrame = CreateRect("TableFrame", table, 36f, 532f, 1802f, 457f);
         AddArt(tableFrame, "UI-26", Color.clear, null, false, null);
 
-        CreateMockLine("HeaderTopLine", table, 0f, HeaderTop, 2000f, 2f, WeakLineColor);
-        CreateMockLine("HeaderBottomLine", table, 0f, HeaderBottom, 2000f, 3f, StrongLineColor);
+        float tableLeft = ResultColumnEdges[0];
+        float tableWidth = ResultColumnEdges[ResultColumnEdges.Length - 1] - tableLeft;
+        CreateMockLine("HeaderTopLine", table, tableLeft, HeaderTop, tableWidth, 2f, WeakLineColor);
+        CreateMockLine("HeaderBottomLine", table, tableLeft, HeaderBottom, tableWidth, 3f, StrongLineColor);
 
         for (int i = 1; i <= ResultRowCount; i++)
         {
-            CreateMockLine($"RowLine{i}", table, 0f, HeaderBottom + i * RowHeight, 2000f, 2f, WeakLineColor);
+            CreateMockLine($"RowLine{i}", table, tableLeft, HeaderBottom + i * RowHeight, tableWidth, 2f, WeakLineColor);
         }
 
         for (int i = 1; i < ResultColumnEdges.Length - 1; i++)
@@ -316,7 +319,7 @@ public static partial class UiMockBuilder
         {
             float left = ResultColumnEdges[i];
             float width = ResultColumnEdges[i + 1] - left;
-            AddText($"Header{i}", table, M(left), M(HeaderTop), M(width), M(HeaderBottom - HeaderTop), headers[i], M(32f), UiFontRole.Body, TextAlignmentOptions.Center);
+            AddText($"Header{i}", table, M(left), M(HeaderTop), M(width), M(HeaderBottom - HeaderTop), headers[i], M(30f), UiFontRole.Body, TextAlignmentOptions.Center);
         }
 
         UiResultRow[] rows = new UiResultRow[ResultRowCount];
@@ -341,12 +344,12 @@ public static partial class UiMockBuilder
     {
         RectTransform row = MockRect($"Row{index}", table, 0f, top, 2000f, height);
 
-        TextMeshProUGUI roundText = AddResultCell(row, 0, height, (index + 1).ToString(), 64f, UiFontRole.Number);
-        TextMeshProUGUI gimmickText = AddResultCell(row, 1, height, "ああああああ", 48f, UiFontRole.Heading);
+        TextMeshProUGUI roundText = AddResultCell(row, 0, height, (index + 1).ToString(), 46f, UiFontRole.Number);
+        TextMeshProUGUI gimmickText = AddResultCell(row, 1, height, "ああああああ", 44f, UiFontRole.Heading);
         GameObject player1Star = CreateResultStar(row, "Player1Star", (ResultColumnEdges[2] + ResultColumnEdges[3]) * 0.5f, height * 0.5f);
-        TextMeshProUGUI resultText = AddResultCell(row, 3, height, "爆発", 40f, UiFontRole.Heading);
+        TextMeshProUGUI resultText = AddResultCell(row, 3, height, "爆発", 36f, UiFontRole.Heading);
         GameObject player2Star = CreateResultStar(row, "Player2Star", (ResultColumnEdges[4] + ResultColumnEdges[5]) * 0.5f, height * 0.5f);
-        TextMeshProUGUI passText = AddResultCell(row, 5, height, "00回", 64f, UiFontRole.Number);
+        TextMeshProUGUI passText = AddResultCell(row, 5, height, "00回", 46f, UiFontRole.Number);
 
         UiResultRow resultRow = row.gameObject.AddComponent<UiResultRow>();
         SetObject(resultRow, "_roundText", roundText);
@@ -385,10 +388,10 @@ public static partial class UiMockBuilder
     /// <returns>作った★</returns>
     private static GameObject CreateResultStar(RectTransform row, string name, float centerX, float centerY)
     {
-        const float Size = 64f;
+        const float Size = 50f;
 
         RectTransform star = CreateCentered(name, row, M(centerX), M(centerY), M(Size), M(Size));
-        TextMeshProUGUI mark = AddText("Mark", star, 0f, 0f, M(Size), M(Size), "★", M(56f), UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI mark = AddText("Mark", star, 0f, 0f, M(Size), M(Size), "★", M(44f), UiFontRole.Body, TextAlignmentOptions.Center);
         mark.color = StarColor;
         AddArt(star, "ART-15_on", Color.clear, null, true, mark.gameObject);
         return star.gameObject;

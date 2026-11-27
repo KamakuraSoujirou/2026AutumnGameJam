@@ -23,6 +23,7 @@ public class RoundGimmickSwitcher : Gimmick
     private readonly List<Gimmick> _mixCandidates = new List<Gimmick>();
     private Gimmick _current;
     private bool _isMixRound;
+    private int _receiveCount = 1;
 
     /// <summary>
     /// 今使っているギミック（ミックスでは、受け取るたびに変わる）
@@ -179,6 +180,15 @@ public class RoundGimmickSwitcher : Gimmick
     }
 
     /// <summary>
+    /// ラリー回数を覚えておく（次の CreatePuzzle で、今のギミックに渡す）
+    /// </summary>
+    /// <param name="receiveCount">そのラウンドで何回目の受け取りか</param>
+    public override void SetReceiveCount(int receiveCount)
+    {
+        _receiveCount = receiveCount;
+    }
+
+    /// <summary>
     /// 爆弾を受け取るたびに呼ばれる。今のギミックに問題を作らせる（ミックスなら、先にギミックを変える）
     /// </summary>
     /// <param name="stage">難易度の段階（1〜4）</param>
@@ -194,6 +204,7 @@ public class RoundGimmickSwitcher : Gimmick
             return;
         }
 
+        _current.SetReceiveCount(_receiveCount);
         _current.CreatePuzzle(stage);
     }
 
