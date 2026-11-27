@@ -382,13 +382,13 @@ public static partial class UiMockBuilder
         AddWorldSprite(heldBomb.gameObject, 12, false);
         heldBomb.gameObject.SetActive(false);
 
-        // 吹き出しの枠の絵（見本：P1は 431×132、P2は 431×132 で文字より右に32px・上に25px ずれる）。文字の位置は動かさず、枠だけ大きさとずれを持たせる
+        // 吹き出しの枠の絵（見本：P1は 431×132、P2は 431×132 で P1 より右に32px・上に25px ずれる）。文字は枠の中央に置く
         float frameShiftX = isLeft ? -1f : 32f;
         float frameShiftY = isLeft ? 0f : -25f;
         float bubbleCenterX = isLeft ? 170.5f : 171.5f;
         RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX + frameShiftX, -91f - BubbleRiseY + frameShiftY, BubbleFrameWidth, BubbleFrameHeight);
         AddArt(bubble, isLeft ? "UI-14" : "UI-14b", GrayFill, null, false, null);
-        TextMeshProUGUI bubbleText = AddText("Text", bubble, (BubbleFrameWidth - BubbleTextWidth) * 0.5f - frameShiftX, (BubbleFrameHeight - BubbleTextHeight) * 0.5f - frameShiftY, BubbleTextWidth, BubbleTextHeight, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI bubbleText = AddText("Text", bubble, (BubbleFrameWidth - BubbleTextWidth) * 0.5f, (BubbleFrameHeight - BubbleTextHeight) * 0.5f, BubbleTextWidth, BubbleTextHeight, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         // 「解除された…」のような長い札でも枠からはみ出さないよう、入りきらないときだけ小さくする
         bubbleText.enableAutoSizing = true;
@@ -811,7 +811,7 @@ public static partial class UiMockBuilder
         hint.color = SubTextColor;
 
         AddFrameArt(screen, "RoundFrame", "UI-13", 763f, 35f, 393f, 126f, GrayFill, null);
-        RectTransform round = CreateRect("Round", screen, 843f, 22f, 234f, 100f);
+        RectTransform round = CreateRect("Round", screen, 842f, 48f, 234f, 100f);
         TextMeshProUGUI roundText = AddText("Text", round, 0f, 0f, 234f, 100f, "R1", 76f, UiFontRole.Heading, TextAlignmentOptions.Center);
 
         TextMeshProUGUI pass = AddText("Pass", screen, 1590f, 44f, 180f, 40f, "パス回数 1", 24f, UiFontRole.Body, TextAlignmentOptions.Left);
@@ -833,18 +833,18 @@ public static partial class UiMockBuilder
     {
         // 帯の枠の絵（見本の位置と大きさ）。文字と星は、枠の中の決まった場所に置く
         AddFrameArt(screen, "BarP1Frame", "UI-15", 76f, 904f, 601f, 140f, GrayFill, null);
-        RectTransform barLeft = CreateRect("BarP1", screen, 125f, 963f, 532f, 66f);
-        TextMeshProUGUI nameLeft = AddText("Name", barLeft, 91f, 0f, 200f, 66f, "P1", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
-        UiWinStars starsLeft = BuildWinStars(barLeft, "WinStars", 343f, 13f);
+        RectTransform barLeft = CreateRect("BarP1", screen, 171f, 944f, 411f, 69f);
+        TextMeshProUGUI nameLeft = AddText("Name", barLeft, 10f, 0f, 200f, 69f, "P1", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
+        UiWinStars starsLeft = BuildWinStars(barLeft, "WinStars", 267f, 15f);
 
         AddFrameArt(screen, "BarGimmickFrame", "UI-16", 759f, 887f, 449f, 151f, GrayFill, null);
-        RectTransform center = CreateRect("BarGimmick", screen, 778f, 963f, 363f, 66f);
+        RectTransform center = CreateRect("BarGimmick", screen, 801.5f, 929f, 363f, 66f);
         TextMeshProUGUI gimmick = AddText("Text", center, 0f, 0f, 363f, 66f, "ギミック名", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         AddFrameArt(screen, "BarP2Frame", "UI-15b", 1281f, 898f, 601f, 140f, GrayFill, null);
-        RectTransform barRight = CreateRect("BarP2", screen, 1262f, 963f, 532f, 66f);
-        TextMeshProUGUI nameRight = AddText("Name", barRight, 208f, 0f, 200f, 66f, "COM", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
-        UiWinStars starsRight = BuildWinStars(barRight, "WinStars", 58f, 13f);
+        RectTransform barRight = CreateRect("BarP2", screen, 1375f, 938f, 411f, 69f);
+        TextMeshProUGUI nameRight = AddText("Name", barRight, 199f, 0f, 200f, 69f, "COM", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
+        UiWinStars starsRight = BuildWinStars(barRight, "WinStars", 12f, 15f);
 
         SetObjectArray(view, "_nameTexts", new Object[] { nameLeft, nameRight });
         SetObjectArray(view, "_winStars", new Object[] { starsLeft, starsRight });

@@ -274,9 +274,9 @@ public static partial class UiMockBuilder
         CreateMockLine("ScoreDividerLeft", screen, 935f, 8f, 5f, 540f, StrongLineColor);
         CreateMockLine("ScoreDividerRight", screen, 1148f, 0f, 5f, 548f, StrongLineColor);
 
-        player1Score = AddText("Player1Score", screen, M(740f), 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
-        AddText("ScoreDash", screen, M(930f), 0f, M(220f), M(180f), "ー", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
-        player2Score = AddText("Player2Score", screen, M(1133f), 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        player1Score = AddText("Player1Score", screen, 684.4f, 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        AddText("ScoreDash", screen, 864.4f, 0f, M(220f), M(180f), "ー", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
+        player2Score = AddText("Player2Score", screen, 1059.4f, 0f, M(220f), M(180f), "0", M(150f), UiFontRole.Heading, TextAlignmentOptions.Center);
     }
 
     /// <summary>

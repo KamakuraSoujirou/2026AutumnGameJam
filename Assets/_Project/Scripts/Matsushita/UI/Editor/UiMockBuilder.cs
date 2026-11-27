@@ -165,7 +165,7 @@ public static partial class UiMockBuilder
         AddText("ControlsHeading", screen, 1290f, 245f, 440f, 64f, "操作メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
         AddFrameArt(screen, "ControlsFrame", "UI-04b", 1224f, 293f, 613f, 227f, Color.white, roundSprite);
-        RectTransform panel = CreateRect("ControlsPanel", screen, 1265f, 305f, 518f, 202f);
+        RectTransform panel = CreateRect("ControlsPanel", screen, 1290f, 319f, 518f, 202f);
 
         AddText("MoveLabel", panel, 24f, 26f, 175f, 44f, "上下左右を選ぶ", 22f, UiFontRole.Body, TextAlignmentOptions.Left);
         CreateChip(panel, "MoveP1", "WASD", 205f, 26f, 100f, 44f, roundSprite).SetSelected(true);

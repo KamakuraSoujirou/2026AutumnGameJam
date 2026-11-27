@@ -57,7 +57,7 @@ MonoBehaviour:
     _label: "\u30E1\u30CB\u30E5\u30FC\u306E\u67A0"
     _size: {x: 456, y: 478}
     _fileName: ui_panel
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -3932161199646977463, guid: d90ba4224622f0a48bd94d3ec520c05f, type: 3}
   - _id: ART-12
     _label: "\u8A66\u5408\u306E\u80CC\u666F"
     _size: {x: 1920, y: 1080}
@@ -187,22 +187,22 @@ MonoBehaviour:
     _label: "\u30E9\u30A6\u30F3\u30C9\u8868\u793A\u306E\u67A0"
     _size: {x: 234, y: 100}
     _fileName: ui_round
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 5734701444035807716, guid: 1a440e79105441c4baaf687f825797e6, type: 3}
   - _id: UI-14
     _label: "\u5439\u304D\u51FA\u3057\u306E\u67A0"
     _size: {x: 383, y: 134}
     _fileName: ui_bubble
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 7324868623741870882, guid: 2d9672b996a4eff45b2ca672474dc34d, type: 3}
   - _id: UI-15
     _label: "\u4E0B\u306E\u5E2F\uFF08\u30D7\u30EC\u30A4\u30E4\u30FC\u540D\u3068\u52DD\u3061\u661F\uFF09"
     _size: {x: 532, y: 66}
     _fileName: ui_bar
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -9120645705308477409, guid: 71ba6ada0694e6f4da001aa09718941d, type: 3}
   - _id: UI-16
     _label: "\u4E0B\u306E\u5E2F\uFF08\u30AE\u30DF\u30C3\u30AF\u540D\uFF09"
     _size: {x: 363, y: 66}
     _fileName: ui_bar_gimmick
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -6650946670269438029, guid: bdf65c0e2e56ebe44a5fc083c86b6f76, type: 3}
   - _id: UI-18
     _label: "\u89E3\u9664\u30DC\u30BF\u30F3"
     _size: {x: 260, y: 70}
@@ -333,47 +333,47 @@ MonoBehaviour:
     _label: "\u30E1\u30CB\u30E5\u30FC\u306E\u67A0\uFF08\u64CD\u4F5C\u30E1\u30CB\u30E5\u30FC\u3002\u659C\u7DDA\uFF09"
     _size: {x: 518, y: 202}
     _fileName: ui_panel_controls
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -532252082648583267, guid: d4c8aec13f7318d4e84b37b9228c7ca3, type: 3}
   - _id: UI-04c
     _label: "\u30E1\u30CB\u30E5\u30FC\u306E\u67A0\uFF08\u30EB\u30FC\u30EB\u3002\u7070\u8272\u306E\u659C\u7DDA\u306E\u5185\u67A0\uFF09"
     _size: {x: 720, y: 540}
     _fileName: ui_panel_rules
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -3376679388757413336, guid: af6aee3182eaa354494201fed556ace0, type: 3}
   - _id: UI-14b
     _label: "\u5439\u304D\u51FA\u3057\u306E\u67A0\uFF08P2\u5074\u3002\u5DE6\u4E0A\u306E\u89D2\u304C\u6B20\u3051\u308B\uFF09"
     _size: {x: 383, y: 134}
     _fileName: ui_bubble_p2
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 6867171589559440332, guid: ac1d4813956610248bfd7a85cd2e6958, type: 3}
   - _id: UI-15b
     _label: "\u4E0B\u306E\u5E2F\uFF08P2\u5074\u3002UI-15\u306E\u93E1\u5199\u3057\uFF09"
     _size: {x: 532, y: 66}
     _fileName: ui_bar_p2
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 3041194875536651966, guid: 65f733fa2399c3b4a9da81efd003f008, type: 3}
   - _id: UI-23
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u30B9\u30B3\u30A2\u677F\uFF08\u659C\u7DDA\uFF09"
     _size: {x: 730, y: 145}
     _fileName: ui_result_score
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 6543387555011753507, guid: c95ee595c6ec1c24e84e61c596a8257f, type: 3}
   - _id: UI-24
     _label: "\u30EA\u30B6\u30EB\u30C8\u306EP1\u306E\u5F8C\u308D\u306E\u516D\u89D2\u5F62\uFF08\u7DB2\u70B9\uFF09"
     _size: {x: 535, y: 360}
     _fileName: ui_result_hex_p1
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -269065249361299088, guid: d561573e2f2d2ec4581948f3dcc3de20, type: 3}
   - _id: UI-25
     _label: "\u30EA\u30B6\u30EB\u30C8\u306EP2\u306E\u5F8C\u308D\u306E\u516D\u89D2\u5F62\uFF08UI-24\u306E\u93E1\u5199\u3057\uFF09"
     _size: {x: 535, y: 360}
     _fileName: ui_result_hex_p2
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -6738507670306139947, guid: a6372f9b286f7ca419202a34abd11e23, type: 3}
   - _id: UI-26
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u7D50\u679C\u8868\u306E\u67A0\uFF08\u5DE6\u30AA\u30EC\u30F3\u30B8\u30FB\u53F3\u30D4\u30F3\u30AF\u306E\u7DB2\u70B9\uFF09"
     _size: {x: 1870, y: 440}
     _fileName: ui_result_table
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 9083219845188273331, guid: dc6170d2cde89d540a3ed24b30663cb0, type: 3}
   - _id: UI-27
     _label: "\u30AF\u30A4\u30C3\u30AF\u30C6\u30AD\u30B9\u30C8\u306E\u5186\uFF08X\u5B57\u30674\u5206\u5272\uFF09"
     _size: {x: 484, y: 476}
     _fileName: ui_quicktext_wheel
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 1176125210750207495, guid: f8cc79622926d8c44b4fbe53b6041ebc, type: 3}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}
   _bodyFont: {fileID: 0}

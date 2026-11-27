@@ -99,6 +99,8 @@ public static partial class UiMockBuilder
             int count = 0;
             count += ConvertPanelToFrame(root, "SettingsPanel", "SettingsFrame", "UI-04", 40f, 304f, 462f, 560f, Color.white, roundSprite);
             count += ConvertPanelToFrame(root, "ControlsPanel", "ControlsFrame", "UI-04b", 1224f, 293f, 613f, 227f, Color.white, roundSprite);
+            // 操作メニューの中身は、左上の欠けた角を避けて右下へずらす
+            count += SetRect(root, "ControlsPanel", null, 1290f, 319f, null, null);
             return count;
         });
 
@@ -111,6 +113,17 @@ public static partial class UiMockBuilder
             count += ConvertPanelToFrame(root, "BarP2", "BarP2Frame", "UI-15b", 1281f, 898f, 601f, 140f, GrayFill, null);
             count += ResizeBubble(root, "PlayerP1", "UI-14", -1f, 0f);
             count += ResizeBubble(root, "PlayerP2", "UI-14b", 32f, -25f);
+            // 文字は、枠の中身（内側）の中央に置く
+            count += SetRect(root, "Round", null, 842f, 48f, null, null);
+            count += SetBubbleText(root, "PlayerP1");
+            count += SetBubbleText(root, "PlayerP2");
+            count += SetRect(root, "BarP1", null, 171f, 944f, 411f, 69f);
+            count += SetRect(root, "Name", "BarP1", 10f, 0f, 200f, 69f);
+            count += SetRect(root, "WinStars", "BarP1", 267f, 15f, null, null);
+            count += SetRect(root, "BarGimmick", null, 801.5f, 929f, null, null);
+            count += SetRect(root, "BarP2", null, 1375f, 938f, 411f, 69f);
+            count += SetRect(root, "Name", "BarP2", 199f, 0f, 200f, 69f);
+            count += SetRect(root, "WinStars", "BarP2", 12f, 15f, null, null);
             return count;
         });
 
@@ -121,6 +134,10 @@ public static partial class UiMockBuilder
             count += AddFrameIfMissing(root, "PlayerP2", "Hexagon", "UI-25", 1324f, 140f, 518f, 353f, 0);
             count += AddFrameIfMissing(root, "Screen", "ScorePlate", "UI-23", 590f, 19f, 756f, 165f, 1);
             count += AddFrameIfMissing(root, "Table", "TableFrame", "UI-26", 36f, 532f, 1802f, 457f, 0);
+            // 勝ち数は、斜線の板の中の「あ ー あ」の位置（左から 790・970・1165）に置く
+            count += SetRect(root, "Player1Score", null, 684.4f, null, null, null);
+            count += SetRect(root, "ScoreDash", null, 864.4f, null, null, null);
+            count += SetRect(root, "Player2Score", null, 1059.4f, null, null, null);
             return count;
         });
 
@@ -261,6 +278,64 @@ public static partial class UiMockBuilder
 
         RectTransform frame = AddFrameArt(parent, frameName, artId, x, y, width, height, Color.clear, null);
         frame.SetSiblingIndex(Mathf.Min(siblingIndex, parent.childCount - 1));
+        return 1;
+    }
+
+    /// <summary>
+    /// 名前で見つけた四角の位置と大きさを決める（左上基準。決めない値は null。何度やっても同じ結果になる）
+    /// </summary>
+    /// <param name="root">プレハブの一番上</param>
+    /// <param name="objectName">四角の名前</param>
+    /// <param name="parentName">親の名前（指定しなければ null）</param>
+    /// <param name="x">左からの位置</param>
+    /// <param name="y">上からの位置</param>
+    /// <param name="width">幅</param>
+    /// <param name="height">高さ</param>
+    /// <returns>見つけて決めたら 1、見つからなければ 0</returns>
+    private static int SetRect(GameObject root, string objectName, string parentName, float? x, float? y, float? width, float? height)
+    {
+        Transform target = null;
+
+        if (parentName == null)
+        {
+            target = FindDescendant(root.transform, objectName);
+        }
+        else
+        {
+            Transform parent = FindDescendant(root.transform, parentName);
+            target = parent != null ? parent.Find(objectName) : null;
+        }
+
+        if (target == null)
+        {
+            return 0;
+        }
+
+        RectTransform rect = (RectTransform)target;
+        Vector2 position = rect.anchoredPosition;
+        Vector2 size = rect.sizeDelta;
+        rect.anchoredPosition = new Vector2(x ?? position.x, y.HasValue ? -y.Value : position.y);
+        rect.sizeDelta = new Vector2(width ?? size.x, height ?? size.y);
+        return 1;
+    }
+
+    /// <summary>
+    /// 吹き出しの文字を、枠の中央に置く
+    /// </summary>
+    /// <param name="root">プレハブの一番上</param>
+    /// <param name="panelName">プレイヤーのパネルの名前</param>
+    /// <returns>直したら 1、見つからなければ 0</returns>
+    private static int SetBubbleText(GameObject root, string panelName)
+    {
+        Transform panel = FindDescendant(root.transform, panelName);
+        RectTransform text = panel != null ? panel.Find("Bubble/Text") as RectTransform : null;
+
+        if (text == null)
+        {
+            return 0;
+        }
+
+        text.anchoredPosition = new Vector2((BubbleFrameWidth - BubbleTextWidth) * 0.5f, -(BubbleFrameHeight - BubbleTextHeight) * 0.5f);
         return 1;
     }
 
