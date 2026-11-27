@@ -40,10 +40,10 @@ public static partial class UiMockBuilder
     private const float CharacterScale = 1.3f;
 
     /// <summary>立ち絵を大きくしたぶん、足元を下げる量（1920×1080 の画面で）</summary>
-    private const float CharacterDropY = 45f;
+    private const float CharacterDropY = 75f;
 
     /// <summary>立ち絵が大きくなったぶん、頭上の吹き出しを上げる量（1920×1080 の画面で）</summary>
-    private const float BubbleRiseY = 50f;
+    private const float BubbleRiseY = 69f;
 
     /// <summary>手に持つ爆弾（と、飛ぶ爆弾）の一辺（1920×1080 の画面で）</summary>
     private const float HeldBombSize = 130f;
