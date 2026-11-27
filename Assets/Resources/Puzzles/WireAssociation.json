@@ -1,5 +1,20 @@
 {
     "puzzles": [
-        { "gimmick": "A", "type": "T3", "text": "空と海に共通する色", "items": [], "choices": [], "answer": "青" }
+        { "gimmick": "A", "type": "T3", "text": "空と海に共通する色", "items": [], "choices": [], "answer": "青" },
+        { "gimmick": "A", "type": "T3", "text": "信号の「止まれ」", "items": [], "choices": [], "answer": "赤" },
+        { "gimmick": "A", "type": "T3", "text": "バナナ・レモン・ひよこ", "items": [], "choices": [], "answer": "黄" },
+        { "gimmick": "A", "type": "T3", "text": "葉っぱ・カエル・メロン", "items": [], "choices": [], "answer": "緑" },
+        { "gimmick": "A", "type": "T3", "text": "トマト・ポスト・消防車", "items": [], "choices": [], "answer": "赤" },
+        { "gimmick": "A", "type": "T3", "text": "ひまわりの花びら", "items": [], "choices": [], "answer": "黄" },
+        { "gimmick": "A", "type": "T3", "text": "晴れた日の空", "items": [], "choices": [], "answer": "青" },
+        { "gimmick": "A", "type": "T3", "text": "抹茶・芝生・キュウリ", "items": [], "choices": [], "answer": "緑" },
+        { "gimmick": "A", "type": "T3", "text": "卵の黄身", "items": [], "choices": [], "answer": "黄" },
+        { "gimmick": "A", "type": "T3", "text": "イチゴ・リンゴ・サンタの服", "items": [], "choices": [], "answer": "赤" },
+        { "gimmick": "A", "type": "T3", "text": "ソーダアイス・サファイア", "items": [], "choices": [], "answer": "青" },
+        { "gimmick": "A", "type": "T3", "text": "エメラルド・森", "items": [], "choices": [], "answer": "緑" },
+        { "gimmick": "A", "type": "T3", "text": "雷マーク・菜の花", "items": [], "choices": [], "answer": "黄" },
+        { "gimmick": "A", "type": "T3", "text": "ルビー・金魚", "items": [], "choices": [], "answer": "赤" },
+        { "gimmick": "A", "type": "T3", "text": "ペンキの「ブルー」", "items": [], "choices": [], "answer": "青" },
+        { "gimmick": "A", "type": "T3", "text": "ピーマン・アオムシ", "items": [], "choices": [], "answer": "緑" }
     ]
 }
