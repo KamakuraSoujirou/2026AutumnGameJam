@@ -169,6 +169,7 @@ public static partial class UiMockBuilder
         GameObject explosionFlash = CreateOverlay("ExplosionFlash", screen, new Color(1f, 1f, 1f, 0.7f));
         explosionFlash.SetActive(false);
         RectTransform explosionText = BuildExplosionText(screen);
+        RectTransform defuseSuccessText = BuildDefuseSuccessText(screen);
 
         BuildResult(screen, roundSprite, out GameObject resultRoot, out TextMeshProUGUI resultTitle, out TextMeshProUGUI resultScore, out Button[] resultButtons, out GameObject[] resultFocusFrames);
 
@@ -185,6 +186,7 @@ public static partial class UiMockBuilder
         SetObject(view, "_dimmer", dimmer);
         SetObject(view, "_explosionFlash", explosionFlash.GetComponent<Image>());
         SetObject(view, "_explosionText", explosionText);
+        SetObject(view, "_defuseSuccessText", defuseSuccessText);
         SetObject(view, "_resultRoot", resultRoot);
         SetObject(view, "_resultTitle", resultTitle);
         SetObject(view, "_resultScore", resultScore);
@@ -307,6 +309,12 @@ public static partial class UiMockBuilder
         RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f, 383f, 134f);
         AddArt(bubble, "UI-14", GrayFill, null, false, null);
         TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
+
+        // 「解除された…」のような長い札でも枠からはみ出さないよう、入りきらないときだけ小さくする
+        bubbleText.enableAutoSizing = true;
+        bubbleText.fontSizeMin = 36f;
+        bubbleText.fontSizeMax = 64f;
+        bubbleText.margin = new Vector4(16f, 0f, 16f, 0f);
 
         UiPlayerPanel playerPanel = panel.gameObject.AddComponent<UiPlayerPanel>();
         SetObject(playerPanel, "_normalVisual", normal);
@@ -705,6 +713,20 @@ public static partial class UiMockBuilder
         TextMeshProUGUI text = AddText("Text", root, 0f, 0f, 800f, 300f, "ドカーン！", 180f, UiFontRole.Heading, TextAlignmentOptions.Center);
         text.color = new Color(0.95f, 0.35f, 0f);
         AddArt(root, "ART-20", Color.clear, null, true, text.gameObject);
+        root.gameObject.SetActive(false);
+        return root;
+    }
+
+    /// <summary>
+    /// 解除成功の文字「解除成功！」を作る（爆発の文字と同じ位置と大きさ）
+    /// </summary>
+    /// <param name="screen">1920×1080 の土台</param>
+    /// <returns>作った表示</returns>
+    private static RectTransform BuildDefuseSuccessText(RectTransform screen)
+    {
+        RectTransform root = CreateCentered("DefuseSuccessText", screen, 960f, 540f, 800f, 300f);
+        TextMeshProUGUI text = AddText("Text", root, 0f, 0f, 800f, 300f, "解除成功！", 180f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        text.color = new Color(0.15f, 0.75f, 0.3f);
         root.gameObject.SetActive(false);
         return root;
     }

@@ -226,7 +226,7 @@ public class BombUiPresenter : MonoBehaviour
     /// </summary>
     private void ShowDefused()
     {
-        _view.ShowDefuseSuccess();
+        _view.ShowDefuseSuccess(_bombManager.RoundWinner);
         _shownHolder = BombManager.NoPlayer;
         ShowWins();
     }

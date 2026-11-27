@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 画面の左右どちらかのプレイヤーの表示。キャラ、頭上の吹き出し（「あと10秒！」「待機中」「…」）、残り3秒以下の赤い帯を管理する
+/// 画面の左右どちらかのプレイヤーの表示。キャラ、頭上の吹き出し（「あと10秒！」「待機中」「…」「解除成功！」など）、残り3秒以下の赤い帯を管理する
 /// </summary>
 public class UiPlayerPanel : MonoBehaviour
 {
@@ -22,6 +22,7 @@ public class UiPlayerPanel : MonoBehaviour
     [SerializeField, Tooltip("相手が解除中のときに出す「解除中！」")] private GameObject _defuseCaption;
 
     private string _holdText = "あと10秒！";
+    private string _caption;
     private bool _isHolding;
     private bool _isThinking;
     private bool _isDanger;
@@ -136,13 +137,27 @@ public class UiPlayerPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 状態に合った文字を吹き出しに出す。文字が変わったときは弾ませる
+    /// 吹き出しに好きな文字を出す（例：「解除成功！」）。出している間は、持っているか・考え中かよりも優先する
+    /// </summary>
+    /// <param name="caption">出す文字。null か空なら、元の吹き出しに戻す</param>
+    public void SetCaption(string caption)
+    {
+        _caption = caption;
+        RefreshBubble();
+    }
+
+    /// <summary>
+    /// 状態に合った文字を吹き出しに出す（好きな文字があれば何より先に出す）。文字が変わったときは弾ませる
     /// </summary>
     private void RefreshBubble()
     {
         string text = WaitingText;
 
-        if (_isHolding)
+        if (!string.IsNullOrEmpty(_caption))
+        {
+            text = _caption;
+        }
+        else if (_isHolding)
         {
             text = _isThinking ? ThinkingText : _holdText;
         }
