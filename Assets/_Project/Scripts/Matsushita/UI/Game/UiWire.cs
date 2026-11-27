@@ -64,6 +64,7 @@ public class UiWire : MonoBehaviour
     private int _colorIndex;
     private bool _isHovered;
     private bool _isHeld;
+    private bool _isSelected;
     private float _darkUntil;
     private float _tintLevel;
 
@@ -92,14 +93,15 @@ public class UiWire : MonoBehaviour
     public float PressRemainingSeconds => Mathf.Max(0f, _darkUntil - Time.unscaledTime);
 
     /// <summary>
-    /// 見た目を目標に合わせる（重なっていれば明るく、押していれば暗く）。
+    /// 見た目を目標に合わせる（重なっている・選択済みなら明るく、押していれば暗く）。
     /// 3状態の絵があるときは絵を切り替え、ないときは白・黒を重ねて明るさを近づける
     /// </summary>
     private void Update()
     {
         bool isPressed = (_isHeld && _isHovered) || Time.unscaledTime < _darkUntil;
-        float target = isPressed ? -_pressStrength : (_isHovered ? _hoverStrength : 0f);
-        ButtonLook look = isPressed ? ButtonLook.Blackout : (_isHovered ? ButtonLook.Light : ButtonLook.Normal);
+        bool isLit = _isHovered || _isSelected;
+        float target = isPressed ? -_pressStrength : (isLit ? _hoverStrength : 0f);
+        ButtonLook look = isPressed ? ButtonLook.Blackout : (isLit ? ButtonLook.Light : ButtonLook.Normal);
         bool isLookChanged = look != _look;
         _look = look;
 
@@ -209,7 +211,18 @@ public class UiWire : MonoBehaviour
     {
         _customLabel = text;
         _silhouette = null;
+        _isSelected = false;
         RefreshLabel();
+    }
+
+    /// <summary>
+    /// ボタンを選択済みの見た目（マウスが重なったときと同じ light）にする（順番スイッチで、押したボタンに使う）。
+    /// 新しい問題では先に SetLabel で文字を設定してから呼ぶ（SetLabel は選択を外す）
+    /// </summary>
+    /// <param name="isSelected">選択済みにするなら true</param>
+    public void SetSelected(bool isSelected)
+    {
+        _isSelected = isSelected;
     }
 
     /// <summary>

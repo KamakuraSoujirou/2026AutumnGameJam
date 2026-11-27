@@ -143,6 +143,17 @@ public class UiBombView : MonoBehaviour
     }
 
     /// <summary>
+    /// ボタンを選択済みの見た目（マウスが重なったときと同じ光った絵）にする（順番スイッチで、押したボタンに使う）。
+    /// 先に SetButtonLabel で文字を設定してから呼ぶ（SetButtonLabel は選択を外す）
+    /// </summary>
+    /// <param name="direction">どの方向のボタンか</param>
+    /// <param name="isSelected">選択済みにするなら true</param>
+    public void SetButtonSelected(InputDirection direction, bool isSelected)
+    {
+        _wires[(int)direction].SetSelected(isSelected);
+    }
+
+    /// <summary>
     /// 配線の記号を設定する（仲間外れの謎と、ランプ条件のときだけ使う）
     /// </summary>
     /// <param name="direction">どの方向の線か</param>

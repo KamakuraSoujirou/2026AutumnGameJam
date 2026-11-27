@@ -94,10 +94,11 @@ public class BombInputConnector : MonoBehaviour
     /// <summary>
     /// Esc が押されたので、タイトルへ戻る。リザルト中はリザルト側（UiResultInput）が Esc を受け取ってタイトルへ戻るので、ここでは何もしない
     /// （両方で戻ると、タイトルが2回読み込まれてしまう）
+    /// リザルトは UiResultRecorder が別に重ねて出すので、試合画面のリザルト（_view.IsResultShown）ではなく、試合が終わったかで判断する
     /// </summary>
     private void OnBackPressed()
     {
-        if (IsResultSelectable())
+        if (_bombManager.State == BombState.MatchOver)
         {
             return;
         }

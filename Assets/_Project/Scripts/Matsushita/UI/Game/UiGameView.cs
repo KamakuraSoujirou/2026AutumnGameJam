@@ -60,6 +60,7 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("爆発のときの白い閃光（解除成功では出さない）")] private Image _explosionFlash;
     [SerializeField, Tooltip("爆発の文字（ドカーン！）")] private RectTransform _explosionText;
     [SerializeField, Tooltip("解除成功の文字（解除成功！）。爆発の文字と同じ位置に出す")] private RectTransform _defuseSuccessText;
+    [SerializeField, Tooltip("爆発の絵のエフェクト。入っていれば「ドカーン！」の文字の代わりにこちらを出す")] private UiExplosionBurst _explosionBurst;
 
     [Header("リザルト")]
     [SerializeField, Tooltip("リザルト全体")] private GameObject _resultRoot;
@@ -416,10 +417,18 @@ public class UiGameView : MonoBehaviour
     public void ShowExplosion(int loserIndex)
     {
         _explosionFlash.gameObject.SetActive(true);
-        _explosionText.gameObject.SetActive(true);
         SetHolder(-1);
         _panels[loserIndex].SetAfro(true);
         _panels[1 - loserIndex].SetWin(true);
+
+        // 爆発の絵があれば「ドカーン！」の文字の代わりに出す（文字は隠したまま、閃光を薄れさせる動きだけ同じものを使う）
+        bool hasBurst = _explosionBurst != null;
+        _explosionText.gameObject.SetActive(!hasBurst);
+
+        if (hasBurst)
+        {
+            _explosionBurst.Play();
+        }
 
         if (Application.isPlaying)
         {
@@ -463,6 +472,11 @@ public class UiGameView : MonoBehaviour
         _explosionText.localScale = Vector3.one;
         _defuseSuccessText.gameObject.SetActive(false);
         _defuseSuccessText.localScale = Vector3.one;
+
+        if (_explosionBurst != null)
+        {
+            _explosionBurst.Clear();
+        }
 
         foreach (UiPlayerPanel panel in _panels)
         {
