@@ -28,6 +28,8 @@ public class UiGameView : MonoBehaviour
     private const float ExplosionFlashAlpha = 0.7f;
     private const int RematchIndex = 0;
     private const int TitleIndex = 1;
+    private const string DefuseWinnerCaption = "解除成功！";
+    private const string DefuseLoserCaption = "解除された…";
 
     [Header("上の表示")]
     [SerializeField, Tooltip("ラウンド（R1）")] private TMP_Text _roundText;
@@ -55,8 +57,9 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("バナーのギミック名（配線切断式）")] private TMP_Text _bannerGimmick;
     [SerializeField, Tooltip("バナーの一行説明")] private TMP_Text _bannerDescription;
     [SerializeField, Tooltip("解除中に画面を暗くする幕")] private GameObject _dimmer;
-    [SerializeField, Tooltip("爆発のときの白い閃光")] private Image _explosionFlash;
+    [SerializeField, Tooltip("爆発のときの白い閃光（解除成功では出さない）")] private Image _explosionFlash;
     [SerializeField, Tooltip("爆発の文字（ドカーン！）")] private RectTransform _explosionText;
+    [SerializeField, Tooltip("解除成功の文字（解除成功！）。爆発の文字と同じ位置に出す")] private RectTransform _defuseSuccessText;
 
     [Header("リザルト")]
     [SerializeField, Tooltip("リザルト全体")] private GameObject _resultRoot;
@@ -338,22 +341,50 @@ public class UiGameView : MonoBehaviour
 
         if (Application.isPlaying)
         {
-            StartCoroutine(PlayExplosion());
+            StartCoroutine(PlayExplosion(_explosionText, true));
         }
     }
 
     /// <summary>
-    /// 爆発の演出を片付けて、キャラを元に戻す
+    /// 解除成功の演出を出す。「解除成功！」を出し（閃光は出さない）、勝った側の吹き出しを「解除成功！」、負けた側を「解除された…」にして、負けた側をアフロ頭にする
+    /// </summary>
+    /// <param name="winnerIndex">解除に成功して勝った側（0：P1、1：P2）</param>
+    public void ShowDefuseSuccess(int winnerIndex)
+    {
+        if (winnerIndex < 0 || winnerIndex >= PlayerCount)
+        {
+            Debug.LogWarning($"解除成功の勝者が 0 か 1 ではありません：{winnerIndex}", this);
+            return;
+        }
+
+        int loserIndex = 1 - winnerIndex;
+        _defuseSuccessText.gameObject.SetActive(true);
+        SetHolder(-1);
+        _panels[winnerIndex].SetCaption(DefuseWinnerCaption);
+        _panels[loserIndex].SetCaption(DefuseLoserCaption);
+        _panels[loserIndex].SetAfro(true);
+
+        if (Application.isPlaying)
+        {
+            StartCoroutine(PlayExplosion(_defuseSuccessText, false));
+        }
+    }
+
+    /// <summary>
+    /// 爆発・解除成功の演出を片付けて、キャラと吹き出しを元に戻す
     /// </summary>
     public void ClearExplosion()
     {
         _explosionFlash.gameObject.SetActive(false);
         _explosionText.gameObject.SetActive(false);
         _explosionText.localScale = Vector3.one;
+        _defuseSuccessText.gameObject.SetActive(false);
+        _defuseSuccessText.localScale = Vector3.one;
 
         foreach (UiPlayerPanel panel in _panels)
         {
             panel.SetAfro(false);
+            panel.SetCaption(null);
         }
     }
 
@@ -611,26 +642,37 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆発の文字を勢いよく出して、閃光を薄れさせる
+    /// 文字を勢いよく出す。閃光ありなら、閃光も薄れさせる（爆発と解除成功で同じ動きを使う）
     /// </summary>
+    /// <param name="word">拡大して出す文字</param>
+    /// <param name="hasFlash">閃光を出すなら true（爆発だけ。解除成功では出さない）</param>
     /// <returns>コルーチン</returns>
-    private IEnumerator PlayExplosion()
+    private IEnumerator PlayExplosion(RectTransform word, bool hasFlash)
     {
         Color flash = _explosionFlash.color;
 
         for (float elapsed = 0f; elapsed < ExplosionSeconds; elapsed += Time.unscaledDeltaTime)
         {
             float rate = elapsed / ExplosionSeconds;
-            flash.a = ExplosionFlashAlpha * (1f - rate);
-            _explosionFlash.color = flash;
+
+            if (hasFlash)
+            {
+                flash.a = ExplosionFlashAlpha * (1f - rate);
+                _explosionFlash.color = flash;
+            }
+
             float pop = rate < 0.4f ? Mathf.Lerp(0.3f, 1.15f, rate / 0.4f) : Mathf.Lerp(1.15f, 1f, (rate - 0.4f) / 0.6f);
-            _explosionText.localScale = Vector3.one * pop;
+            word.localScale = Vector3.one * pop;
             yield return null;
         }
 
-        flash.a = 0f;
-        _explosionFlash.color = flash;
-        _explosionText.localScale = Vector3.one;
+        if (hasFlash)
+        {
+            flash.a = 0f;
+            _explosionFlash.color = flash;
+        }
+
+        word.localScale = Vector3.one;
     }
 
     /// <summary>

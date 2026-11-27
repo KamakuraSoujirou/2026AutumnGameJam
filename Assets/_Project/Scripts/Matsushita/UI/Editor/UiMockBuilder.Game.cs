@@ -169,8 +169,9 @@ public static partial class UiMockBuilder
         GameObject explosionFlash = CreateOverlay("ExplosionFlash", screen, new Color(1f, 1f, 1f, 0.7f));
         explosionFlash.SetActive(false);
         RectTransform explosionText = BuildExplosionText(screen);
+        RectTransform defuseSuccessText = BuildDefuseSuccessText(screen);
 
-        BuildResult(screen, roundSprite, out GameObject resultRoot, out TextMeshProUGUI resultTitle, out TextMeshProUGUI resultScore);
+        BuildResult(screen, roundSprite, out GameObject resultRoot, out TextMeshProUGUI resultTitle, out TextMeshProUGUI resultScore, out Button[] resultButtons, out GameObject[] resultFocusFrames);
 
         SetObject(view, "_bomb", bomb);
         SetObject(view, "_defuseButton", defuseClick);
@@ -185,9 +186,12 @@ public static partial class UiMockBuilder
         SetObject(view, "_dimmer", dimmer);
         SetObject(view, "_explosionFlash", explosionFlash.GetComponent<Image>());
         SetObject(view, "_explosionText", explosionText);
+        SetObject(view, "_defuseSuccessText", defuseSuccessText);
         SetObject(view, "_resultRoot", resultRoot);
         SetObject(view, "_resultTitle", resultTitle);
         SetObject(view, "_resultScore", resultScore);
+        SetObjectArray(view, "_resultButtons", resultButtons);
+        SetObjectArray(view, "_resultFocusFrames", resultFocusFrames);
 
         SetInitialGameState(view, bomb);
     }
@@ -305,6 +309,12 @@ public static partial class UiMockBuilder
         RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f, 383f, 134f);
         AddArt(bubble, "UI-14", GrayFill, null, false, null);
         TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
+
+        // 「解除された…」のような長い札でも枠からはみ出さないよう、入りきらないときだけ小さくする
+        bubbleText.enableAutoSizing = true;
+        bubbleText.fontSizeMin = 36f;
+        bubbleText.fontSizeMax = 64f;
+        bubbleText.margin = new Vector4(16f, 0f, 16f, 0f);
 
         UiPlayerPanel playerPanel = panel.gameObject.AddComponent<UiPlayerPanel>();
         SetObject(playerPanel, "_normalVisual", normal);
@@ -708,6 +718,20 @@ public static partial class UiMockBuilder
     }
 
     /// <summary>
+    /// 解除成功の文字「解除成功！」を作る（爆発の文字と同じ位置と大きさ）
+    /// </summary>
+    /// <param name="screen">1920×1080 の土台</param>
+    /// <returns>作った表示</returns>
+    private static RectTransform BuildDefuseSuccessText(RectTransform screen)
+    {
+        RectTransform root = CreateCentered("DefuseSuccessText", screen, 960f, 540f, 800f, 300f);
+        TextMeshProUGUI text = AddText("Text", root, 0f, 0f, 800f, 300f, "解除成功！", 180f, UiFontRole.Heading, TextAlignmentOptions.Center);
+        text.color = new Color(0.15f, 0.75f, 0.3f);
+        root.gameObject.SetActive(false);
+        return root;
+    }
+
+    /// <summary>
     /// リザルトを作る
     /// </summary>
     /// <param name="screen">1920×1080 の土台</param>
@@ -715,20 +739,46 @@ public static partial class UiMockBuilder
     /// <param name="root">リザルト全体</param>
     /// <param name="title">勝者の表示</param>
     /// <param name="score">勝ち星の数の表示</param>
-    private static void BuildResult(RectTransform screen, Sprite roundSprite, out GameObject root, out TextMeshProUGUI title, out TextMeshProUGUI score)
+    /// <param name="buttons">ボタン（再戦、タイトルへの順）</param>
+    /// <param name="focusFrames">選んでいるボタンに出す枠（ボタンと同じ順）</param>
+    private static void BuildResult(RectTransform screen, Sprite roundSprite, out GameObject root, out TextMeshProUGUI title, out TextMeshProUGUI score, out Button[] buttons, out GameObject[] focusFrames)
     {
         RectTransform result = CreateStretch("Result", screen);
         Image dim = result.gameObject.AddComponent<Image>();
         dim.color = new Color(0f, 0f, 0f, 0.75f);
         dim.raycastTarget = false;
 
-        RectTransform panel = CreateRect("Panel", result, 460f, 250f, 1000f, 580f);
+        RectTransform panel = CreateRect("Panel", result, 460f, 200f, 1000f, 680f);
         AddArt(panel, "UI-07", LightGray, roundSprite, false, null);
         AddOutline(panel);
 
         title = AddText("Title", panel, 0f, 60f, 1000f, 170f, "P1の勝ち！", 140f, UiFontRole.Heading, TextAlignmentOptions.Center);
         score = AddText("Score", panel, 0f, 250f, 1000f, 130f, "2 − 0", 110f, UiFontRole.Number, TextAlignmentOptions.Center);
-        AddText("Hint", panel, 0f, 450f, 1000f, 70f, "ボタンを押すと もう一度", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
+        AddText("Hint", panel, 0f, 566f, 1000f, 60f, "A D／方向キーで選ぶ　Space か Enter で決める", 32f, UiFontRole.Body, TextAlignmentOptions.Center);
+
+        // UI_Result のメニューと同じ作りで、横に並べる。最初は「再戦」を選んだ状態
+        string[] labels = { "再戦", "タイトルへ" };
+        buttons = new Button[labels.Length];
+        focusFrames = new GameObject[labels.Length];
+
+        for (int i = 0; i < labels.Length; i++)
+        {
+            float x = 70f + i * 460f;
+
+            RectTransform frame = CreateRect($"ResultFocusFrame{i}", panel, x - 12f, 408f, 424f, 134f);
+            Image frameImage = frame.gameObject.AddComponent<Image>();
+            frameImage.sprite = roundSprite;
+            frameImage.type = Image.Type.Sliced;
+            frameImage.color = FocusFrameColor;
+            frameImage.raycastTarget = false;
+            frame.gameObject.SetActive(i == 0);
+            focusFrames[i] = frame.gameObject;
+
+            RectTransform button = CreateRect($"ResultButton{i}", panel, x, 420f, 400f, 110f);
+            AddArt(button, "UI-20", Orange, roundSprite, false, null);
+            AddText("Label", button, 0f, 0f, 400f, 110f, labels[i], 56f, UiFontRole.Heading, TextAlignmentOptions.Center);
+            buttons[i] = AddClickArea(button);
+        }
 
         result.gameObject.SetActive(false);
         root = result.gameObject;
