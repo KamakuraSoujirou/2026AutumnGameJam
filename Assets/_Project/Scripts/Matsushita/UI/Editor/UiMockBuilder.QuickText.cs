@@ -12,23 +12,37 @@ public static partial class UiMockBuilder
     private const string QuickTextSetPath = PrefabFolder + "/UiQuickTextSet.asset";
     private const string QuickTextWheelName = "QuickTextWheel";
 
-    /// <summary>候補の円の直径（1920×1080 の画面で）</summary>
+    /// <summary>円の絵の素材ID（UiSkin）と、入れる画像のファイル名（拡張子なし）</summary>
+    private const string QuickTextArtId = "UI-27";
+    private const string QuickTextArtFileName = "UI_Wakusen_Aori 1";
+
+    /// <summary>候補の円の幅（1920×1080 の画面で）</summary>
     private const float WheelSize = 520f;
+
+    /// <summary>円の絵（UI-27。484×476）を、縦横比そのままで置いたときの高さ</summary>
+    private const float WheelArtHeight = WheelSize * 476f / 484f;
 
     /// <summary>候補の円の中心の位置（パネルの左上から。立ち絵の胴のあたり）</summary>
     private const float WheelCenterX = 171f;
     private const float WheelCenterY = 215f;
 
-    /// <summary>円の中央の丸（案内の文字を入れる）の直径</summary>
-    private const float WheelHubSize = 190f;
+    /// <summary>選んでいる扇を光らせる円の直径（円の絵の、外側の黒い線より内側に収める）</summary>
+    private const float WheelHighlightSize = 480f;
 
     /// <summary>円の中心から、文を置く位置までの距離</summary>
     private const float WheelLabelRadius = 172f;
 
-    /// <summary>扇1つが円のどれだけを占めるか（0.25 より少し小さくして、扇の間に隙間を作る）</summary>
-    private const float WheelSliceFill = 0.245f;
+    /// <summary>扇1つが円のどれだけを占めるか（0.25 より少し小さくして、絵の白い区切り線を隠さない）</summary>
+    private const float WheelSliceFill = 0.235f;
 
-    private static readonly Color WheelWedgeColor = new Color(0.06f, 0.08f, 0.14f, 0.9f);
+    /// <summary>円の絵がまだ入っていないときの、仮の円の色</summary>
+    private static readonly Color WheelPlaceholderColor = new Color(0.54f, 0.82f, 0.8f, 0.95f);
+
+    /// <summary>選んでいない扇の色（透明。円の絵をそのまま見せる）</summary>
+    private static readonly Color WheelWedgeColor = new Color(1f, 0.85f, 0.25f, 0f);
+
+    /// <summary>文字の色（円の絵の水色の上で読みやすい濃い色）</summary>
+    private static readonly Color WheelTextColor = new Color(0.1f, 0.16f, 0.2f, 1f);
 
     /// <summary>扇の並び：画面の上・下・左・右（W・S・A・D のキーの位置）</summary>
     private static readonly string[] WheelSlotNames = { "Up", "Down", "Left", "Right" };
@@ -47,10 +61,10 @@ public static partial class UiMockBuilder
     };
 
     /// <summary>候補の下に出す、取り消しの案内（P1、P2の順）</summary>
-    private static readonly string[] WheelCancelCaptions = { "Q で取り消し", "右Shift で取り消し" };
+    private static readonly string[] WheelCancelCaptions = { "離すと送信 ／ Q で取り消し", "離すと送信 ／ 右Shift で取り消し" };
 
     /// <summary>
-    /// すでにある試合画面のプレハブに、クイックテキストの候補と文のセットを足す。作り直さずにその場で足すので、プレハブを手で直した分は消えない
+    /// すでにある試合画面のプレハブに、クイックテキストの候補と文のセットを足す。候補がすでにあれば（円の絵を替えたときなど）、候補だけを作り直す。プレハブのほかの部分は触らない
     /// </summary>
     [MenuItem("Tools/UI仮組/クイックテキストを足す")]
     public static void AddQuickTextToGame()
@@ -61,6 +75,7 @@ public static partial class UiMockBuilder
             return;
         }
 
+        AssignQuickTextArt();
         GameObject contents = PrefabUtility.LoadPrefabContents(GamePrefabPath);
 
         try
@@ -72,10 +87,15 @@ public static partial class UiMockBuilder
                 screen.Find("PlayerP2").GetComponent<UiPlayerPanel>()
             };
 
-            if (panels[0].transform.Find(QuickTextWheelName) != null)
+            // 前に作った候補は、作り直すために消す（候補は組み立てで作るものなので、消しても困らない）
+            foreach (UiPlayerPanel panel in panels)
             {
-                Debug.Log("クイックテキストの候補はすでに入っています");
-                return;
+                Transform oldWheel = panel.transform.Find(QuickTextWheelName);
+
+                if (oldWheel != null)
+                {
+                    Object.DestroyImmediate(oldWheel.gameObject);
+                }
             }
 
             BuildQuickText(contents.GetComponent<UiGameView>(), panels);
@@ -106,6 +126,33 @@ public static partial class UiMockBuilder
         }
 
         SetObject(view, "_quickTextSet", LoadOrCreateQuickTextSet());
+    }
+
+    /// <summary>
+    /// 円の絵（UI_Wakusen_Aori 1）を、UiSkin の UI-27 に入れる（手で入れた別の画像は上書きしない）
+    /// </summary>
+    private static void AssignQuickTextArt()
+    {
+        UiSkin skin = LoadOrCreateSkin();
+        string path = $"{WakusenFolder}/{QuickTextArtFileName}.png";
+        EnsureSpriteImport(path);
+        Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        UiSkinEntry entry = skin.FindEntry(QuickTextArtId);
+
+        if (sprite == null || entry == null)
+        {
+            Debug.LogWarning($"クイックテキストの円の絵を入れられません：{QuickTextArtId} ← {path}");
+            return;
+        }
+
+        bool isReplaceable = entry.Sprite == null || entry.Sprite.name.StartsWith("UI_Wakusen_");
+
+        if (isReplaceable && entry.Sprite != sprite)
+        {
+            entry.Sprite = sprite;
+            EditorUtility.SetDirty(skin);
+            AssetDatabase.SaveAssets();
+        }
     }
 
     /// <summary>
@@ -143,12 +190,16 @@ public static partial class UiMockBuilder
 
         RectTransform wheelRect = CreateCentered(QuickTextWheelName, panel, WheelCenterX, WheelCenterY, WheelSize, WheelSize);
 
+        // 円の絵（X字で4分割）。扇・文より奥に描くため、最初に作る
+        RectTransform circle = CreateCentered("Circle", wheelRect, Half, Half, WheelSize, WheelArtHeight);
+        AddArt(circle, QuickTextArtId, WheelPlaceholderColor, circleSprite, false, null);
+
         Image[] wedges = new Image[WheelSlotNames.Length];
 
         for (int slot = 0; slot < wedges.Length; slot++)
         {
-            // 円の上から時計回りに塗った扇を、向きに合わせて回す（塗った扇の真ん中は、上から時計回りに sliceCenterDegrees の位置）
-            RectTransform wedge = CreateCentered($"Wedge_{WheelSlotNames[slot]}", wheelRect, Half, Half, WheelSize, WheelSize);
+            // 円の上から時計回りに塗った扇（選んだときだけ色が付く）を、向きに合わせて回す（塗った扇の真ん中は、上から時計回りに sliceCenterDegrees の位置）
+            RectTransform wedge = CreateCentered($"Wedge_{WheelSlotNames[slot]}", wheelRect, Half, Half, WheelHighlightSize, WheelHighlightSize);
             Image image = wedge.gameObject.AddComponent<Image>();
             image.sprite = circleSprite;
             image.type = Image.Type.Filled;
@@ -162,12 +213,6 @@ public static partial class UiMockBuilder
             wedges[slot] = image;
         }
 
-        RectTransform hub = CreateCentered("Hub", wheelRect, Half, Half, WheelHubSize, WheelHubSize);
-        Image hubImage = hub.gameObject.AddComponent<Image>();
-        hubImage.sprite = circleSprite;
-        hubImage.color = WheelWedgeColor;
-        hubImage.raycastTarget = false;
-
         TextMeshProUGUI[] texts = new TextMeshProUGUI[WheelSlotNames.Length];
         TextMeshProUGUI[] keyTexts = new TextMeshProUGUI[WheelSlotNames.Length];
 
@@ -178,10 +223,10 @@ public static partial class UiMockBuilder
             float centerY = Half + direction.y * WheelLabelRadius;
 
             keyTexts[slot] = AddText($"Key_{WheelSlotNames[slot]}", wheelRect, centerX - 50f, centerY - 48f, 100f, 36f, WheelKeyNames[playerIndex][slot], 26f, UiFontRole.Heading, TextAlignmentOptions.Center);
-            keyTexts[slot].color = Color.white;
+            keyTexts[slot].color = WheelTextColor;
 
             TextMeshProUGUI text = AddText($"Text_{WheelSlotNames[slot]}", wheelRect, centerX - 85f, centerY - 10f, 170f, 60f, UiQuickTextSet.GetDefaultSlotText(slot), 36f, UiFontRole.Body, TextAlignmentOptions.Center);
-            text.color = Color.white;
+            text.color = WheelTextColor;
             text.textWrappingMode = TextWrappingModes.Normal;
             text.enableAutoSizing = true;
             text.fontSizeMin = 20f;
@@ -189,17 +234,13 @@ public static partial class UiMockBuilder
             texts[slot] = text;
         }
 
-        TextMeshProUGUI hubText = AddText("HubText", wheelRect, Half - WheelHubSize * 0.5f, Half - 40f, WheelHubSize, 80f, "離すと\n送信", 28f, UiFontRole.Heading, TextAlignmentOptions.Center);
-        hubText.color = Color.white;
-        hubText.textWrappingMode = TextWrappingModes.Normal;
-
-        RectTransform caption = CreateCentered("CancelCaption", wheelRect, Half, WheelSize + 32f, 400f, 46f);
+        RectTransform caption = CreateCentered("CancelCaption", wheelRect, Half, WheelSize + 32f, 520f, 46f);
         Image captionImage = caption.gameObject.AddComponent<Image>();
         captionImage.sprite = roundSprite;
         captionImage.type = Image.Type.Sliced;
         captionImage.color = new Color(0f, 0f, 0f, 0.65f);
         captionImage.raycastTarget = false;
-        TextMeshProUGUI captionText = AddText("Text", caption, 0f, 0f, 400f, 46f, WheelCancelCaptions[playerIndex], 26f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI captionText = AddText("Text", caption, 0f, 0f, 520f, 46f, WheelCancelCaptions[playerIndex], 26f, UiFontRole.Body, TextAlignmentOptions.Center);
         captionText.color = Color.white;
 
         UiQuickTextWheel wheel = wheelRect.gameObject.AddComponent<UiQuickTextWheel>();

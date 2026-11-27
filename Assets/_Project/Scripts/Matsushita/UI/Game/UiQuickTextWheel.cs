@@ -17,9 +17,9 @@ public class UiQuickTextWheel : MonoBehaviour
     [SerializeField, Tooltip("扇の画像（画面の上・下・左・右の順）")] private Image[] _wedges = new Image[DirectionCount];
     [SerializeField, Tooltip("扇の中の文（画面の上・下・左・右の順）")] private TMP_Text[] _texts = new TMP_Text[DirectionCount];
     [SerializeField, Tooltip("扇の中のキー名（画面の上・下・左・右の順）")] private TMP_Text[] _keyTexts = new TMP_Text[DirectionCount];
-    [SerializeField, Tooltip("選んでいない扇の色")] private Color _wedgeColor = new Color(0.06f, 0.08f, 0.14f, 0.9f);
-    [SerializeField, Tooltip("選んでいる扇の色")] private Color _selectedWedgeColor = new Color(1f, 0.85f, 0.25f, 1f);
-    [SerializeField, Tooltip("選んでいない扇の文字の色")] private Color _textColor = Color.white;
+    [SerializeField, Tooltip("選んでいない扇の色（円の絵の上に重ねるので、透明にして絵をそのまま見せる）")] private Color _wedgeColor = new Color(1f, 0.85f, 0.25f, 0f);
+    [SerializeField, Tooltip("選んでいる扇の色（円の絵の上に重ねる）")] private Color _selectedWedgeColor = new Color(1f, 0.85f, 0.25f, 0.95f);
+    [SerializeField, Tooltip("選んでいない扇の文字の色")] private Color _textColor = new Color(0.1f, 0.16f, 0.2f, 1f);
     [SerializeField, Tooltip("選んでいる扇の文字の色")] private Color _selectedTextColor = new Color(0.23f, 0.16f, 0f, 1f);
 
     private float _openElapsed = OpenSeconds;

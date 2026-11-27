@@ -26,8 +26,8 @@ MonoBehaviour:
   - _id: ART-09_normal
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_1p_rough_v1
-    _sprite: {fileID: 17462529948901505, guid: a9c0cb0f2c18cf5469328b4b814ae0d0, type: 3}
+    _fileName: chr_1p_v1
+    _sprite: {fileID: 6944170928028169348, guid: a5f8389807cf1d4459c55547f0b014a9, type: 3}
   - _id: ART-10_normal
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
@@ -81,8 +81,8 @@ MonoBehaviour:
   - _id: ART-09_afro
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u30A2\u30D5\u30ED\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p1_afro
-    _sprite: {fileID: 0}
+    _fileName: chr_1p_v4
+    _sprite: {fileID: -2453084743817411707, guid: 84a39c67452b4dc40905e1226f385701, type: 3}
   - _id: ART-10_afro
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u30A2\u30D5\u30ED\uFF09"
     _size: {x: 600, y: 900}
@@ -171,8 +171,8 @@ MonoBehaviour:
   - _id: ART-11_p1_panic
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u7126\u308A\u9854\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p1_panic
-    _sprite: {fileID: 0}
+    _fileName: chr_1p_v2
+    _sprite: {fileID: -4801378604471669273, guid: 7a3cd9e67bf2a984c98a247fc54352ab, type: 3}
   - _id: ART-11_p2_panic
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u7126\u308A\u9854\uFF09"
     _size: {x: 600, y: 900}
@@ -216,8 +216,8 @@ MonoBehaviour:
   - _id: ART-11_p1_win
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u52DD\u3061\u9854\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p1_win
-    _sprite: {fileID: 0}
+    _fileName: chr_1p_v3
+    _sprite: {fileID: -219184749020342967, guid: 6c1d18fa4a947c544ab5bf0c92120bda, type: 3}
   - _id: ART-11_p2_win
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u52DD\u3061\u9854\uFF09"
     _size: {x: 600, y: 900}
@@ -368,6 +368,11 @@ MonoBehaviour:
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u7D50\u679C\u8868\u306E\u67A0\uFF08\u5DE6\u30AA\u30EC\u30F3\u30B8\u30FB\u53F3\u30D4\u30F3\u30AF\u306E\u7DB2\u70B9\uFF09"
     _size: {x: 1870, y: 440}
     _fileName: ui_result_table
+    _sprite: {fileID: 0}
+  - _id: UI-27
+    _label: "\u30AF\u30A4\u30C3\u30AF\u30C6\u30AD\u30B9\u30C8\u306E\u5186\uFF08X\u5B57\u30674\u5206\u5272\uFF09"
+    _size: {x: 484, y: 476}
+    _fileName: ui_quicktext_wheel
     _sprite: {fileID: 0}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}

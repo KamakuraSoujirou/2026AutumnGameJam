@@ -161,7 +161,8 @@ public static partial class UiMockBuilder
             new UiSkinEntry("UI-15", "下の帯（P1側。プレイヤー名と勝ち星）", new Vector2(532f, 66f), "ui_bar"),
             new UiSkinEntry("UI-15b", "下の帯（P2側。UI-15の鏡写し）", new Vector2(532f, 66f), "ui_bar_p2"),
             new UiSkinEntry("UI-16", "下の帯（ギミック名）", new Vector2(363f, 66f), "ui_bar_gimmick"),
-            new UiSkinEntry("UI-18", "解除ボタン", new Vector2(260f, 70f), "ui_defuse")
+            new UiSkinEntry("UI-18", "解除ボタン", new Vector2(260f, 70f), "ui_defuse"),
+            new UiSkinEntry("UI-27", "クイックテキストの円（X字で4分割）", new Vector2(484f, 476f), "ui_quicktext_wheel")
         };
 
         for (int i = 0; i < WireNames.Length; i++)
@@ -381,10 +382,13 @@ public static partial class UiMockBuilder
         AddWorldSprite(heldBomb.gameObject, 12, false);
         heldBomb.gameObject.SetActive(false);
 
+        // 吹き出しの枠の絵（見本：P1は 431×132、P2は 431×132 で文字より右に32px・上に25px ずれる）。文字の位置は動かさず、枠だけ大きさとずれを持たせる
+        float frameShiftX = isLeft ? -1f : 32f;
+        float frameShiftY = isLeft ? 0f : -25f;
         float bubbleCenterX = isLeft ? 170.5f : 171.5f;
-        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX, -91f - BubbleRiseY, 383f, 134f);
+        RectTransform bubble = CreateCentered("Bubble", panel, bubbleCenterX + frameShiftX, -91f - BubbleRiseY + frameShiftY, BubbleFrameWidth, BubbleFrameHeight);
         AddArt(bubble, isLeft ? "UI-14" : "UI-14b", GrayFill, null, false, null);
-        TextMeshProUGUI bubbleText = AddText("Text", bubble, 0f, 0f, 383f, 134f, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
+        TextMeshProUGUI bubbleText = AddText("Text", bubble, (BubbleFrameWidth - BubbleTextWidth) * 0.5f - frameShiftX, (BubbleFrameHeight - BubbleTextHeight) * 0.5f - frameShiftY, BubbleTextWidth, BubbleTextHeight, "あと10秒！", 64f, UiFontRole.Body, TextAlignmentOptions.Center);
 
         // 「解除された…」のような長い札でも枠からはみ出さないよう、入りきらないときだけ小さくする
         bubbleText.enableAutoSizing = true;
@@ -806,8 +810,8 @@ public static partial class UiMockBuilder
         TextMeshProUGUI hint = AddText("BackHint", screen, 232f, 46f, 320f, 36f, "Esc でタイトルへ", 22f, UiFontRole.Body, TextAlignmentOptions.Left);
         hint.color = SubTextColor;
 
+        AddFrameArt(screen, "RoundFrame", "UI-13", 763f, 35f, 393f, 126f, GrayFill, null);
         RectTransform round = CreateRect("Round", screen, 843f, 22f, 234f, 100f);
-        AddArt(round, "UI-13", GrayFill, null, false, null);
         TextMeshProUGUI roundText = AddText("Text", round, 0f, 0f, 234f, 100f, "R1", 76f, UiFontRole.Heading, TextAlignmentOptions.Center);
 
         TextMeshProUGUI pass = AddText("Pass", screen, 1590f, 44f, 180f, 40f, "パス回数 1", 24f, UiFontRole.Body, TextAlignmentOptions.Left);
@@ -827,17 +831,18 @@ public static partial class UiMockBuilder
     /// <param name="view">試合画面（参照を入れる先）</param>
     private static void BuildBottomBars(RectTransform screen, UiGameView view)
     {
+        // 帯の枠の絵（見本の位置と大きさ）。文字と星は、枠の中の決まった場所に置く
+        AddFrameArt(screen, "BarP1Frame", "UI-15", 76f, 904f, 601f, 140f, GrayFill, null);
         RectTransform barLeft = CreateRect("BarP1", screen, 125f, 963f, 532f, 66f);
-        AddArt(barLeft, "UI-15", GrayFill, null, false, null);
         TextMeshProUGUI nameLeft = AddText("Name", barLeft, 91f, 0f, 200f, 66f, "P1", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         UiWinStars starsLeft = BuildWinStars(barLeft, "WinStars", 343f, 13f);
 
+        AddFrameArt(screen, "BarGimmickFrame", "UI-16", 759f, 887f, 449f, 151f, GrayFill, null);
         RectTransform center = CreateRect("BarGimmick", screen, 778f, 963f, 363f, 66f);
-        AddArt(center, "UI-16", GrayFill, null, false, null);
         TextMeshProUGUI gimmick = AddText("Text", center, 0f, 0f, 363f, 66f, "ギミック名", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
 
+        AddFrameArt(screen, "BarP2Frame", "UI-15b", 1281f, 898f, 601f, 140f, GrayFill, null);
         RectTransform barRight = CreateRect("BarP2", screen, 1262f, 963f, 532f, 66f);
-        AddArt(barRight, "UI-15b", GrayFill, null, false, null);
         TextMeshProUGUI nameRight = AddText("Name", barRight, 208f, 0f, 200f, 66f, "COM", 40f, UiFontRole.Body, TextAlignmentOptions.Center);
         UiWinStars starsRight = BuildWinStars(barRight, "WinStars", 58f, 13f);
 
@@ -1068,6 +1073,27 @@ public static partial class UiMockBuilder
         AssetDatabase.SaveAssets();
         ApplySkinToPrefabs();
         Debug.Log($"P2の立ち絵を {replacedCount} 件差し替えて、プレハブに反映しました");
+    }
+
+    /// <summary>
+    /// P1 の立ち絵を、新しい絵（通常：chr_1p_v1、焦り顔：chr_1p_v2、勝ち顔：chr_1p_v3、アフロ：chr_1p_v4）に差し替えて、プレハブとタイトルに反映する。
+    /// 試合画面のキャラに勝ち顔の見た目がまだなければ、先に足す。P2 の絵は変えない
+    /// </summary>
+    [MenuItem("Tools/UI仮組/P1の立ち絵を新しい絵に差し替える")]
+    public static void ReplaceP1CharacterWithNewArt()
+    {
+        AddWinVisualsToGamePrefab();
+        UiSkin skin = LoadOrCreateSkin();
+        int replacedCount = 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-09_normal", "chr_1p_v1") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-11_p1_panic", "chr_1p_v2") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-11_p1_win", "chr_1p_v3") ? 1 : 0;
+        replacedCount += ReplaceSkinSprite(skin, "ART-09_afro", "chr_1p_v4") ? 1 : 0;
+
+        EditorUtility.SetDirty(skin);
+        AssetDatabase.SaveAssets();
+        ApplySkinToPrefabs();
+        Debug.Log($"P1の立ち絵を {replacedCount} 件差し替えて、プレハブに反映しました");
     }
 
     /// <summary>

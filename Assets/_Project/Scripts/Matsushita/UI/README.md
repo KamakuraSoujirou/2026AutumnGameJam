@@ -168,7 +168,7 @@ UI-01〜04 は素材リストにない仮の番号です（発注書に足すか
 3. 本番の使い方：`UiGameView` が起動時に `QuickTextInput` を自分に付けて、`PlayerInputReader`（同じオブジェクトか、シーンから探す）の `DirectionPressed` `DirectionReleased` `DefusePressed` を見る。ゲーム進行側は何もしなくてよい。「使えるか」を別の条件にしたいときは `QuickTextInput.CanUse` に処理を渡す
 4. 呼び出し：`UiGameView.ShowQuickText(プレイヤー, 方向)`（方向はキー入力として届いた `InputDirection`）、`ShowRandomQuickText(プレイヤー)`（CPU用。`CpuPlayer` が人間の回答中に5〜11秒おきに呼ぶ）、`SetQuickTextWheel(プレイヤー, 開くか, 選んでいる方向)`、`CanUseQuickText(プレイヤー)`。文を出しておく時間は `UiGameView` の Quick Text Seconds（1.5秒）、候補が出るまでは `QuickTextInput` の Wheel Delay Seconds（0.2秒）
 5. 上と下のボタンを入れ替えてあるため、W は `InputDirection.Down` として届く。文の並びは「押したキーの画面の位置」（W＝上）で、`UiQuickTextSet.SlotOf` が対応させる
-6. 候補の円は素材なしの仮の形（扇は `Image` の塗りつぶし）。絵にするときは、扇・中央の丸の `Image` に絵を入れる
+6. 候補の円の絵は `UI_Wakusen_Aori 1`（X字で4分割）。UiSkin の `UI-27` に入っていて、メニュー「クイックテキストを足す」か「枠線の素材を反映」で入る。選んでいる扇の黄色は、絵の上に重ねた塗りつぶしの `Image`（選んでいないときは透明）。絵を替えるなら UiSkin の `UI-27` に入れる（円の中心と4つの扇の向きは、いまの絵に合わせてある）。メニューを実行すると、候補（`QuickTextWheel`）は作り直す
 
 ## 背景とベルトの粒（試合画面）
 - 背景：素材ID ART-12、ファイル名 `game_bg`。`Art/BackGround/game_bg.png` は、絵の担当が出した「ボボボラボ背景 グミなし.png」のコピー（ベルトの粒がない版）。「グミなし」が更新されたら、コピーし直す

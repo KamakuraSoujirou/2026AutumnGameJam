@@ -124,9 +124,9 @@ public static partial class UiMockBuilder
     {
         AddText("SettingsHeading", screen, 40f, 240f, 440f, 64f, "対戦設定メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
+        // 枠の絵は、中身より奥に描くため先に作る（見本の位置と大きさ）
+        AddFrameArt(screen, "SettingsFrame", "UI-04", 40f, 304f, 462f, 560f, Color.white, roundSprite);
         RectTransform panel = CreateRect("SettingsPanel", screen, 20f, 320f, 456f, 478f);
-        AddArt(panel, "UI-04", Color.white, roundSprite, false, null);
-        AddOutline(panel);
 
         UiOptionRow[] rows =
         {
@@ -164,9 +164,8 @@ public static partial class UiMockBuilder
     {
         AddText("ControlsHeading", screen, 1290f, 245f, 440f, 64f, "操作メニュー", 44f, UiFontRole.Heading, TextAlignmentOptions.Left);
 
+        AddFrameArt(screen, "ControlsFrame", "UI-04b", 1224f, 293f, 613f, 227f, Color.white, roundSprite);
         RectTransform panel = CreateRect("ControlsPanel", screen, 1265f, 305f, 518f, 202f);
-        AddArt(panel, "UI-04b", Color.white, roundSprite, false, null);
-        AddOutline(panel);
 
         AddText("MoveLabel", panel, 24f, 26f, 175f, 44f, "上下左右を選ぶ", 22f, UiFontRole.Body, TextAlignmentOptions.Left);
         CreateChip(panel, "MoveP1", "WASD", 205f, 26f, 100f, 44f, roundSprite).SetSelected(true);
