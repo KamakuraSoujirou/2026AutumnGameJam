@@ -90,6 +90,7 @@ public static partial class UiMockBuilder
 
         RectTransform background = CreateStretch("Background", screen);
         AddArt(background, "ART-13", Color.white, null, false, null);
+        SetArtFallback(background.GetComponent<UiArtSlot>(), TitleBackgroundFallbackArtId);
 
         RectTransform logo = CreateRect("Logo", screen, 610f, 25f, 700f, 130f);
         TextMeshProUGUI logoText = AddText("LogoText", logo, 0f, 0f, 700f, 130f, "あと10秒", 110f, UiFontRole.Heading, TextAlignmentOptions.Center);

@@ -175,6 +175,7 @@ UI-01〜04 は素材リストにない仮の番号です（発注書に足すか
 - 粒：`Game/UiConveyorFlow`。画面いっぱいの `Screen/Conveyor` に付き、左右のベルトの線に沿って粒（SpriteRenderer）が流れる。線の点（x・y は 1920×1080 の位置、z は大きさの倍率）・速さ・間隔・向き（Is Reversed）は Inspector で変えられる。いまはドームの際から出て、外側のベルトの上（外側の端から Start Margin = 120px 手前）で小さくなって消える（中央から外の向き）。切る距離は Start Margin（外側）・End Margin（中央側）。描画順は背景（0）と立ち絵（10）の間（1）
 - 粒の絵：素材ID ART-24_pink／ART-24_green／ART-24_yellow（`Art/BackGround/belt_dot_*.png`。絵の担当の「グミ」の分け絵から切り出した）。1つもなければ仮の楕円
 - 使い方：すでにある `UI_Game.prefab` には、メニューの **Tools → UI仮組 → ベルトの粒を足す** で足し、そのあと **素材を割り当てて反映** で背景と粒の絵を入れる。「試合画面を作る」で作り直したときは、最初から入る
+- タイトルの背景：ART-13（`title_bg`）の絵が届くまで、試合の背景 ART-12（何もないラボ）を代わりに出す（`UiArtSlot` の Fallback Art Id）。すでにある `UI_Title.prefab` には **Tools → UI仮組 → タイトルの背景をラボにする** で、作り直さずに入れる（「タイトルを作る」で作り直したときは最初から入る）。ART-13 に絵を入れれば、そちらが優先される
 - 止めたいときは `UiConveyorFlow.IsFlowing` を false にする（粒はその場で止まる）
 - PC画面：`Game/UiPcScreenBoot`。画面いっぱいの `Screen/PcScreen` に付き、左の机のPC画面の絵（素材ID ART-25、`Art/BackGround/game_pc.png`。絵の担当の「pc画面のみ」のコピー）を、ときどき点ける。待機（最初は2.5秒、そのあとは8〜20秒のランダム）→ 起動（ちらついて点く）→ 点灯（4秒、かすかにちらつく）→ 消灯（0.3秒）の繰り返し。起動の動き（Boot Style）・待ち時間・点灯時間は Inspector で変えられる。`BootNow()` で今すぐ起動、`IsRunning` を false にすると起動しない。すでにある `UI_Game.prefab` には **Tools → UI仮組 → PC画面を足す** で足し、そのあと **素材を割り当てて反映** で絵を入れる。絵がなければ何も出ない
 
