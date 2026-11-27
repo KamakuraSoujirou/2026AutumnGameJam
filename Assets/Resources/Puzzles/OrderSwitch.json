@@ -1,6 +1,5 @@
 {
     "puzzles": [
-        { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["すごろく", "てるてるぼうず", "とらんぷ", "なぞなぞ"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["うで", "おなか", "せなか", "みみ"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["おりがみ", "せんぷうき", "ぬいぐるみ", "めがね"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C2", "text": "五十音順に押せ", "items": ["かめ", "さる", "たぬき", "わに"], "choices": [], "answer": "" },
@@ -112,7 +111,6 @@
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ハチ", "ネコ", "ベッド", "太陽"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["サッカーボール", "机", "ゾウ", "富士山"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["カメ", "冷蔵庫", "家", "地球"], "choices": [], "answer": "" },
-        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["スマホ", "ティラノサウルス", "富士山", "太陽"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["サッカーボール", "自動車", "飛行機", "太陽"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["りんご", "ウサギ", "ラクダ", "太陽"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["スマホ", "ヒツジ", "自動車", "地球"], "choices": [], "answer": "" },
@@ -132,7 +130,6 @@
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["アリ", "カエル", "冷蔵庫", "家"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["カエル", "冷蔵庫", "富士山", "木星"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["アリ", "サッカーボール", "冷蔵庫", "月"], "choices": [], "answer": "" },
-        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "ニワトリ", "ティラノサウルス", "飛行機"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["サッカーボール", "ペンギン", "ゾウ", "飛行機"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "スズメ", "パンダ", "ゾウ"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["机", "バス", "飛行機", "木星"], "choices": [], "answer": "" },
@@ -144,12 +141,14 @@
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["アリ", "カエル", "カメ", "自動車"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ハチ", "スマホ", "机", "バス"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "ウサギ", "パンダ", "家"], "choices": [], "answer": "" },
-        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ハチ", "スマホ", "ドア", "ティラノサウルス"], "choices": [], "answer": "" },
-        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "カエル", "ラクダ", "ティラノサウルス"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ハチ", "スマホ", "ニワトリ", "ウシ"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["りんご", "傘", "ラクダ", "バス"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["りんご", "ランドセル", "パンダ", "家"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["カエル", "ネコ", "自転車", "家"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["スマホ", "ティラノサウルス", "富士山", "太陽"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "ニワトリ", "ティラノサウルス", "飛行機"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["ハチ", "スマホ", "ドア", "ティラノサウルス"], "choices": [], "answer": "" },
+        { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["てんとう虫", "カエル", "ラクダ", "ティラノサウルス"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["りんご", "ランドセル", "ヒツジ", "ティラノサウルス"], "choices": [], "answer": "" },
         { "gimmick": "C", "type": "C4", "text": "小さいものから順に押せ", "items": ["カエル", "カメ", "ピアノ", "ティラノサウルス"], "choices": [], "answer": "" }
     ]

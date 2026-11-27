@@ -36,7 +36,6 @@
 | ウシ | cow | Delapouite |
 | ラクダ | camel | Delapouite |
 | ゾウ | elephant | Delapouite |
-| ティラノサウルス | dinosaur-rex | Lorc |
 | りんご | shiny-apple | Lorc |
 | スマホ | smartphone | Delapouite |
 | えんぴつ | pencil | Delapouite |
@@ -59,3 +58,4 @@
 | 地球 | earth-asia-oceania | Delapouite |
 | 木星 | jupiter | Delapouite |
 | 太陽 | sun | Lorc |
+| ティラノサウルス | dinosaur-rex | Lorc |

@@ -15,9 +15,14 @@ public class UiWire : MonoBehaviour
     private const int SingleLineMaxLength = 5;
 
     // 折り返すときの文字の枠（ひし形の中に収まる大きさ）と、いちばん小さくする文字の大きさ
-    private const float WrapLabelWidth = 80f;
-    private const float WrapLabelHeight = 64f;
+    private const float WrapLabelWidth = 64f;
+    private const float WrapLabelHeight = 40f;
     private const float WrapLabelMinFontSize = 10f;
+
+    // ひし形の中に文字を収めるための数字。ひし形の対角線は約117（ボタンの枠148の中）で、
+    // 文字の「幅＋高さ」がこの値を超えると、角からはみ出す。1文字の高さは、文字の大きさの約0.9倍
+    private const float DiamondTextSpan = 103f;
+    private const float GlyphHeightRatio = 0.9f;
 
     // シルエットの画像の大きさ（ひし形の中に収まる大きさ）
     private const float SilhouetteSize = 64f;
@@ -66,6 +71,7 @@ public class UiWire : MonoBehaviour
     private Vector2 _labelCenter;
     private Vector2 _labelSingleLineSize;
     private float _labelSingleLineMinFontSize;
+    private float _labelSingleLineMaxFontSize;
     private bool _isLabelPrepared;
     private Sprite _silhouette;
     private Image _silhouetteImage;
@@ -305,8 +311,13 @@ public class UiWire : MonoBehaviour
         _labelRect.sizeDelta = size;
         _labelRect.anchoredPosition = _labelCenter - Vector2.Scale(new Vector2(0.5f, 0.5f) - _labelRect.pivot, size);
 
+        // 1行のときは、文字数が多いほど文字を小さくして、ひし形の中に収める（幅＝文字数×大きさ、高さ＝大きさ×0.9）
+        float fitFontSize = DiamondTextSpan / (text.Length + GlyphHeightRatio);
+        float maxFontSize = isWrapped ? _labelSingleLineMaxFontSize : Mathf.Min(_labelSingleLineMaxFontSize, fitFontSize);
+
         _label.enableAutoSizing = true;
-        _label.fontSizeMin = isWrapped ? WrapLabelMinFontSize : _labelSingleLineMinFontSize;
+        _label.fontSizeMax = maxFontSize;
+        _label.fontSizeMin = Mathf.Min(isWrapped ? WrapLabelMinFontSize : _labelSingleLineMinFontSize, maxFontSize);
         _label.textWrappingMode = isWrapped ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
     }
 
@@ -323,6 +334,7 @@ public class UiWire : MonoBehaviour
         _labelRect = (RectTransform)_label.transform;
         _labelSingleLineSize = _labelRect.sizeDelta;
         _labelSingleLineMinFontSize = _label.fontSizeMin;
+        _labelSingleLineMaxFontSize = _label.fontSizeMax;
 
         // 基準点（ピボット）から見た、枠の中心の位置
         _labelCenter = _labelRect.anchoredPosition + Vector2.Scale(new Vector2(0.5f, 0.5f) - _labelRect.pivot, _labelSingleLineSize);
