@@ -93,6 +93,7 @@ public class UiTitleInput : MonoBehaviour
     /// </summary>
     private void RequestStart()
     {
+        SoundPlayer.PlaySe(SoundId.Decide);
         GameConfig.Load().SetMatchRules(_view.WinsToMatch, _view.IsShortenEnabled);
         Debug.Log($"ゲームスタート（CPU対戦：{_view.IsCpuMode}、CPUの強さ：{_view.CpuLevel}、{_view.WinsToMatch}本先取、時間短縮：{_view.IsShortenEnabled}、読み上げ：{_view.IsVoiceEnabled}）");
         _onStartRequested.Invoke();

@@ -95,6 +95,11 @@ public class UiTitleView : MonoBehaviour
             next = Mathf.Clamp(next + delta, 0, _rows.Length);
         }
 
+        if (next != _focusIndex)
+        {
+            SoundPlayer.PlaySe(SoundId.Cursor);
+        }
+
         _focusIndex = next;
         RefreshFocus();
     }
@@ -121,7 +126,14 @@ public class UiTitleView : MonoBehaviour
             return;
         }
 
+        int before = _rows[_focusIndex].SelectedIndex;
         _rows[_focusIndex].Move(delta);
+
+        if (_rows[_focusIndex].SelectedIndex != before)
+        {
+            SoundPlayer.PlaySe(SoundId.Cursor);
+        }
+
         RefreshCpuLevelRow();
     }
 
@@ -131,6 +143,7 @@ public class UiTitleView : MonoBehaviour
     /// <param name="rowIndex">クリックされた行の番号</param>
     private void OnOptionClicked(int rowIndex)
     {
+        SoundPlayer.PlaySe(SoundId.Cursor);
         _focusIndex = rowIndex;
         RefreshFocus();
         RefreshCpuLevelRow();

@@ -71,7 +71,7 @@ public class UiResultView : MonoBehaviour
             }
         }
 
-        CloseMenu();
+        _menuRoot.SetActive(false);
     }
 
     /// <summary>
@@ -79,6 +79,7 @@ public class UiResultView : MonoBehaviour
     /// </summary>
     public void OpenMenu()
     {
+        SoundPlayer.PlaySe(SoundId.Decide);
         _menuRoot.SetActive(true);
         _menuFocusIndex = RestartIndex;
         RefreshMenuFocus();
@@ -89,6 +90,7 @@ public class UiResultView : MonoBehaviour
     /// </summary>
     public void CloseMenu()
     {
+        SoundPlayer.PlaySe(SoundId.Cancel);
         _menuRoot.SetActive(false);
     }
 
@@ -98,7 +100,14 @@ public class UiResultView : MonoBehaviour
     /// <param name="delta">上なら -1、下なら 1</param>
     public void MoveMenuFocus(int delta)
     {
-        _menuFocusIndex = Mathf.Clamp(_menuFocusIndex + delta, 0, _menuButtons.Length - 1);
+        int next = Mathf.Clamp(_menuFocusIndex + delta, 0, _menuButtons.Length - 1);
+
+        if (next != _menuFocusIndex)
+        {
+            SoundPlayer.PlaySe(SoundId.Cursor);
+        }
+
+        _menuFocusIndex = next;
         RefreshMenuFocus();
     }
 
@@ -122,6 +131,7 @@ public class UiResultView : MonoBehaviour
     /// </summary>
     public void RequestRestart()
     {
+        SoundPlayer.PlaySe(SoundId.Decide);
         RestartRequested?.Invoke();
     }
 
@@ -130,6 +140,7 @@ public class UiResultView : MonoBehaviour
     /// </summary>
     public void RequestTitle()
     {
+        SoundPlayer.PlaySe(SoundId.Decide);
         TitleRequested?.Invoke();
     }
 
