@@ -18,6 +18,7 @@ public class UiTitleView : MonoBehaviour
     [SerializeField, Tooltip("CPUの強さの行。2人対戦のときは薄くする")] private CanvasGroup _cpuLevelGroup;
     [SerializeField, Tooltip("ゲームスタートを選んでいるときに出す枠")] private GameObject _startFocusFrame;
     [SerializeField, Tooltip("ゲームスタートのボタン（マウスで押す用）")] private Button _startButton;
+    [SerializeField, Tooltip("ルールの飛び出すタブ")] private UiRulesTab _rulesTab;
 
     private int _focusIndex;
 
@@ -57,6 +58,11 @@ public class UiTitleView : MonoBehaviour
     public bool IsStartFocused => _focusIndex == _rows.Length;
 
     /// <summary>
+    /// ルールのタブを開いているか（開いている間は、設定の操作とゲームスタートを止める）
+    /// </summary>
+    public bool IsRulesOpen => _rulesTab != null && _rulesTab.IsOpen;
+
+    /// <summary>
     /// マウスでクリックできるように準備する
     /// </summary>
     private void Awake()
@@ -88,6 +94,11 @@ public class UiTitleView : MonoBehaviour
     /// <param name="delta">上なら -1、下なら 1</param>
     public void MoveFocus(int delta)
     {
+        if (IsRulesOpen)
+        {
+            return;
+        }
+
         int next = Mathf.Clamp(_focusIndex + delta, 0, _rows.Length);
 
         if (next == CpuLevelRow && !IsCpuMode)
@@ -121,7 +132,7 @@ public class UiTitleView : MonoBehaviour
     /// <param name="delta">左なら -1、右なら 1</param>
     public void ChangeOption(int delta)
     {
-        if (IsStartFocused)
+        if (IsStartFocused || IsRulesOpen)
         {
             return;
         }
@@ -135,6 +146,28 @@ public class UiTitleView : MonoBehaviour
         }
 
         RefreshCpuLevelRow();
+    }
+
+    /// <summary>
+    /// ルールのタブを開閉する（タブがなければ何もしない）
+    /// </summary>
+    public void ToggleRules()
+    {
+        if (_rulesTab != null)
+        {
+            _rulesTab.Toggle();
+        }
+    }
+
+    /// <summary>
+    /// ルールのタブを閉じる（タブがなければ何もしない）
+    /// </summary>
+    public void CloseRules()
+    {
+        if (_rulesTab != null)
+        {
+            _rulesTab.Close();
+        }
     }
 
     /// <summary>

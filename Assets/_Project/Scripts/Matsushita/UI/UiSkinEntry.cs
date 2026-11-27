@@ -29,9 +29,13 @@ public class UiSkinEntry
     public Vector2 Size => _size;
 
     /// <summary>
-    /// 自動で割り当てるときに探すファイル名
+    /// 自動で割り当てるときに探すファイル名（変えられるのはエディタの組み立て用）
     /// </summary>
-    public string FileName => _fileName;
+    public string FileName
+    {
+        get => _fileName;
+        set => _fileName = value;
+    }
 
     /// <summary>
     /// 差し替える画像

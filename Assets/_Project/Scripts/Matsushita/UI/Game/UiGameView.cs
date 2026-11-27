@@ -22,7 +22,7 @@ public class UiGameView : MonoBehaviour
     private const float PenaltyRiseDistance = 70f;
     private const float FuseGrowSeconds = 0.35f;
     private const float FlightArcHeight = 160f;
-    private const float FlyingEndScale = 0.55f;
+    private const float MinFlightSeconds = 0.12f;
     private const float BannerPopSeconds = 0.25f;
     private const float ExplosionSeconds = 0.5f;
     private const float ExplosionFlashAlpha = 0.7f;
@@ -48,7 +48,7 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("爆弾")] private UiBombView _bomb;
     [SerializeField, Tooltip("プレイヤーの表示（P1、P2の順）")] private UiPlayerPanel[] _panels = new UiPlayerPanel[PlayerCount];
     [SerializeField, Tooltip("導火線（P1側、P2側の順）")] private UiFuse[] _fuses = new UiFuse[PlayerCount];
-    [SerializeField, Tooltip("爆弾が飛んでいる間に動かす爆弾")] private RectTransform _flyingBomb;
+    [SerializeField, Tooltip("爆弾が飛んでいる間に動かす爆弾（立ち絵が手に持っている爆弾と同じ絵・同じ大きさにする）")] private RectTransform _flyingBomb;
     [SerializeField, Tooltip("「−2秒」の表示（P1、P2の順に別の場所）")] private TMP_Text[] _penaltyTexts = new TMP_Text[PlayerCount];
 
     [Header("演出")]
@@ -67,6 +67,10 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("勝ち星の数の表示")] private TMP_Text _resultScore;
     [SerializeField, Tooltip("リザルトのボタン（再戦、タイトルへの順）")] private Button[] _resultButtons;
     [SerializeField, Tooltip("リザルトで選んでいるボタンに出す枠（ボタンと同じ順）")] private GameObject[] _resultFocusFrames;
+
+    [Header("クイックテキスト")]
+    [SerializeField, Tooltip("方向キーごとの文。空なら初期の文を使う")] private UiQuickTextSet _quickTextSet;
+    [SerializeField, Min(0.1f), Tooltip("文を吹き出しに出しておく時間（秒）")] private float _quickTextSeconds = 1.5f;
 
     private readonly Vector2[] _penaltyStartPositions = new Vector2[PlayerCount];
     private readonly Coroutine[] _penaltyRoutines = new Coroutine[PlayerCount];
@@ -109,6 +113,12 @@ public class UiGameView : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+
+        // クイックテキストの入力（待機中の方向キーを押し続ける→離して送る）。Game シーンを書き換えずに使えるよう、ここで付ける
+        if (GetComponent<QuickTextInput>() == null)
+        {
+            gameObject.AddComponent<QuickTextInput>();
+        }
 
         for (int i = 0; i < PlayerCount; i++)
         {
@@ -228,7 +238,8 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆弾を持っている側を切り替える。持っている側の吹き出しは「あと10秒！」、導火線はその側に伸びる
+    /// 爆弾を持っている側を切り替える。持っている側の吹き出しは「あと10秒！」、導火線はその側に伸びて、手に爆弾が出る。
+    /// 爆弾が飛んでいる間は、手の爆弾の出し入れは飛ぶ演出が行う
     /// </summary>
     /// <param name="holderIndex">持っている側（0：P1、1：P2、-1：どちらも持っていない）</param>
     public void SetHolder(int holderIndex)
@@ -239,6 +250,11 @@ public class UiGameView : MonoBehaviour
         for (int i = 0; i < _panels.Length; i++)
         {
             _panels[i].SetHolding(i == holderIndex);
+
+            if (!_isFlying)
+            {
+                _panels[i].SetHeldBomb(i == holderIndex);
+            }
         }
 
         _bomb.SetShaking(false);
@@ -253,6 +269,65 @@ public class UiGameView : MonoBehaviour
     public void SetThinking(int playerIndex, bool isThinking)
     {
         _panels[playerIndex].SetThinking(isThinking);
+    }
+
+    /// <summary>
+    /// クイックテキストを使える状態か。爆弾を持っていない側で、相手が解除中でなく、バナー・爆発・リザルトも出ていないときに使える（爆弾が飛んでいる間は両方使える）
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <returns>使えるなら true</returns>
+    public bool CanUseQuickText(int playerIndex)
+    {
+        return _panels[playerIndex].IsQuickTextAvailable
+            && !_dimmer.activeSelf
+            && !_bannerRoot.activeSelf
+            && !_resultRoot.activeSelf
+            && !_explosionText.gameObject.activeSelf;
+    }
+
+    /// <summary>
+    /// 待機中の側の吹き出しを、方向キーに割り当てた文にする。決めた時間（1.5秒）がたつと「待機中」に戻る。使えないときは何もしない
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <param name="direction">離したキーの方向（キー入力として届いた InputDirection）</param>
+    /// <returns>出せたら true</returns>
+    public bool ShowQuickText(int playerIndex, InputDirection direction)
+    {
+        return CanUseQuickText(playerIndex) && _panels[playerIndex].ShowQuickText(GetQuickText(UiQuickTextSet.SlotOf(direction)), _quickTextSeconds);
+    }
+
+    /// <summary>
+    /// 待機中の側に、ランダムな文を出す（CPUが使う）
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <returns>出せたら true</returns>
+    public bool ShowRandomQuickText(int playerIndex)
+    {
+        return ShowQuickText(playerIndex, (InputDirection)UnityEngine.Random.Range(0, UiQuickTextSet.SlotCount));
+    }
+
+    /// <summary>
+    /// クイックテキストの円形の候補を出す／閉じる。出すときは、選んでいる方向の扇を光らせる
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <param name="isOpen">出すなら true</param>
+    /// <param name="selected">選んでいる方向（キー入力として届いた InputDirection）</param>
+    public void SetQuickTextWheel(int playerIndex, bool isOpen, InputDirection selected)
+    {
+        if (!isOpen)
+        {
+            _panels[playerIndex].CloseQuickTextWheel();
+            return;
+        }
+
+        string[] texts = new string[UiQuickTextSet.SlotCount];
+
+        for (int slot = 0; slot < texts.Length; slot++)
+        {
+            texts[slot] = GetQuickText(slot);
+        }
+
+        _panels[playerIndex].OpenQuickTextWheel(texts, selected);
     }
 
     /// <summary>
@@ -316,16 +391,22 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆弾が相手のキャラへ飛ぶ演出を再生する。飛んでいる間は、導火線が消えて時間も止まる
+    /// 立ち絵が手に持っている爆弾が、投げる側の手から相手の手へ飛ぶ演出を再生する。飛んでいる間は、導火線が消えて時間も止まる。
+    /// 中央の爆弾は動かず、飛び始めで見えなくなり、届いたら戻る。
+    /// ボタンの押し込みの見た目が残っているときは、それが終わるまで待ってから飛ばす
     /// </summary>
+    /// <remarks>
+    /// 投げる側は「受ける側の反対」。押し込みを待った分は飛ぶ時間から引くので、届く時刻は duration のまま変わらない（待ちが長いときだけ、飛ぶ時間の下限の分だけ遅れる）
+    /// </remarks>
     /// <param name="toPlayerIndex">受け取る側（0：P1、1：P2）</param>
-    /// <param name="duration">飛んでいる時間（秒）</param>
+    /// <param name="duration">待ち時間を含めて、届くまでにかける時間（秒）</param>
     /// <param name="onArrived">届いたときに呼ぶ処理（ここで SetHolder を呼ぶと、受け取った側に導火線が伸びる）</param>
-    public void ThrowBomb(int toPlayerIndex, float duration, Action onArrived)
+    /// <param name="onTakeOff">押し込みの見た目が終わって、爆弾が飛び始めるときに呼ぶ処理（爆弾の中の表示を片付けるのに使う）</param>
+    public void ThrowBomb(int toPlayerIndex, float duration, Action onArrived, Action onTakeOff = null)
     {
         _isFlying = true;
         SetHolder(-1);
-        StartCoroutine(PlayFlight(toPlayerIndex, duration, onArrived));
+        StartCoroutine(PlayFlight(toPlayerIndex, duration, onArrived, onTakeOff));
     }
 
     /// <summary>
@@ -454,6 +535,7 @@ public class UiGameView : MonoBehaviour
         _isFlying = false;
         _flyingBomb.gameObject.SetActive(false);
         _bomb.gameObject.SetActive(true);
+        _bomb.ResetPress();
         _dimmer.SetActive(false);
         HideBanner();
         HideResult();
@@ -463,8 +545,21 @@ public class UiGameView : MonoBehaviour
         {
             _panels[i].SetDefuseCaption(false);
             _panels[i].SetThinking(false);
+            _panels[i].SetHeldBomb(false);
+            _panels[i].ClearQuickText();
+            _panels[i].CloseQuickTextWheel();
             StopPenalty(i);
         }
+    }
+
+    /// <summary>
+    /// 画面の位置（上・下・左・右）に割り当てた文を返す（文のセットがなければ初期の文）
+    /// </summary>
+    /// <param name="slot">0：上、1：下、2：左、3：右</param>
+    /// <returns>文</returns>
+    private string GetQuickText(int slot)
+    {
+        return _quickTextSet != null ? _quickTextSet.GetSlotText(slot) : UiQuickTextSet.GetDefaultSlotText(slot);
     }
 
     /// <summary>
@@ -605,20 +700,34 @@ public class UiGameView : MonoBehaviour
     }
 
     /// <summary>
-    /// 爆弾を中央から相手のキャラへ、山なりに小さくしながら飛ばす。飛んでいる間、中央の爆弾は隠す
+    /// 押し込みの見た目が終わるのを待ってから、投げる側の手の爆弾を、受ける側の手まで山なりに飛ばす。
+    /// 飛び始めで中央の爆弾を隠し（動かさない）、届いたら戻して、受けた側の手に爆弾を出す
     /// </summary>
     /// <param name="toPlayerIndex">受け取る側</param>
-    /// <param name="duration">飛んでいる時間（秒）</param>
+    /// <param name="duration">待ち時間を含めて、届くまでにかける時間（秒）</param>
     /// <param name="onArrived">届いたときに呼ぶ処理</param>
+    /// <param name="onTakeOff">飛び始めるときに呼ぶ処理</param>
     /// <returns>コルーチン</returns>
-    private IEnumerator PlayFlight(int toPlayerIndex, float duration, Action onArrived)
+    private IEnumerator PlayFlight(int toPlayerIndex, float duration, Action onArrived, Action onTakeOff)
     {
-        RectTransform bombRect = (RectTransform)_bomb.transform;
-        Vector3 start = GetCenter(bombRect);
-        Vector3 end = GetCenter((RectTransform)_panels[toPlayerIndex].transform);
-        float startScale = bombRect.rect.width / _flyingBomb.rect.width;
+        int fromPlayerIndex = 1 - toPlayerIndex;
+        float waited = 0f;
 
+        while (_bomb.PressRemainingSeconds > 0f)
+        {
+            waited += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        onTakeOff?.Invoke();
+        duration = Mathf.Max(MinFlightSeconds, duration - waited);
+
+        Vector3 start = GetCenter(_panels[fromPlayerIndex].HeldBombRect);
+        Vector3 end = GetCenter(_panels[toPlayerIndex].HeldBombRect);
+
+        _panels[fromPlayerIndex].SetHeldBomb(false);
         _bomb.gameObject.SetActive(false);
+        _flyingBomb.position = start;
         _flyingBomb.gameObject.SetActive(true);
 
         for (float elapsed = 0f; elapsed < duration; elapsed += Time.unscaledDeltaTime)
@@ -628,16 +737,15 @@ public class UiGameView : MonoBehaviour
             Vector3 position = Vector3.Lerp(start, end, eased);
             position.y += Mathf.Sin(Mathf.PI * eased) * FlightArcHeight;
             _flyingBomb.position = position;
-            _flyingBomb.localScale = Vector3.one * Mathf.Lerp(startScale, FlyingEndScale, eased);
             _flyingBomb.localRotation = Quaternion.Euler(0f, 0f, -360f * eased * (toPlayerIndex == 0 ? -1f : 1f));
             yield return null;
         }
 
         _flyingBomb.gameObject.SetActive(false);
-        _flyingBomb.localScale = Vector3.one;
         _flyingBomb.localRotation = Quaternion.identity;
         _bomb.gameObject.SetActive(true);
         _isFlying = false;
+        _panels[toPlayerIndex].SetHeldBomb(true);
         onArrived?.Invoke();
     }
 

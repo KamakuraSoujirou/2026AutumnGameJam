@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 
 /// <summary>
-/// 画面中央の爆弾の表示。4本の配線、中央のランプとシリアル番号、液晶の問題文と解除の状態を管理する
+/// 画面中央の爆弾の表示。4本の配線、中央のランプ、液晶の問題文と解除の状態を管理する
 /// </summary>
 public class UiBombView : MonoBehaviour
 {
@@ -17,7 +17,7 @@ public class UiBombView : MonoBehaviour
     [SerializeField, Tooltip("タイマー液晶の残り時間")] private TMP_Text _timeText;
     [SerializeField, Tooltip("ランプが点灯している見た目")] private GameObject _lampOn;
     [SerializeField, Tooltip("ランプが消えている見た目")] private GameObject _lampOff;
-    [SerializeField, Tooltip("シリアル番号")] private TMP_Text _serialText;
+    [SerializeField, Tooltip("消灯の見た目を一時的に隠す（ONの間、ランプが消えているときは何も出さない）")] private bool _isLampOffHidden;
     [SerializeField, Tooltip("液晶の問題文")] private TMP_Text _questionText;
     [SerializeField, Tooltip("液晶の下段に出す解除の状態")] private TMP_Text _defuseStatusText;
     [SerializeField, Tooltip("解除が使えるときに出す解除ボタン")] private GameObject _defuseButton;
@@ -84,12 +84,41 @@ public class UiBombView : MonoBehaviour
     }
 
     /// <summary>
-    /// ボタンを押した動きを見せる（ぎゅっと縮んで戻る）
+    /// 押した見た目の残り時間（秒）。どれかのボタンが暗くなっている間は 0 より大きい
+    /// </summary>
+    public float PressRemainingSeconds
+    {
+        get
+        {
+            float remaining = 0f;
+
+            foreach (UiWire wire in _wires)
+            {
+                remaining = Mathf.Max(remaining, wire.PressRemainingSeconds);
+            }
+
+            return remaining;
+        }
+    }
+
+    /// <summary>
+    /// キーで押したときの見た目を見せる（少しの間、暗くなって戻る。マウスで押したときは UiWire が自分で暗くする）
     /// </summary>
     /// <param name="direction">どの方向のボタンか</param>
     public void PressButton(InputDirection direction)
     {
         _wires[(int)direction].Press();
+    }
+
+    /// <summary>
+    /// すべてのボタンの、重なり・押下の見た目を元に戻す
+    /// </summary>
+    public void ResetPress()
+    {
+        foreach (UiWire wire in _wires)
+        {
+            wire.ResetPress();
+        }
     }
 
     /// <summary>
@@ -100,6 +129,17 @@ public class UiBombView : MonoBehaviour
     public void SetButtonLabel(InputDirection direction, string text)
     {
         _wires[(int)direction].SetLabel(text);
+    }
+
+    /// <summary>
+    /// ボタンの文字の代わりに、言葉に合うシルエットを出す（大きさの問題で使う）。
+    /// 先に SetButtonLabel で文字を設定してから呼ぶ。合う画像が無い言葉は、文字のまま出る
+    /// </summary>
+    /// <param name="direction">どの方向のボタンか</param>
+    /// <param name="word">ボタンの言葉（例：「ゾウ」）。空にするとシルエットを消して文字に戻す</param>
+    public void SetButtonSilhouette(InputDirection direction, string word)
+    {
+        _wires[(int)direction].SetSilhouette(UiSilhouetteLibrary.Find(word));
     }
 
     /// <summary>
@@ -128,16 +168,15 @@ public class UiBombView : MonoBehaviour
     public void SetLamp(bool isOn)
     {
         _lampOn.SetActive(isOn);
-        _lampOff.SetActive(!isOn);
+        _lampOff.SetActive(!isOn && !_isLampOffHidden);
     }
 
     /// <summary>
-    /// シリアル番号を設定する
+    /// シリアル番号は廃止した（画面には出さない）。呼び出し側が残っていてもコンパイルが通るように、何もしないメソッドとして残してある
     /// </summary>
-    /// <param name="serial">シリアル番号（10〜99）</param>
+    /// <param name="serial">シリアル番号（使わない）</param>
     public void SetSerial(int serial)
     {
-        _serialText.text = serial.ToString();
     }
 
     /// <summary>

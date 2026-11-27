@@ -24,13 +24,21 @@ public class BombInputConnector : MonoBehaviour
     }
 
     /// <summary>
+    /// CPU対戦なら、どちらのキーセットでもP1を操作できるようにする（CpuPlayer が設定を決めたあと、全部の Awake が終わってから）
+    /// </summary>
+    private void Start()
+    {
+        _inputReader.IsCpuMode = CpuSettings.IsCpuMode;
+    }
+
+    /// <summary>
     /// 入力の知らせを受け取れるようにする
     /// </summary>
     private void OnEnable()
     {
         _inputReader.DirectionPressed += OnDirectionPressed;
         _inputReader.DefusePressed += OnDefusePressed;
-        _inputReader.BackPressed += _view.RequestBack;
+        _inputReader.BackPressed += OnBackPressed;
         _view.DirectionClicked += OnDirectionClicked;
         _view.DefuseRequested += OnDefuseClicked;
         _view.RematchRequested += OnRematchRequested;
@@ -43,7 +51,7 @@ public class BombInputConnector : MonoBehaviour
     {
         _inputReader.DirectionPressed -= OnDirectionPressed;
         _inputReader.DefusePressed -= OnDefusePressed;
-        _inputReader.BackPressed -= _view.RequestBack;
+        _inputReader.BackPressed -= OnBackPressed;
         _view.DirectionClicked -= OnDirectionClicked;
         _view.DefuseRequested -= OnDefuseClicked;
         _view.RematchRequested -= OnRematchRequested;
@@ -84,6 +92,21 @@ public class BombInputConnector : MonoBehaviour
     }
 
     /// <summary>
+    /// Esc が押されたので、タイトルへ戻る。リザルト中はリザルト側（UiResultInput）が Esc を受け取ってタイトルへ戻るので、ここでは何もしない
+    /// （両方で戻ると、タイトルが2回読み込まれてしまう）
+    /// リザルトは UiResultRecorder が別に重ねて出すので、試合画面のリザルト（_view.IsResultShown）ではなく、試合が終わったかで判断する
+    /// </summary>
+    private void OnBackPressed()
+    {
+        if (_bombManager.State == BombState.MatchOver)
+        {
+            return;
+        }
+
+        _view.RequestBack();
+    }
+
+    /// <summary>
     /// 解除キーが押されたことを爆弾本体に伝える（始められるかどうかは BombManager が決める）
     /// </summary>
     /// <param name="player">押したプレイヤーの番号</param>
@@ -97,6 +120,13 @@ public class BombInputConnector : MonoBehaviour
     /// </summary>
     private void OnDefuseClicked()
     {
+        // CPU対戦でCOMが持っているときは、COMの代わりに解除を始めてしまうので無視する
+        if (IsCpuHolding())
+        {
+            UiEventSystem.ClearSelection();
+            return;
+        }
+
         _bombManager.TryStartDefuse(_bombManager.Holder);
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
@@ -138,13 +168,26 @@ public class BombInputConnector : MonoBehaviour
 
     /// <summary>
     /// ひし形ボタンのクリックを爆弾本体に伝える。マウスはどちらが押したか分からないので、持ち主の入力として扱う
+    /// ただしCPU対戦でCOMが持っているときは、COMの代わりに解いてしまうので無視する
     /// </summary>
     /// <param name="direction">クリックされた方向</param>
     private void OnDirectionClicked(InputDirection direction)
     {
-        _bombManager.TryPress(_bombManager.Holder, direction);
+        if (!IsCpuHolding())
+        {
+            _bombManager.TryPress(_bombManager.Holder, direction, true);
+        }
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
         UiEventSystem.ClearSelection();
+    }
+
+    /// <summary>
+    /// CPU対戦で、COMが爆弾を持っているか。マウスはどちらが押したか分からないので、このときのクリックは無視する
+    /// </summary>
+    /// <returns>COMが持っているなら true</returns>
+    private bool IsCpuHolding()
+    {
+        return CpuSettings.IsCpuMode && _bombManager.Holder == BombManager.PlayerCount - 1;
     }
 }

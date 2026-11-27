@@ -84,6 +84,25 @@ public class UiSkin : ScriptableObject
     }
 
     /// <summary>
+    /// 登録の「探すファイル名」を変える（素材のファイル名が決まったときの直し用。エディタの組み立て用）
+    /// </summary>
+    /// <param name="id">素材ID</param>
+    /// <param name="fileName">新しいファイル名（拡張子なし）</param>
+    /// <returns>変えたら true</returns>
+    public bool UpdateFileName(string id, string fileName)
+    {
+        UiSkinEntry entry = FindEntry(id);
+
+        if (entry == null || entry.FileName == fileName)
+        {
+            return false;
+        }
+
+        entry.FileName = fileName;
+        return true;
+    }
+
+    /// <summary>
     /// 同じIDがまだなければ登録を足す（エディタの組み立て用）
     /// </summary>
     /// <param name="entry">足す登録</param>

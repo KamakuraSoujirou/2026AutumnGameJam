@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -27,6 +28,52 @@ public abstract class Gimmick : MonoBehaviour
     /// 次に押すと正解の方向（CPUが使う）
     /// </summary>
     public abstract InputDirection NextAnswer { get; }
+
+    /// <summary>
+    /// 謎の重さ（0.7〜1.6、初期値1）。COMの考える時間に掛けるので、考えるのに時間がかかる謎ほど大きくする
+    /// 上書きしなければ1のまま
+    /// </summary>
+    public virtual float ThinkWeight => 1f;
+
+    /// <summary>
+    /// 今の問題の「定番の間違い」の方向を返す（COMが間違えるとき、ひっかけに引っかかる動きに使う）
+    /// 上書きしなければ「なし」で、COMはランダムに間違える
+    /// </summary>
+    /// <param name="decoy">定番の間違いの方向。正解とは違う方向を返すこと</param>
+    /// <returns>定番の間違いがあれば true</returns>
+    public virtual bool TryGetDecoy(out InputDirection decoy)
+    {
+        decoy = InputDirection.Up;
+        return false;
+    }
+
+    /// <summary>
+    /// 同時押しの受付時間（秒、キーボード・ゲームパッド）。0 なら、ふつうの「1つずつ押す」ギミック
+    /// 0より大きいと、最初のボタンから この秒数のあいだに押されたボタンを、まとめて AnswerChord に渡す
+    /// </summary>
+    public virtual float ChordWindow => 0f;
+
+    /// <summary>
+    /// 同時押しの受付時間（秒、マウスのクリック）。クリックは同時にできないので、長めにする
+    /// </summary>
+    public virtual float ChordMouseWindow => 0f;
+
+    /// <summary>
+    /// 同時押しの答えの方向（CPUが一度に押す）。同時押しでないギミックは null
+    /// </summary>
+    public virtual IReadOnlyList<InputDirection> ChordAnswers => null;
+
+    /// <summary>
+    /// 同時押しのギミックで、受付時間のあいだに押されたボタンをまとめて受け取る（ChordWindow が 0 より大きいときだけ呼ばれる）
+    /// 押されるたびに呼ばれ（isWindowClosed は false）、受付時間が終わったときにも1回呼ばれる（true）
+    /// </summary>
+    /// <param name="pressed">ここまでに押された方向（押した順。同じ方向は1回だけ）</param>
+    /// <param name="isWindowClosed">受付時間が終わったか。true のときは Correct か Wrong を返すこと</param>
+    /// <returns>まだ決まらなければ Continue、そろえば Correct、間違いなら Wrong</returns>
+    public virtual AnswerResult AnswerChord(IReadOnlyList<InputDirection> pressed, bool isWindowClosed)
+    {
+        return AnswerResult.Wrong;
+    }
 
     /// <summary>
     /// ラウンドの最初に呼ばれる

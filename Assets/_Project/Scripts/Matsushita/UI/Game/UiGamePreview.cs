@@ -17,19 +17,15 @@ public class UiGamePreview : MonoBehaviour
     private const int DefuseMinPass = 5;
     private const float IntroTime = 1.8f;
 
-    private static readonly string[] Questions =
-    {
-        "赤い★の線を切れ",
-        "青いインクで「あか」\n文字の意味の線を切れ",
-        "「空と海に共通する色」の線を切れ",
-        "シリアルが偶数なら赤、\n奇数なら青の線を切れ"
-    };
+    private static readonly string[] ColorNames = { "赤", "青", "黄", "緑" };
 
+    private readonly UiWireColor[] _wireColors = new UiWireColor[4];
     private UiGameView _view;
     private PlayerInputReader _reader;
     private float _remainingTime = HoldTime;
     private float _introRemaining;
     private int _holderIndex;
+    private InputDirection _correctDirection;
     private int _passCount = 1;
     private int _player1Wins;
     private int _player2Wins;
@@ -145,6 +141,11 @@ public class UiGamePreview : MonoBehaviour
             _view.SetThinking(_holderIndex, true);
         }
 
+        if (keyboard.cKey.wasPressedThisFrame)
+        {
+            _view.ShowRandomQuickText(1 - _holderIndex);
+        }
+
         if (keyboard.enterKey.wasPressedThisFrame)
         {
             _view.ShowResult(_holderIndex, _player1Wins, _player2Wins);
@@ -152,7 +153,8 @@ public class UiGamePreview : MonoBehaviour
     }
 
     /// <summary>
-    /// 方向が押されたとき、持っている側ならボタンを押した動きを見せる（持っていない側の入力は無視する）
+    /// 方向が押されたとき、持っている側ならボタンを押した見た目を見せる（持っていない側の入力は無視する）。
+    /// 正解の線なら線を切って相手に渡し、違う線なら「−2秒」を出す
     /// </summary>
     /// <param name="player">押したプレイヤー</param>
     /// <param name="direction">押した方向</param>
@@ -164,6 +166,17 @@ public class UiGamePreview : MonoBehaviour
         }
 
         _view.Bomb.PressButton(direction);
+
+        if (direction == _correctDirection)
+        {
+            _view.Bomb.SetWire(direction, _wireColors[(int)direction], UiWireState.Cut);
+            PassBomb();
+        }
+        else
+        {
+            _remainingTime -= MissPenalty;
+            _view.ShowPenalty(_holderIndex, MissPenalty);
+        }
     }
 
     /// <summary>
@@ -230,7 +243,6 @@ public class UiGamePreview : MonoBehaviour
 
         _isFlying = true;
         _view.SetThinking(_holderIndex, false);
-        _view.Bomb.SetWire(InputDirection.Up, UiWireColor.Red, UiWireState.Cut);
         int nextHolder = 1 - _holderIndex;
         _view.ThrowBomb(nextHolder, FlightTime, () => OnBombArrived(nextHolder));
     }
@@ -315,13 +327,14 @@ public class UiGamePreview : MonoBehaviour
 
         for (int i = 0; i < colors.Length; i++)
         {
+            _wireColors[i] = colors[i];
             bomb.SetWire((InputDirection)i, colors[i], UiWireState.Normal);
             bomb.SetWireSymbol((InputDirection)i, string.Empty);
         }
 
-        bomb.SetQuestion(Questions[Random.Range(0, Questions.Length)]);
+        _correctDirection = (InputDirection)Random.Range(0, colors.Length);
+        bomb.SetQuestion($"{ColorNames[(int)_wireColors[(int)_correctDirection]]}の線を切れ");
         bomb.SetLamp(Random.value < 0.5f);
-        bomb.SetSerial(Random.Range(10, 100));
         bomb.SetInput(string.Empty);
 
         UiDefuseState defuseState = UiDefuseState.Locked;

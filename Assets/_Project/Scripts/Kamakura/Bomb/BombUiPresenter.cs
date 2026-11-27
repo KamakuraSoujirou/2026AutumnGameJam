@@ -106,7 +106,7 @@ public class BombUiPresenter : MonoBehaviour
                 ShowDefused();
                 break;
             case BombState.MatchOver:
-                _view.ShowResult(_bombManager.MatchWinner, _bombManager.GetWins(0), _bombManager.GetWins(1));
+                // 試合が終わったあとのリザルトは、UiResultRecorder（Matsushita/UI/Result）が重ねて出す
                 break;
         }
     }
@@ -125,7 +125,7 @@ public class BombUiPresenter : MonoBehaviour
         _view.ResetEffects();
         ResetBomb();
         _view.SetRound(round);
-        _view.SetPlayerNames("P1", "P2");
+        _view.SetPlayerNames("P1", CpuSettings.IsCpuMode ? "COM" : "P2");
         _view.SetGimmickName(gimmickName);
         ShowWins();
         _view.SetPass(1, 1);
@@ -172,9 +172,9 @@ public class BombUiPresenter : MonoBehaviour
     {
         _shownHolder = BombManager.NoPlayer;
 
+        // ボタンの押し込みが終わってから飛び始めるので、爆弾の中の表示を戻すのは飛び始めるとき。
         // 飛び終わったら時間の表示を入れ直して、導火線を出す
-        _view.ThrowBomb(_bombManager.FlightTarget, _bombManager.FlightDuration, () => _shownHundredths = -1);
-        ResetBomb();
+        _view.ThrowBomb(_bombManager.FlightTarget, _bombManager.FlightDuration, () => _shownHundredths = -1, ResetBomb);
     }
 
     /// <summary>

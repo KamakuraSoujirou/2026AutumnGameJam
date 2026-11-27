@@ -26,18 +26,18 @@ MonoBehaviour:
   - _id: ART-09_normal
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p1_normal
-    _sprite: {fileID: 0}
+    _fileName: chr_1p_rough_v1
+    _sprite: {fileID: 17462529948901505, guid: a9c0cb0f2c18cf5469328b4b814ae0d0, type: 3}
   - _id: ART-10_normal
     _label: "\u30AD\u30E3\u30E9 P2\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}
-    _fileName: chr_p2_normal
-    _sprite: {fileID: 0}
+    _fileName: bomb_p2_rough_v1
+    _sprite: {fileID: 2310003547637917332, guid: 08993fe16d2c4ef4ea29766eb66ad919, type: 3}
   - _id: ART-01
     _label: "\u7206\u5F3E\u672C\u4F53"
     _size: {x: 800, y: 800}
     _fileName: bomb_core
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 8014180507354026193, guid: 5d6cc234baef17748ac6a5c0e1362237, type: 3}
   - _id: UI-01
     _label: "\u9078\u629E\u80A2\u30DC\u30BF\u30F3\uFF08\u9078\u629E\u4E2D\uFF09"
     _size: {x: 104, y: 44}
@@ -63,11 +63,6 @@ MonoBehaviour:
     _size: {x: 1920, y: 1080}
     _fileName: game_bg
     _sprite: {fileID: 0}
-  - _id: UI-06
-    _label: "\u7206\u5F3E\u306E\u6DB2\u6676"
-    _size: {x: 560, y: 190}
-    _fileName: ui_lcd
-    _sprite: {fileID: 0}
   - _id: UI-07
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u67A0"
     _size: {x: 1000, y: 580}
@@ -76,12 +71,12 @@ MonoBehaviour:
   - _id: ART-04_on
     _label: "\u30E9\u30F3\u30D7\uFF08\u70B9\u706F\uFF09"
     _size: {x: 96, y: 96}
-    _fileName: lamp_on
-    _sprite: {fileID: 0}
+    _fileName: bomb_lamp
+    _sprite: {fileID: 1438221489543780230, guid: fc0ad83f30447004c81a2f075d31637f, type: 3}
   - _id: ART-04_off
     _label: "\u30E9\u30F3\u30D7\uFF08\u6D88\u706F\uFF09"
     _size: {x: 96, y: 96}
-    _fileName: lamp_off
+    _fileName: bomb_lamp_blackout
     _sprite: {fileID: 0}
   - _id: ART-09_afro
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u30A2\u30D5\u30ED\uFF09"
@@ -173,11 +168,6 @@ MonoBehaviour:
     _size: {x: 130, y: 130}
     _fileName: spark
     _sprite: {fileID: 0}
-  - _id: ART-01_cap
-    _label: "\u7206\u5F3E\u306E\u53E3\u91D1"
-    _size: {x: 176, y: 48}
-    _fileName: bomb_cap
-    _sprite: {fileID: 0}
   - _id: ART-11_p1_panic
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u7126\u308A\u9854\uFF09"
     _size: {x: 600, y: 900}
@@ -213,35 +203,10 @@ MonoBehaviour:
     _size: {x: 363, y: 66}
     _fileName: ui_bar_gimmick
     _sprite: {fileID: 0}
-  - _id: UI-17
-    _label: "\u7206\u5F3E\u306E\u30BF\u30A4\u30DE\u30FC\u6DB2\u6676"
-    _size: {x: 365, y: 95}
-    _fileName: ui_timer
-    _sprite: {fileID: 0}
   - _id: UI-18
     _label: "\u89E3\u9664\u30DC\u30BF\u30F3"
     _size: {x: 260, y: 70}
     _fileName: ui_defuse
-    _sprite: {fileID: 0}
-  - _id: ART-05_red
-    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08red\uFF09"
-    _size: {x: 270, y: 270}
-    _fileName: button_red
-    _sprite: {fileID: 0}
-  - _id: ART-05_blue
-    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08blue\uFF09"
-    _size: {x: 270, y: 270}
-    _fileName: button_blue
-    _sprite: {fileID: 0}
-  - _id: ART-05_yellow
-    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08yellow\uFF09"
-    _size: {x: 270, y: 270}
-    _fileName: button_yellow
-    _sprite: {fileID: 0}
-  - _id: ART-05_green
-    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08green\uFF09"
-    _size: {x: 270, y: 270}
-    _fileName: button_green
     _sprite: {fileID: 0}
   - _id: ART-21
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u80CC\u666F"
@@ -258,16 +223,91 @@ MonoBehaviour:
     _size: {x: 600, y: 900}
     _fileName: chr_p2_win
     _sprite: {fileID: 0}
-  - _id: UI-19
-    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u8868\u306E\u67A0"
-    _size: {x: 700, y: 730}
-    _fileName: ui_result_table
+  - _id: ART-01_held
+    _label: "\u624B\u306B\u6301\u3064\u7206\u5F3E\uFF08\u7ACB\u3061\u7D75\u306E\u624B\u306B\u51FA\u3059\u3002\u98DB\u3076\u7206\u5F3E\u3082\u540C\u3058\u7D75\uFF09"
+    _size: {x: 260, y: 260}
+    _fileName: bomb_held
     _sprite: {fileID: 0}
-  - _id: UI-20
-    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u30DC\u30BF\u30F3\uFF08\u6B21\u3078\u30FB\u30EA\u30B9\u30BF\u30FC\u30C8\u30FB\u30BF\u30A4\u30C8\u30EB\u3078\uFF09"
-    _size: {x: 480, y: 110}
-    _fileName: ui_result_button
+  - _id: ART-22
+    _label: "\u300CWIN\u300D\u306E\u6587\u5B57"
+    _size: {x: 380, y: 150}
+    _fileName: result_win
     _sprite: {fileID: 0}
+  - _id: ART-23
+    _label: "\u300CLOSE\u300D\u306E\u6587\u5B57"
+    _size: {x: 400, y: 150}
+    _fileName: result_lose
+    _sprite: {fileID: 0}
+  - _id: UI-21
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306EHOME\u30DC\u30BF\u30F3"
+    _size: {x: 135, y: 115}
+    _fileName: ui_result_home
+    _sprite: {fileID: 0}
+  - _id: UI-22
+    _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u518D\u6226\u30DC\u30BF\u30F3\uFF08\u4E38\uFF09"
+    _size: {x: 146, y: 146}
+    _fileName: ui_result_restart
+    _sprite: {fileID: 0}
+  - _id: ART-05_red_normal
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08red\u30FBnormal\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_red_normal
+    _sprite: {fileID: -8938231364525288098, guid: 652e6bd340c7c844393fc3a6e1672316, type: 3}
+  - _id: ART-05_red_light
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08red\u30FBlight\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_red_light
+    _sprite: {fileID: -9051383264006267931, guid: fd37332eae4aa924995a2380be203dd1, type: 3}
+  - _id: ART-05_red_blackout
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08red\u30FBblackout\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_red_blackout
+    _sprite: {fileID: -7454105726458000483, guid: 79210aca856f7ba4cb2fa53d9de556a5, type: 3}
+  - _id: ART-05_blue_normal
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08blue\u30FBnormal\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_blue_normal
+    _sprite: {fileID: -6900245126122950562, guid: e0a4b5e9da982fc48a33fbdd3dc0678e, type: 3}
+  - _id: ART-05_blue_light
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08blue\u30FBlight\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_blue_light
+    _sprite: {fileID: 7153298624918019743, guid: 4019ad9b180db6e448c42dc3200cdeac, type: 3}
+  - _id: ART-05_blue_blackout
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08blue\u30FBblackout\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_blue_blackout
+    _sprite: {fileID: -1619932820833490418, guid: ed9f000c42c04704ab697590d7d5cec7, type: 3}
+  - _id: ART-05_yellow_normal
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08yellow\u30FBnormal\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_yellow_normal
+    _sprite: {fileID: -5605997413332520256, guid: 248cd3b1b523cb74bb400b450632914e, type: 3}
+  - _id: ART-05_yellow_light
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08yellow\u30FBlight\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_yellow_light
+    _sprite: {fileID: -2439577208018734661, guid: 51f48118f78c54d4b81235f3430113a1, type: 3}
+  - _id: ART-05_yellow_blackout
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08yellow\u30FBblackout\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_yellow_blackout
+    _sprite: {fileID: 2731942345906458531, guid: f3d3baf140ae54f469a451d17b3bd0c9, type: 3}
+  - _id: ART-05_green_normal
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08green\u30FBnormal\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_green_normal
+    _sprite: {fileID: 6912781676294427064, guid: dff27b4c35c8257489f6cc2c49ee6224, type: 3}
+  - _id: ART-05_green_light
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08green\u30FBlight\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_green_light
+    _sprite: {fileID: 5772429024101337973, guid: fea0a3f5a27019c46a1e1115da335812, type: 3}
+  - _id: ART-05_green_blackout
+    _label: "\u3072\u3057\u5F62\u30DC\u30BF\u30F3\uFF08green\u30FBblackout\uFF09"
+    _size: {x: 200, y: 200}
+    _fileName: bomb_switch_green_blackout
+    _sprite: {fileID: -5809310627037536636, guid: cda03edeaed0fae439007bbb9d66adfa, type: 3}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}
   _bodyFont: {fileID: 0}
