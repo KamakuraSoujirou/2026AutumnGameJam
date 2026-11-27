@@ -362,7 +362,7 @@ public class OrderGimmick : Gimmick
     }
 
     /// <summary>
-    /// スイッチの文字、押した順の番号、入力済みの文字を表示する（置いていないものは飛ばす）
+    /// スイッチの文字、押した順の番号、入力済みの文字を表示する。押したスイッチは光らせる（置いていないものは飛ばす）
     /// </summary>
     private void ShowSwitches()
     {
@@ -386,6 +386,7 @@ public class OrderGimmick : Gimmick
             {
                 _bombView.SetButtonLabel(direction, _labels[i]);
                 _bombView.SetButtonSilhouette(direction, _isSilhouette ? _labels[i] : string.Empty);
+                _bombView.SetButtonSelected(direction, order > 0);
                 _bombView.SetWireSymbol(direction, orderText);
             }
         }

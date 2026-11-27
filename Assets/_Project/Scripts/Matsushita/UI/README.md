@@ -58,6 +58,7 @@
 - `UiGameView` のメソッドを呼ぶ：`SetTime` `SetHoldTime` `SetHolder` `SetRound` `SetPass` `SetPlayerNames` `SetGimmickName` `SetWins` `ShowBanner` `ShowPenalty` `SetDefuse` `ThrowBomb` `ShowExplosion` `ShowResult`。「戻る」は `RequestBack()`（または Inspector の On Back Requested）。
 - 爆弾の中身は `UiGameView.Bomb`：`SetWire` `SetButtonLabel` `SetWireSymbol` `SetQuestion` `SetLamp` `SetInput` `SetDefuseState`。方向は `InputDirection` と同じ。シリアル番号は廃止した（`SetSerial` は何もしないメソッドとして残してあるので、呼び出しは消してよい）。
 - 大きさの問題（小さいものから順に押せ）は、ボタンに文字ではなく絵を出す。`SetButtonSilhouette(方向, 言葉)` を `SetButtonLabel` のあとに呼ぶ（画像は `UiSilhouetteLibrary` が探す。`SetButtonLabel` を呼ぶと文字に戻る）。
+- 順番スイッチで押したボタンは `SetButtonSelected(方向, true)` で、マウスが重なったときと同じ光った絵（light）のままにする。`SetButtonLabel` のあとに呼ぶ（`SetButtonLabel` を呼ぶと選択は外れる）。
 - 暗号・順番スイッチのボタンの文字は `SetButtonLabel`（空にすると色名の頭文字に戻る）。配線のギミックでは、色名の頭文字（赤・青・黄・緑）がボタンに出る。
 - プレイヤー入力：`PlayerInputReader` がキーボードを読む（P1：WASD と Q、P2：矢印キーと 右Shift か /、戻る：Esc）。爆弾の上と下のボタンを入れ替えてあるので、上のキー（W・↑）は方向 `Down`、下のキー（S・↓）は方向 `Up` として知らせる（押したキーと同じ側のボタンが反応する）。`DirectionPressed(プレイヤー, 方向)` `DefusePressed(プレイヤー)` `BackPressed` で知らせる。押した瞬間だけで、長押しは1回。CPU対戦では `IsCpuMode` をオンにすると、どちらのキーセットでもP1を操作できる。持っているか・スタン中かの判断はゲーム進行側。ゲームパッドは使わない。
 - 入力の見た目：ひし形ボタンは、マウスが重なると明るく、押している間は暗くなる。絵が3状態（normal・light・blackout）そろっていれば light／blackout の絵に切り替え、そろっていなければ白を25%・黒を30%重ねる。ちょんと押しても、暗い状態を最低0.15秒は見せる。キーで押したときは `UiBombView.PressButton(方向)` を呼ぶと、0.15秒だけ暗くなって戻る。濃さと長さは `UiWire` の Inspector で変えられる（確認用シーンでは、持っている側の入力だけ反応する）。
