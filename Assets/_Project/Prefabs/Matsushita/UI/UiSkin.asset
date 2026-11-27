@@ -62,7 +62,7 @@ MonoBehaviour:
     _label: "\u8A66\u5408\u306E\u80CC\u666F"
     _size: {x: 1920, y: 1080}
     _fileName: game_bg
-    _sprite: {fileID: 0}
+    _sprite: {fileID: -6600994041416419396, guid: 28b0dd95f28f21547856c4e527a57f88, type: 3}
   - _id: UI-07
     _label: "\u30EA\u30B6\u30EB\u30C8\u306E\u67A0"
     _size: {x: 1000, y: 580}
@@ -77,7 +77,7 @@ MonoBehaviour:
     _label: "\u30E9\u30F3\u30D7\uFF08\u6D88\u706F\uFF09"
     _size: {x: 96, y: 96}
     _fileName: bomb_lamp_blackout
-    _sprite: {fileID: 0}
+    _sprite: {fileID: 3203990280827701557, guid: db353e7a609293a40a9bd22c0ebd3df8, type: 3}
   - _id: ART-09_afro
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u30A2\u30D5\u30ED\uFF09"
     _size: {x: 600, y: 900}
@@ -308,6 +308,27 @@ MonoBehaviour:
     _size: {x: 200, y: 200}
     _fileName: bomb_switch_green_blackout
     _sprite: {fileID: -5809310627037536636, guid: cda03edeaed0fae439007bbb9d66adfa, type: 3}
+  - _id: ART-24_pink
+    _label: "\u30D9\u30EB\u30C8\u306E\u7C92\uFF08\u30D4\u30F3\u30AF\uFF09"
+    _size: {x: 130, y: 88}
+    _fileName: belt_dot_pink
+    _sprite: {fileID: -3909150864022726700, guid: 79c294ec772279c48926170f8a0a16be, type: 3}
+  - _id: ART-24_green
+    _label: "\u30D9\u30EB\u30C8\u306E\u7C92\uFF08\u7DD1\uFF09"
+    _size: {x: 130, y: 88}
+    _fileName: belt_dot_green
+    _sprite: {fileID: -3036029517565141305, guid: 8c20835b0d503844da6ab2bf0e1f156e, type: 3}
+  - _id: ART-24_yellow
+    _label: "\u30D9\u30EB\u30C8\u306E\u7C92\uFF08\u9EC4\uFF09"
+    _size: {x: 130, y: 88}
+    _fileName: belt_dot_yellow
+    _sprite: {fileID: -5957184781081423021, guid: 24fb806ea7ed2634bb62b59eb53400ab, type: 3}
+  - _id: ART-25
+    _label: "PC\u753B\u9762\uFF08\u70B9\u3044\u305F\u3068\u304D\u306E\u7D75\u3002\u80CC\u666F\u3068\u540C\u3058
+      1920\xD71080 \u3067\u3001\u753B\u9762\u306E\u90E8\u5206\u3060\u3051\uFF09"
+    _size: {x: 1920, y: 1080}
+    _fileName: game_pc
+    _sprite: {fileID: 21300000, guid: 8dd8087a01666414795ddbf1de5d009b, type: 3}
   _headingFont: {fileID: 0}
   _numberFont: {fileID: 0}
   _bodyFont: {fileID: 0}

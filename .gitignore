@@ -60,3 +60,7 @@ crashlytics-build.properties
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# ===== シルエット素材（Unityパッケージで配る。二次配布になるのでGitには入れない） =====
+/[Aa]ssets/_SilhouetteIcons/
+/[Aa]ssets/_SilhouetteIcons.meta

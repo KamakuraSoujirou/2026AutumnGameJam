@@ -65,5 +65,12 @@ orderDatabase.ResetUsed();                    // 試合の最初に呼ぶ（出�
 ## 大きさの問題（C4）は絵だけで出す
 
 - C4 の4つの言葉がすべて `Silhouettes.json` にあるときだけ、ボタンに文字ではなくシルエットを出す。1つでも無ければ、4つとも文字で出す。
-- C4 に新しい言葉を足すときは、画像（`Assets/_PrivateAssets/Art/Silhouettes/Resources/Silhouettes/`）と `Silhouettes.json` の行も足す。画像の出典は `docs/credits-silhouette-icons.md` に書く。
+- C4 に新しい言葉を足すときは、画像（`Assets/_SilhouetteIcons/Resources/Silhouettes/`）と `Silhouettes.json` の行も足す。画像の出典は `docs/credits-silhouette-icons.md` に書く。
 - 紛らわしい絵（何の絵か分かりにくいもの、大きさが読みにくいもの）は使わない。
+
+### シルエット画像の入れ方（Unity パッケージ）
+
+- 画像は第三者の素材（Game-icons.net、CC BY 3.0）で、二次配布になるため、Git には入れない。代わりに `SilhouetteIcons.unitypackage` を別の方法（共有フォルダーなど）で配る。
+- 受け取った人は、Unity の **Assets → Import Package → Custom Package...** で読み込む。`Assets/_SilhouetteIcons/` ができる（このフォルダーは `.gitignore` に入れてあるので、コミットされない）。
+- 画像が入っていない環境でも、大きさの問題は文字で出るので、ゲームは動く。
+- 画像を足す・直したときは、パッケージを作り直して配り直す。
