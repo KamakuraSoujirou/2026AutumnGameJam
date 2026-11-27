@@ -26,7 +26,7 @@ public static partial class UiMockBuilder
     private const float WheelCenterX = 171f;
     private const float WheelCenterY = 215f;
 
-    /// <summary>選んでいる扇を光らせる円の直径（円の絵の、外側の黒い線より内側に収める）</summary>
+    /// <summary>選んでいる扇に影を掛ける円の直径（円の絵の、外側の黒い線より内側に収める）</summary>
     private const float WheelHighlightSize = 480f;
 
     /// <summary>円の中心から、文を置く位置までの距離</summary>
@@ -39,7 +39,7 @@ public static partial class UiMockBuilder
     private static readonly Color WheelPlaceholderColor = new Color(0.54f, 0.82f, 0.8f, 0.95f);
 
     /// <summary>選んでいない扇の色（透明。円の絵をそのまま見せる）</summary>
-    private static readonly Color WheelWedgeColor = new Color(1f, 0.85f, 0.25f, 0f);
+    private static readonly Color WheelWedgeColor = new Color(0f, 0f, 0f, 0f);
 
     /// <summary>文字の色（円の絵の水色の上で読みやすい濃い色）</summary>
     private static readonly Color WheelTextColor = new Color(0.1f, 0.16f, 0.2f, 1f);

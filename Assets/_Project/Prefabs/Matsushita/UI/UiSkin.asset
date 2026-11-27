@@ -21,8 +21,8 @@ MonoBehaviour:
   - _id: ART-14
     _label: "\u30BF\u30A4\u30C8\u30EB\u30ED\u30B4"
     _size: {x: 700, y: 130}
-    _fileName: title_logo
-    _sprite: {fileID: 0}
+    _fileName: ui_title
+    _sprite: {fileID: 5539121114689356873, guid: dd16a348bd696c84aa6bd2d1eb8699c8, type: 3}
   - _id: ART-09_normal
     _label: "\u30AD\u30E3\u30E9 P1\uFF08\u901A\u5E38\uFF09"
     _size: {x: 600, y: 900}

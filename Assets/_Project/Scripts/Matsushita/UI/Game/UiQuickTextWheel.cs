@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// クイックテキストの円形の候補。方向キーを押し続けている間、キャラの上に出て、選んでいる方向の扇が黄色になる
+/// クイックテキストの円形の候補。方向キーを押し続けている間、キャラの上に出て、選んでいる方向の扇に影が掛かる
 /// </summary>
 /// <remarks>
 /// 扇・文・キー名は、画面の上・下・左・右の順（W・S・A・D のキーの位置）に並べる。開く／閉じる／選ぶだけで、いつ出すかの判断は QuickTextInput が行う
@@ -17,10 +17,10 @@ public class UiQuickTextWheel : MonoBehaviour
     [SerializeField, Tooltip("扇の画像（画面の上・下・左・右の順）")] private Image[] _wedges = new Image[DirectionCount];
     [SerializeField, Tooltip("扇の中の文（画面の上・下・左・右の順）")] private TMP_Text[] _texts = new TMP_Text[DirectionCount];
     [SerializeField, Tooltip("扇の中のキー名（画面の上・下・左・右の順）")] private TMP_Text[] _keyTexts = new TMP_Text[DirectionCount];
-    [SerializeField, Tooltip("選んでいない扇の色（円の絵の上に重ねるので、透明にして絵をそのまま見せる）")] private Color _wedgeColor = new Color(1f, 0.85f, 0.25f, 0f);
-    [SerializeField, Tooltip("選んでいる扇の色（円の絵の上に重ねる）")] private Color _selectedWedgeColor = new Color(1f, 0.85f, 0.25f, 0.95f);
+    [SerializeField, Tooltip("選んでいない扇の色（円の絵の上に重ねるので、透明にして絵をそのまま見せる）")] private Color _wedgeColor = new Color(0f, 0f, 0f, 0f);
+    [SerializeField, Tooltip("選んでいる扇の色（円の絵の上に重ねる影。半透明の黒）")] private Color _selectedWedgeColor = new Color(0f, 0f, 0f, 0.35f);
     [SerializeField, Tooltip("選んでいない扇の文字の色")] private Color _textColor = new Color(0.1f, 0.16f, 0.2f, 1f);
-    [SerializeField, Tooltip("選んでいる扇の文字の色")] private Color _selectedTextColor = new Color(0.23f, 0.16f, 0f, 1f);
+    [SerializeField, Tooltip("選んでいる扇の文字の色（影が掛かっても読めるように、白）")] private Color _selectedTextColor = Color.white;
 
     private float _openElapsed = OpenSeconds;
 
@@ -69,7 +69,7 @@ public class UiQuickTextWheel : MonoBehaviour
     }
 
     /// <summary>
-    /// 選んでいる方向の扇を黄色にして、ほかを元の色に戻す
+    /// 選んでいる方向の扇に影を掛けて、ほかを元に戻す
     /// </summary>
     /// <param name="selected">選んでいる方向</param>
     public void SetSelected(InputDirection selected)
