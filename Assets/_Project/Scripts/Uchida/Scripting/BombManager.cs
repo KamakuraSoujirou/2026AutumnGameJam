@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -18,6 +19,9 @@ public class BombManager : MonoBehaviour
 
     private readonly int[] _wins = new int[PlayerCount];
 
+    // 同時押しのギミックで、受付時間のあいだに押されたボタン
+    private readonly List<InputDirection> _chordPressed = new List<InputDirection>();
+
     private GameConfig _config;
     private BombState _state;
     private int _holder;
@@ -31,6 +35,8 @@ public class BombManager : MonoBehaviour
     private float _phaseDuration;
     private float _lockTimer;
     private float _stunTimer;
+    private float _chordTimer;
+    private bool _isChordOpen;
 
     /// <summary>
     /// 表示を変えるべきこと（持ち手・問題文・勝ち数・状態など）が起きたときに呼ばれる
@@ -107,12 +113,19 @@ public class BombManager : MonoBehaviour
     /// </summary>
     /// <param name="player">押したプレイヤーの番号（0 か 1）</param>
     /// <param name="direction">押された方向</param>
+    /// <param name="isMouse">マウスのクリックか（同時押しのギミックでは、受付時間が長くなる）</param>
     /// <returns>受け付けたら true</returns>
-    public bool TryPress(int player, InputDirection direction)
+    public bool TryPress(int player, InputDirection direction, bool isMouse = false)
     {
         if (_state != BombState.Answering || player != _holder || _lockTimer > 0f || _stunTimer > 0f)
         {
             return false;
+        }
+
+        // 同時押しのギミックなら、受付時間のあいだ押されたボタンをためて、まとめて判定する
+        if (_isChordOpen || _gimmick.ChordWindow > 0f)
+        {
+            return TryPressChord(direction, isMouse);
         }
 
         OnPressed?.Invoke(direction);
@@ -182,6 +195,7 @@ public class BombManager : MonoBehaviour
                 break;
             case BombState.Answering:
                 TickInputLock();
+                TickChord();
                 break;
             case BombState.Flying:
                 if (TickPhase())
@@ -225,6 +239,7 @@ public class BombManager : MonoBehaviour
         _roundWinner = NoPlayer;
         _stunTimer = 0f;
         _lockTimer = 0f;
+        CloseChord();
         _gimmick.ResetRound();
         _holdTime = _bombTimer.TimeLimit;
         _bombTimer.ResetTime(_holdTime);
@@ -240,6 +255,7 @@ public class BombManager : MonoBehaviour
     {
         _holder = player;
         _receiveCount++;
+        CloseChord();
         _stage = DifficultyCalculator.GetStage(_receiveCount, _config.StagePasses);
         _gimmick.CreatePuzzle(_stage);
         _lockTimer = _config.ReceiveLockDuration;
@@ -278,15 +294,23 @@ public class BombManager : MonoBehaviour
     /// <param name="direction">押された方向</param>
     private void Press(InputDirection direction)
     {
-        AnswerResult result = _gimmick.Answer(direction);
+        ApplyResult(_gimmick.Answer(direction), direction.ToString());
+    }
 
+    /// <summary>
+    /// ギミックの答えの結果に合わせて、パス・ペナルティを行う
+    /// </summary>
+    /// <param name="result">ギミックが返した結果</param>
+    /// <param name="inputText">ログに出す、押したボタンの説明</param>
+    private void ApplyResult(AnswerResult result, string inputText)
+    {
         switch (result)
         {
             case AnswerResult.Correct:
                 Pass();
                 break;
             case AnswerResult.Wrong:
-                Debug.Log($"[BombManager] P{_holder + 1} 不正解（{direction}）");
+                Debug.Log($"[BombManager] P{_holder + 1} 不正解（{inputText}）");
                 _stunTimer = _config.StunDuration;
                 OnMissed?.Invoke(_holder, _config.WrongPenalty);
                 OnChanged?.Invoke();
@@ -296,6 +320,78 @@ public class BombManager : MonoBehaviour
                 OnChanged?.Invoke();
                 break;
         }
+    }
+
+    /// <summary>
+    /// 同時押しのギミックで、押されたボタンをためる。最初のボタンで受付時間が始まり、そろうか間違えた時点で判定する
+    /// </summary>
+    /// <param name="direction">押された方向</param>
+    /// <param name="isMouse">マウスのクリックか</param>
+    /// <returns>受け付けたら true（受付時間のあいだに同じボタンをもう一度押しても、受け付けない）</returns>
+    private bool TryPressChord(InputDirection direction, bool isMouse)
+    {
+        if (_chordPressed.Contains(direction))
+        {
+            return false;
+        }
+
+        if (!_isChordOpen)
+        {
+            _isChordOpen = true;
+            _chordTimer = isMouse ? _gimmick.ChordMouseWindow : _gimmick.ChordWindow;
+        }
+
+        OnPressed?.Invoke(direction);
+        _chordPressed.Add(direction);
+
+        AnswerResult result = _gimmick.AnswerChord(_chordPressed, false);
+        string inputText = string.Join("+", _chordPressed);
+
+        if (result != AnswerResult.Continue)
+        {
+            CloseChord();
+        }
+
+        ApplyResult(result, inputText);
+        return true;
+    }
+
+    /// <summary>
+    /// 同時押しの受付時間を進める。終わったら、ためたボタンで判定する
+    /// </summary>
+    private void TickChord()
+    {
+        if (!_isChordOpen)
+        {
+            return;
+        }
+
+        _chordTimer -= Time.deltaTime;
+
+        if (_chordTimer > 0f)
+        {
+            return;
+        }
+
+        AnswerResult result = _gimmick.AnswerChord(_chordPressed, true);
+        string inputText = string.Join("+", _chordPressed);
+        CloseChord();
+
+        // 受付時間が終わったあとに Continue は返さない約束だが、返ってきたときは何もしない
+        if (result != AnswerResult.Continue)
+        {
+            ApplyResult(result, inputText);
+        }
+    }
+
+    /// <summary>
+    /// 同時押しの受付を閉じて、ためたボタンを捨てる
+    /// </summary>
+    private void CloseChord()
+    {
+        _isChordOpen = false;
+        _chordTimer = 0f;
+        _chordPressed.Clear();
     }
 
     /// <summary>
@@ -320,6 +416,7 @@ public class BombManager : MonoBehaviour
         }
 
         _stunTimer = 0f;
+        CloseChord();
         _roundWinner = GetOpponent(_holder);
         _wins[_roundWinner]++;
         Debug.Log($"[BombManager] 爆発！ P{_holder + 1} の負け（P1 {_wins[0]} - {_wins[1]} P2）");

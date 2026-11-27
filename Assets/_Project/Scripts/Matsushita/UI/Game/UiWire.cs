@@ -11,6 +11,14 @@ public class UiWire : MonoBehaviour
     private const int ColorCount = 4;
     private const float GoneAlpha = 0.3f;
 
+    // この文字数までは1行のまま出す。それより長い言葉は折り返して、ひし形の中に収める
+    private const int SingleLineMaxLength = 5;
+
+    // 折り返すときの文字の枠（ひし形の中に収まる大きさ）と、いちばん小さくする文字の大きさ
+    private const float WrapLabelWidth = 80f;
+    private const float WrapLabelHeight = 64f;
+    private const float WrapLabelMinFontSize = 10f;
+
     [SerializeField, Tooltip("つながっている配線の見た目（赤・青・黄・緑の順）")] private GameObject[] _normalVisuals = new GameObject[ColorCount];
     [SerializeField, Tooltip("切れている配線の見た目（赤・青・黄・緑の順）")] private GameObject[] _cutVisuals = new GameObject[ColorCount];
     [SerializeField, Tooltip("ひし形ボタンの見た目（赤・青・黄・緑の順）")] private GameObject[] _buttonVisuals = new GameObject[ColorCount];
@@ -50,6 +58,12 @@ public class UiWire : MonoBehaviour
     private bool _isHeld;
     private float _darkUntil;
     private float _tintLevel;
+
+    private RectTransform _labelRect;
+    private Vector2 _labelCenter;
+    private Vector2 _labelSingleLineSize;
+    private float _labelSingleLineMinFontSize;
+    private bool _isLabelPrepared;
 
     /// <summary>
     /// ボタンをマウスで押すためのボタン
@@ -201,7 +215,49 @@ public class UiWire : MonoBehaviour
     /// </summary>
     private void RefreshLabel()
     {
-        _label.text = string.IsNullOrEmpty(_customLabel) ? ColorNames[_colorIndex] : _customLabel;
+        string text = string.IsNullOrEmpty(_customLabel) ? ColorNames[_colorIndex] : _customLabel;
+        FitLabel(text);
+        _label.text = text;
+    }
+
+    /// <summary>
+    /// 文字の長さに合わせて、文字の枠と折り返しを切り替える。
+    /// 短い言葉は今までどおり1行で大きく出し、長い言葉は2行以上に折り返して、ひし形からはみ出さないようにする
+    /// </summary>
+    /// <param name="text">ボタンに出す文字</param>
+    private void FitLabel(string text)
+    {
+        PrepareLabel();
+
+        bool isWrapped = text.Length > SingleLineMaxLength;
+        Vector2 size = isWrapped ? new Vector2(WrapLabelWidth, WrapLabelHeight) : _labelSingleLineSize;
+
+        // 枠の中心は変えずに、大きさだけ変える（基準点が中心でなくても動くように、中心から位置を計算し直す）
+        _labelRect.sizeDelta = size;
+        _labelRect.anchoredPosition = _labelCenter - Vector2.Scale(new Vector2(0.5f, 0.5f) - _labelRect.pivot, size);
+
+        _label.enableAutoSizing = true;
+        _label.fontSizeMin = isWrapped ? WrapLabelMinFontSize : _labelSingleLineMinFontSize;
+        _label.textWrappingMode = isWrapped ? TextWrappingModes.Normal : TextWrappingModes.NoWrap;
+    }
+
+    /// <summary>
+    /// 文字の枠の、もとの大きさと中心を覚えておく（最初に1回だけ）
+    /// </summary>
+    private void PrepareLabel()
+    {
+        if (_isLabelPrepared)
+        {
+            return;
+        }
+
+        _labelRect = (RectTransform)_label.transform;
+        _labelSingleLineSize = _labelRect.sizeDelta;
+        _labelSingleLineMinFontSize = _label.fontSizeMin;
+
+        // 基準点（ピボット）から見た、枠の中心の位置
+        _labelCenter = _labelRect.anchoredPosition + Vector2.Scale(new Vector2(0.5f, 0.5f) - _labelRect.pivot, _labelSingleLineSize);
+        _isLabelPrepared = true;
     }
 
     /// <summary>

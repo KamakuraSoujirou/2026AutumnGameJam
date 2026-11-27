@@ -141,6 +141,11 @@ public class UiGamePreview : MonoBehaviour
             _view.SetThinking(_holderIndex, true);
         }
 
+        if (keyboard.cKey.wasPressedThisFrame)
+        {
+            _view.ShowRandomQuickText(1 - _holderIndex);
+        }
+
         if (keyboard.enterKey.wasPressedThisFrame)
         {
             _view.ShowResult(_holderIndex, _player1Wins, _player2Wins);

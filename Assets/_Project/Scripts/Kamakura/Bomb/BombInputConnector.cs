@@ -132,7 +132,7 @@ public class BombInputConnector : MonoBehaviour
             return;
         }
 
-        _bombManager.TryPress(_bombManager.Holder, direction);
+        _bombManager.TryPress(_bombManager.Holder, direction, true);
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
         UiEventSystem.ClearSelection();

@@ -65,6 +65,10 @@ public class UiGameView : MonoBehaviour
     [SerializeField, Tooltip("リザルトのボタン（再戦、タイトルへの順）")] private Button[] _resultButtons;
     [SerializeField, Tooltip("リザルトで選んでいるボタンに出す枠（ボタンと同じ順）")] private GameObject[] _resultFocusFrames;
 
+    [Header("クイックテキスト")]
+    [SerializeField, Tooltip("方向キーごとの文。空なら初期の文を使う")] private UiQuickTextSet _quickTextSet;
+    [SerializeField, Min(0.1f), Tooltip("文を吹き出しに出しておく時間（秒）")] private float _quickTextSeconds = 1.5f;
+
     private readonly Vector2[] _penaltyStartPositions = new Vector2[PlayerCount];
     private readonly Coroutine[] _penaltyRoutines = new Coroutine[PlayerCount];
     private int _resultFocusIndex;
@@ -106,6 +110,12 @@ public class UiGameView : MonoBehaviour
     private void Awake()
     {
         EnsureEventSystem();
+
+        // クイックテキストの入力（待機中の方向キーを押し続ける→離して送る）。Game シーンを書き換えずに使えるよう、ここで付ける
+        if (GetComponent<QuickTextInput>() == null)
+        {
+            gameObject.AddComponent<QuickTextInput>();
+        }
 
         for (int i = 0; i < PlayerCount; i++)
         {
@@ -256,6 +266,65 @@ public class UiGameView : MonoBehaviour
     public void SetThinking(int playerIndex, bool isThinking)
     {
         _panels[playerIndex].SetThinking(isThinking);
+    }
+
+    /// <summary>
+    /// クイックテキストを使える状態か。爆弾を持っていない側で、相手が解除中でなく、バナー・爆発・リザルトも出ていないときに使える（爆弾が飛んでいる間は両方使える）
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <returns>使えるなら true</returns>
+    public bool CanUseQuickText(int playerIndex)
+    {
+        return _panels[playerIndex].IsQuickTextAvailable
+            && !_dimmer.activeSelf
+            && !_bannerRoot.activeSelf
+            && !_resultRoot.activeSelf
+            && !_explosionText.gameObject.activeSelf;
+    }
+
+    /// <summary>
+    /// 待機中の側の吹き出しを、方向キーに割り当てた文にする。決めた時間（1.5秒）がたつと「待機中」に戻る。使えないときは何もしない
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <param name="direction">離したキーの方向（キー入力として届いた InputDirection）</param>
+    /// <returns>出せたら true</returns>
+    public bool ShowQuickText(int playerIndex, InputDirection direction)
+    {
+        return CanUseQuickText(playerIndex) && _panels[playerIndex].ShowQuickText(GetQuickText(UiQuickTextSet.SlotOf(direction)), _quickTextSeconds);
+    }
+
+    /// <summary>
+    /// 待機中の側に、ランダムな文を出す（CPUが使う）
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <returns>出せたら true</returns>
+    public bool ShowRandomQuickText(int playerIndex)
+    {
+        return ShowQuickText(playerIndex, (InputDirection)UnityEngine.Random.Range(0, UiQuickTextSet.SlotCount));
+    }
+
+    /// <summary>
+    /// クイックテキストの円形の候補を出す／閉じる。出すときは、選んでいる方向の扇を光らせる
+    /// </summary>
+    /// <param name="playerIndex">0：P1、1：P2</param>
+    /// <param name="isOpen">出すなら true</param>
+    /// <param name="selected">選んでいる方向（キー入力として届いた InputDirection）</param>
+    public void SetQuickTextWheel(int playerIndex, bool isOpen, InputDirection selected)
+    {
+        if (!isOpen)
+        {
+            _panels[playerIndex].CloseQuickTextWheel();
+            return;
+        }
+
+        string[] texts = new string[UiQuickTextSet.SlotCount];
+
+        for (int slot = 0; slot < texts.Length; slot++)
+        {
+            texts[slot] = GetQuickText(slot);
+        }
+
+        _panels[playerIndex].OpenQuickTextWheel(texts, selected);
     }
 
     /// <summary>
@@ -446,8 +515,20 @@ public class UiGameView : MonoBehaviour
             _panels[i].SetDefuseCaption(false);
             _panels[i].SetThinking(false);
             _panels[i].SetHeldBomb(false);
+            _panels[i].ClearQuickText();
+            _panels[i].CloseQuickTextWheel();
             StopPenalty(i);
         }
+    }
+
+    /// <summary>
+    /// 画面の位置（上・下・左・右）に割り当てた文を返す（文のセットがなければ初期の文）
+    /// </summary>
+    /// <param name="slot">0：上、1：下、2：左、3：右</param>
+    /// <returns>文</returns>
+    private string GetQuickText(int slot)
+    {
+        return _quickTextSet != null ? _quickTextSet.GetSlotText(slot) : UiQuickTextSet.GetDefaultSlotText(slot);
     }
 
     /// <summary>

@@ -17,6 +17,10 @@ public class CpuPlayer : MonoBehaviour
     /// <summary>入力がまだ受け付けられなかったとき、もう一度試すまでの時間（秒）</summary>
     private const float RetryDelay = 0.05f;
 
+    /// <summary>待機中に、COMがクイックテキストを出す間隔の下限と上限（秒）。ときどき1文出す程度にする</summary>
+    private const float QuickTextMinInterval = 5f;
+    private const float QuickTextMaxInterval = 11f;
+
     private static readonly InputDirection[] AllDirections =
     {
         InputDirection.Up,
@@ -35,11 +39,13 @@ public class CpuPlayer : MonoBehaviour
     private readonly List<InputDirection> _triedWrong = new List<InputDirection>();
     private readonly List<InputDirection> _pressedCorrect = new List<InputDirection>();
     private readonly List<InputDirection> _candidates = new List<InputDirection>();
+    private readonly List<InputDirection> _chordButtons = new List<InputDirection>();
 
     private CpuProfile _profile;
     private float _lockWait;
     private float _thinkTimer;
     private float _thinkWeight = 1f;
+    private float _quickTextTimer;
     private bool _isPlanned;
     private bool _hasMissed;
     private InputDirection _lastPressed;
@@ -61,6 +67,7 @@ public class CpuPlayer : MonoBehaviour
         }
 
         _profile = CpuProfile.Get(CpuSettings.Level);
+        _quickTextTimer = Random.Range(QuickTextMinInterval, QuickTextMaxInterval);
     }
 
     /// <summary>
@@ -93,6 +100,7 @@ public class CpuPlayer : MonoBehaviour
                 EndTurn();
             }
 
+            UpdateQuickText();
             return;
         }
 
@@ -119,6 +127,27 @@ public class CpuPlayer : MonoBehaviour
         {
             Act();
         }
+    }
+
+    /// <summary>
+    /// 人間が爆弾を持って答えている間（COMは待機中）、ときどきクイックテキストを1文出す
+    /// </summary>
+    private void UpdateQuickText()
+    {
+        if (_bombManager.State != BombState.Answering)
+        {
+            return;
+        }
+
+        _quickTextTimer -= Time.deltaTime;
+
+        if (_quickTextTimer > 0f)
+        {
+            return;
+        }
+
+        _view.ShowRandomQuickText(CpuIndex);
+        _quickTextTimer = Random.Range(QuickTextMinInterval, QuickTextMaxInterval);
     }
 
     /// <summary>
@@ -158,6 +187,14 @@ public class CpuPlayer : MonoBehaviour
     /// </summary>
     private void Act()
     {
+        IReadOnlyList<InputDirection> chordAnswers = _gimmick.ChordAnswers;
+
+        if (chordAnswers != null && chordAnswers.Count > 0)
+        {
+            ActChord(chordAnswers);
+            return;
+        }
+
         InputDirection expected = _gimmick.NextAnswer;
         InputDirection direction = expected;
 
@@ -181,6 +218,83 @@ public class CpuPlayer : MonoBehaviour
             _pressedCorrect.Add(direction);
             StartThinking(true);
         }
+    }
+
+    /// <summary>
+    /// 同時押しのギミックで、答えのボタンを同じフレームに全部押す。間違えるときは、答えのうち1つを別のボタンに替える
+    /// （替えたボタンは最後に押すので、その時点で不正解になる）
+    /// </summary>
+    /// <param name="answers">同時押しの答えの方向</param>
+    private void ActChord(IReadOnlyList<InputDirection> answers)
+    {
+        _chordButtons.Clear();
+
+        for (int i = 0; i < answers.Count; i++)
+        {
+            _chordButtons.Add(answers[i]);
+        }
+
+        if (!_profile.RollIsCorrect() && TryPickChordWrong(answers, out InputDirection wrong))
+        {
+            // 答えのうち1つを、間違いのボタンに替える
+            _chordButtons.RemoveAt(Random.Range(0, _chordButtons.Count));
+            _chordButtons.Add(wrong);
+        }
+
+        _hasMissed = false;
+
+        // 最初のボタンが受け付けられなければ、まだ何も押していないので、少し待ってやり直す
+        if (!_bombManager.TryPress(CpuIndex, _chordButtons[0]))
+        {
+            _thinkTimer = RetryDelay;
+            return;
+        }
+
+        _lastPressed = _chordButtons[0];
+
+        for (int i = 1; i < _chordButtons.Count; i++)
+        {
+            _lastPressed = _chordButtons[i];
+            _bombManager.TryPress(CpuIndex, _chordButtons[i]);
+        }
+    }
+
+    /// <summary>
+    /// 同時押しで間違えるときに、答えの1つと入れ替える、答えにないボタンを選ぶ
+    /// </summary>
+    /// <param name="answers">同時押しの答えの方向</param>
+    /// <param name="wrong">選んだ間違いの方向</param>
+    /// <returns>選べたら true（答えにないボタンがすべて試し済みなら false。そのときは正解を押す）</returns>
+    private bool TryPickChordWrong(IReadOnlyList<InputDirection> answers, out InputDirection wrong)
+    {
+        _candidates.Clear();
+
+        foreach (InputDirection direction in AllDirections)
+        {
+            bool isAnswer = false;
+
+            for (int i = 0; i < answers.Count; i++)
+            {
+                if (answers[i] == direction)
+                {
+                    isAnswer = true;
+                }
+            }
+
+            if (!isAnswer && !_triedWrong.Contains(direction))
+            {
+                _candidates.Add(direction);
+            }
+        }
+
+        if (_candidates.Count == 0)
+        {
+            wrong = InputDirection.Up;
+            return false;
+        }
+
+        wrong = _candidates[Random.Range(0, _candidates.Count)];
+        return true;
     }
 
     /// <summary>

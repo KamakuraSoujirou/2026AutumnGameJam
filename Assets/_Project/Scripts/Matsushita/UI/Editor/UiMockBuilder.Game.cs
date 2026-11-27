@@ -230,6 +230,7 @@ public static partial class UiMockBuilder
 
         SetObject(view, "_bomb", bomb);
         SetObject(view, "_defuseButton", defuseClick);
+        BuildQuickText(view, new[] { panel1, panel2 });
         SetObjectArray(view, "_panels", new Object[] { panel1, panel2 });
         SetObjectArray(view, "_fuses", new Object[] { fuseLeft, fuseRight });
         SetObject(view, "_flyingBomb", flyingBomb);

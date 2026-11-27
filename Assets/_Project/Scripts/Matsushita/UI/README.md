@@ -35,6 +35,8 @@
 | Enter | リザルトを出す |
 | Esc | 「戻る」（コンソールに出すだけ。本番はタイトルへ） |
 | R | ラウンドをやり直す（バナーが出る） |
+| C | 待機中の側にランダムなクイックテキスト（CPUの確認用） |
+| 待機中の側の方向キー（P1：WASD、P2：矢印）を押し続けて、離す | クイックテキスト（下の「クイックテキスト」を参照） |
 
 画面の配置（1920×1080）
 - 上：左に「戻る」＋「Esc でタイトルへ」、中央に「R1」、右に「パス回数」「難易度」。
@@ -56,7 +58,7 @@
 - `UiGameView` のメソッドを呼ぶ：`SetTime` `SetHoldTime` `SetHolder` `SetRound` `SetPass` `SetPlayerNames` `SetGimmickName` `SetWins` `ShowBanner` `ShowPenalty` `SetDefuse` `ThrowBomb` `ShowExplosion` `ShowResult`。「戻る」は `RequestBack()`（または Inspector の On Back Requested）。
 - 爆弾の中身は `UiGameView.Bomb`：`SetWire` `SetButtonLabel` `SetWireSymbol` `SetQuestion` `SetLamp` `SetInput` `SetDefuseState`。方向は `InputDirection` と同じ。シリアル番号は廃止した（`SetSerial` は何もしないメソッドとして残してあるので、呼び出しは消してよい）。
 - 暗号・順番スイッチのボタンの文字は `SetButtonLabel`（空にすると色名の頭文字に戻る）。配線のギミックでは、色名の頭文字（赤・青・黄・緑）がボタンに出る。
-- プレイヤー入力：`PlayerInputReader` がキーボードを読む（P1：WASD と Q、P2：矢印キーと 右Shift か /、戻る：Esc）。`DirectionPressed(プレイヤー, 方向)` `DefusePressed(プレイヤー)` `BackPressed` で知らせる。押した瞬間だけで、長押しは1回。CPU対戦では `IsCpuMode` をオンにすると、どちらのキーセットでもP1を操作できる。持っているか・スタン中かの判断はゲーム進行側。ゲームパッドは使わない。
+- プレイヤー入力：`PlayerInputReader` がキーボードを読む（P1：WASD と Q、P2：矢印キーと 右Shift か /、戻る：Esc）。爆弾の上と下のボタンを入れ替えてあるので、上のキー（W・↑）は方向 `Down`、下のキー（S・↓）は方向 `Up` として知らせる（押したキーと同じ側のボタンが反応する）。`DirectionPressed(プレイヤー, 方向)` `DefusePressed(プレイヤー)` `BackPressed` で知らせる。押した瞬間だけで、長押しは1回。CPU対戦では `IsCpuMode` をオンにすると、どちらのキーセットでもP1を操作できる。持っているか・スタン中かの判断はゲーム進行側。ゲームパッドは使わない。
 - 入力の見た目：ひし形ボタンは、マウスが重なると明るく、押している間は暗くなる。絵が3状態（normal・light・blackout）そろっていれば light／blackout の絵に切り替え、そろっていなければ白を25%・黒を30%重ねる。ちょんと押しても、暗い状態を最低0.15秒は見せる。キーで押したときは `UiBombView.PressButton(方向)` を呼ぶと、0.15秒だけ暗くなって戻る。濃さと長さは `UiWire` の Inspector で変えられる（確認用シーンでは、持っている側の入力だけ反応する）。
 - 正解したあとの流れ：`ThrowBomb` は、ボタンの押し込みの見た目が終わるまで爆弾を見せてから飛ばす。待った分は飛ぶ時間から引くので、届く時刻は変わらない（飛ぶ時間の下限は0.12秒）。爆弾の中の表示（切れた線など）を戻したいときは、`ThrowBomb` の `onTakeOff`（飛び始めに呼ばれる）の中で行う。
 - 試合画面を作り直すと（`Tools/UI仮組/…`）、明るさ用の画像（`Tint_Art` `Tint_Placeholder`）と `UiWirePointerRelay` が入る。古いプレハブのままでは、明るさは変わらない。
@@ -145,7 +147,8 @@ UI-01〜04 は素材リストにない仮の番号です（発注書に足すか
 | `Game/UiBombView` / `Game/UiWire` | 爆弾（タイマー液晶・ランプ・口の形の液晶）と、ひし形ボタン＋配線1組（重なりで明るく、押下で暗く） |
 | `Game/UiWirePointerRelay` | ひし形ボタンへの重なり・押下を `UiWire` に渡す（Button と同じオブジェクトに付ける） |
 | `Game/UiFuse` | 導火線。火花が爆弾へ進み、残り時間に比例して短くなる |
-| `Game/UiPlayerPanel` | キャラ（通常・焦り顔・アフロ）、頭上の吹き出し、残り3秒以下の赤い帯 |
+| `Game/UiPlayerPanel` | キャラ（通常・焦り顔・アフロ）、頭上の吹き出し（待機中はクイックテキストの文も）、クイックテキストの候補、残り3秒以下の赤い帯 |
+| `Game/QuickTextInput` / `Game/UiQuickTextWheel` / `UiQuickTextSet` | クイックテキストの入力（押し続ける→離す・取り消し）、円形の候補、文のセット |
 | `Game/UiWinStars` | 勝ち星 |
 | `Game/UiGamePreview` | 試合画面の確認用（キーで動きを再現）。本番では外す |
 | `UiEventSystem` | マウスで押すための EventSystem を、なければ作る共通処理 |
@@ -155,6 +158,16 @@ UI-01〜04 は素材リストにない仮の番号です（発注書に足すか
 | `Result/UiResultEase` | 出てくる動きの変換（ゆっくり止まる・弾む・落ちる） |
 | `Result/UiResultPreview` | リザルト画面の確認用（仮の結果を出す）。本番では外す |
 | `Editor/UiMockBuilder` | 上のメニュー。プレハブとシーンを組み立てる |
+
+## クイックテキスト（待機中の側が、頭上の「待機中」を定型文に変える）
+爆弾を持っていない側が方向キー（P1：WASD、P2：矢印）を押し続けると、0.2秒後に円形の候補が出る（上・下・左・右の4つ。押している方向の扇が黄色）。キーを離すと、その方向の文が頭上の吹き出しに1.5秒出て「待機中」に戻る。短く押して離したときも出る。押している間に解除キー（Q／右Shift）を押すと取り消し（キーを全部離すまで何も出ない）。使えるのは、待機中で、相手が解除中でなく、バナー・爆発・リザルトも出ていないとき。残り時間や爆弾の入力には関わらない。仕様は `docs/spec-ato10byo-v2.md` の「4.1 クイックテキスト」。
+
+1. すでにある `UI_Game.prefab` には、メニューバーの **Tools → UI仮組 → クイックテキストを足す** で、作り直さずにその場で足す（候補と、文のセット `UiQuickTextSet.asset`）。「試合画面を作る」で作り直したときは、最初から入る
+2. 文を変えるときは `Assets/_Project/Prefabs/Matsushita/UI/UiQuickTextSet.asset` の Texts（上＝W・↑、下＝S・↓、左＝A・←、右＝D・→ の順）を書き換える。空欄は初期の文（いくぞ！／ざんねん〜／まだまだ！／ナイス！）
+3. 本番の使い方：`UiGameView` が起動時に `QuickTextInput` を自分に付けて、`PlayerInputReader`（同じオブジェクトか、シーンから探す）の `DirectionPressed` `DirectionReleased` `DefusePressed` を見る。ゲーム進行側は何もしなくてよい。「使えるか」を別の条件にしたいときは `QuickTextInput.CanUse` に処理を渡す
+4. 呼び出し：`UiGameView.ShowQuickText(プレイヤー, 方向)`（方向はキー入力として届いた `InputDirection`）、`ShowRandomQuickText(プレイヤー)`（CPU用。`CpuPlayer` が人間の回答中に5〜11秒おきに呼ぶ）、`SetQuickTextWheel(プレイヤー, 開くか, 選んでいる方向)`、`CanUseQuickText(プレイヤー)`。文を出しておく時間は `UiGameView` の Quick Text Seconds（1.5秒）、候補が出るまでは `QuickTextInput` の Wheel Delay Seconds（0.2秒）
+5. 上と下のボタンを入れ替えてあるため、W は `InputDirection.Down` として届く。文の並びは「押したキーの画面の位置」（W＝上）で、`UiQuickTextSet.SlotOf` が対応させる
+6. 候補の円は素材なしの仮の形（扇は `Image` の塗りつぶし）。絵にするときは、扇・中央の丸の `Image` に絵を入れる
 
 ## 残っていること
 - Windows の Unity（6000.3.28f1）のバッチ実行で、「タイトルを作る」「試合画面を作る」の実行と、試合画面の表示・動き（キー入力を送った再生）を確認した。実機のエディタで開いた見た目と、本物の画像を入れたときの見た目は未確認
