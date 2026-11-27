@@ -683,6 +683,16 @@ public static partial class UiMockBuilder
             isChanged |= skin.AddEntryIfMissing(entry);
         }
 
+        foreach (UiSkinEntry entry in CreateConveyorEntries())
+        {
+            isChanged |= skin.AddEntryIfMissing(entry);
+        }
+
+        foreach (UiSkinEntry entry in CreatePcScreenEntries())
+        {
+            isChanged |= skin.AddEntryIfMissing(entry);
+        }
+
         // 爆弾の素材のファイル名が決まったので、すでにある登録の探すファイル名を合わせる
         isChanged |= skin.UpdateFileName("ART-04_on", "bomb_lamp");
         isChanged |= skin.UpdateFileName("ART-04_off", "bomb_lamp_blackout");
