@@ -119,6 +119,13 @@ public class BombInputConnector : MonoBehaviour
     /// </summary>
     private void OnDefuseClicked()
     {
+        // CPU対戦でCOMが持っているときは、COMの代わりに解除を始めてしまうので無視する
+        if (IsCpuHolding())
+        {
+            UiEventSystem.ClearSelection();
+            return;
+        }
+
         _bombManager.TryStartDefuse(_bombManager.Holder);
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
@@ -165,14 +172,21 @@ public class BombInputConnector : MonoBehaviour
     /// <param name="direction">クリックされた方向</param>
     private void OnDirectionClicked(InputDirection direction)
     {
-        if (CpuSettings.IsCpuMode && _bombManager.Holder == BombManager.PlayerCount - 1)
+        if (!IsCpuHolding())
         {
-            return;
+            _bombManager.TryPress(_bombManager.Holder, direction, true);
         }
-
-        _bombManager.TryPress(_bombManager.Holder, direction, true);
 
         // クリックしたボタンが選択されたままだと、Enter でもう一度押されてしまう
         UiEventSystem.ClearSelection();
+    }
+
+    /// <summary>
+    /// CPU対戦で、COMが爆弾を持っているか。マウスはどちらが押したか分からないので、このときのクリックは無視する
+    /// </summary>
+    /// <returns>COMが持っているなら true</returns>
+    private bool IsCpuHolding()
+    {
+        return CpuSettings.IsCpuMode && _bombManager.Holder == BombManager.PlayerCount - 1;
     }
 }
